@@ -1,12 +1,12 @@
 <div class="sidebar">
-  <h4 class="text-center mb-4">☕ CoffeeWare</h4>
+  <h4 class="text-center mb-4">Dinsos - PM</h4>
 
   <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active fw-bold text-primary' : '' ?>">
     <i class="bi bi-speedometer2"></i> Dashboard
   </a>
 
-  <a href="users.php" class="<?= basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-people"></i> Users
+  <a href="rekap.php" class="<?= basename($_SERVER['PHP_SELF']) == 'rekap.php' ? 'active fw-bold text-primary' : '' ?>">
+    <i class="bi bi-people"></i> Rekapitulasi
   </a>
 
   <!-- Dropdown Menu -->
