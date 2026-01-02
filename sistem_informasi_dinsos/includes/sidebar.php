@@ -16,7 +16,7 @@
      role="button" 
      aria-expanded="false" 
      aria-controls="menuDropdown">
-    <span><i class="bi bi-cup-hot"></i> Menu</span>
+    <span><i class="bi bi-cup-hot"></i> Sekretariat</span>
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
