@@ -6,7 +6,7 @@
   </a>
 
   <a href="rekap.php" class="<?= basename($_SERVER['PHP_SELF']) == 'rekap.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-people"></i> Rekapitulasi
+    <i class="bi bi-pie-chart-fill"></i> Rekapitulasi
   </a>
 
   <!-- Dropdown Menu -->
