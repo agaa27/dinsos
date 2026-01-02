@@ -37,11 +37,11 @@ $bidangOpen = in_array($currentPage, [
      role="button"
      aria-expanded="<?= $menuOpen ? 'true' : 'false' ?>"
      aria-controls="menuDropdown">
-    <span><i class="bi bi-cup-hot"></i> Sekretariat</span>
+    <span><i class="bi bi-briefcase"></i> Sekretariat</span>
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
-  <div class="collapse submenu <?= $menuOpen ? 'show' : '' ?>" id="menuDropdown">
+  <div class="collapse submenu <?= $menuOpen ? 'show' : '' ?> ps-3" id="menuDropdown" style="font-size: 15px;">
     <a href="perencanaan.php"
        class="<?= ($currentPage === 'perencanaan.php' && $category === '') ? 'active fw-bold text-primary' : '' ?>">
       Keuangan dan Perencanaan
@@ -50,21 +50,6 @@ $bidangOpen = in_array($currentPage, [
     <a href="kepegawaian.php"
        class="<?= ($currentPage === 'kepegawaian.php') ? 'active fw-bold text-primary' : '' ?>">
       Umum dan kepegawaian
-    </a>
-
-    <a href="menus.php?category=non-coffee"
-       class="<?= ($currentPage === 'menus.php' && $category === 'non-coffee') ? 'active fw-bold text-primary' : '' ?>">
-      Non-Coffee
-    </a>
-
-    <a href="menus.php?category=main-course"
-       class="<?= ($currentPage === 'menus.php' && $category === 'main-course') ? 'active fw-bold text-primary' : '' ?>">
-      Main Course
-    </a>
-
-    <a href="menus.php?category=snack"
-       class="<?= ($currentPage === 'menus.php' && $category === 'snack') ? 'active fw-bold text-primary' : '' ?>">
-      Snacks
     </a>
   </div>
 
@@ -79,20 +64,20 @@ $bidangOpen = in_array($currentPage, [
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
-  <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>" id="bidangDropdown">
+  <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>ps-3" id="bidangDropdown" style="font-size: 15px;">
     <a href="seksi-rehabilitasi.php"
        class="<?= $currentPage === 'seksi-rehabilitasi.php' ? 'active fw-bold text-primary' : '' ?>">
-      Seksi Rehabilitasi Sosial
+       Seksi Rehabilitasi Sosial
     </a>
 
     <a href="seksi-jaminan.php"
        class="<?= $currentPage === 'seksi-jaminan.php' ? 'active fw-bold text-primary' : '' ?>">
-      Seksi Perlindungan & Jaminan Sosial
+       Seksi Perlindungan & Jaminan Sosial
     </a>
 
     <a href="seksi-pemberdayaan.php"
        class="<?= $currentPage === 'seksi-pemberdayaan.php' ? 'active fw-bold text-primary' : '' ?>">
-      Seksi Pemberdayaan Sosial
+       Seksi Pemberdayaan Sosial
     </a>
   </div>
 

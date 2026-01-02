@@ -137,12 +137,12 @@ if (isset($_POST['submit'])) {
         
         .login-logo {
             text-align: center;
-            margin-bottom: 40px;
+            /* margin-bottom: 40px; */
         }
         
         .login-logo img {
             height: 70px;
-            margin-bottom: 15px;
+            /* margin-bottom: 15px; */
         }
         
         .login-logo h2 {
@@ -260,10 +260,10 @@ if (isset($_POST['submit'])) {
         
         <!-- Bagian Kanan: Form Login -->
         <div class="login-right">
-            <div class="login-logo">
+            <div class="login-logo ">
                 <!-- Ganti dengan logo asli Kota Tarakan -->
-                <div style="background: #1e3c72; width: 70px; height: 70px; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-hands-helping" style="color: white; font-size: 32px;"></i>
+                <div style=" width: 70px; height: 70px; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                    <img src="assets/image/dinsos_logo.png" alt="">
                 </div>
                 <h2>DINSOS & PM</h2>
                 <p>Kota Tarakan</p>
