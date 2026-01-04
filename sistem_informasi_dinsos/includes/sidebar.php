@@ -6,14 +6,13 @@ $category    = $_GET['category'] ?? '';
 $menuOpen = in_array($currentPage, [
   'perencanaan.php',
   'kepegawaian.php',
-  'seksi-pemberdayaan.php'
 ]);
 
 // Dropdown Bidang / Seksi terbuka jika di halaman seksi
 $bidangOpen = in_array($currentPage, [
-  'seksi-rehabilitasi.php',
-  'seksi-jaminan.php',
-  'seksi-pemberdayaan.php'
+  'rehabilitasi.php',
+  'perlindungan.php',
+  'pemberdayaan.php'
 ]);
 ?>
 
@@ -41,7 +40,7 @@ $bidangOpen = in_array($currentPage, [
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
-  <div class="collapse submenu <?= $menuOpen ? 'show' : '' ?> ps-3" id="menuDropdown" style="font-size: 15px;">
+  <div class="collapse submenu <?= $menuOpen ? 'show' : '' ?>" id="menuDropdown">
     <a href="perencanaan.php"
        class="<?= ($currentPage === 'perencanaan.php' && $category === '') ? 'active fw-bold text-primary' : '' ?>">
       Keuangan dan Perencanaan
@@ -64,24 +63,24 @@ $bidangOpen = in_array($currentPage, [
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
-  <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>ps-3" id="bidangDropdown" style="font-size: 15px;">
-    <a href="seksi-rehabilitasi.php"
-       class="<?= $currentPage === 'seksi-rehabilitasi.php' ? 'active fw-bold text-primary' : '' ?>">
+  <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>" id="bidangDropdown">
+    <a href="rehabilitasi.php"
+       class="<?= $currentPage === 'rehabilitasi.php' ? 'active fw-bold text-primary' : '' ?>">
        Seksi Rehabilitasi Sosial
     </a>
 
-    <a href="seksi-jaminan.php"
-       class="<?= $currentPage === 'seksi-jaminan.php' ? 'active fw-bold text-primary' : '' ?>">
+    <a href="perlindungan.php"
+       class="<?= $currentPage === 'perlindungan.php' ? 'active fw-bold text-primary' : '' ?>">
        Seksi Perlindungan & Jaminan Sosial
     </a>
 
-    <a href="seksi-pemberdayaan.php"
-       class="<?= $currentPage === 'seksi-pemberdayaan.php' ? 'active fw-bold text-primary' : '' ?>">
+    <a href="pemberdayaan.php"
+       class="<?= $currentPage === 'pemberdayaan.php' ? 'active fw-bold text-primary' : '' ?>">
        Seksi Pemberdayaan Sosial
     </a>
   </div>
 
-  <a href="orders.php"
+  <!-- <a href="orders.php"
      class="<?= $currentPage === 'orders.php' ? 'active fw-bold text-primary' : '' ?>">
     <i class="bi bi-cart4"></i> Orders
   </a>
@@ -89,5 +88,5 @@ $bidangOpen = in_array($currentPage, [
   <a href="reports.php"
      class="<?= $currentPage === 'reports.php' ? 'active fw-bold text-primary' : '' ?>">
     <i class="bi bi-file-earmark-text"></i> Reports
-  </a>
+  </a> -->
 </div>

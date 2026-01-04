@@ -34,6 +34,10 @@
     .sidebar a:hover, .sidebar a.active {
       background-color: #343a40;
       color: #fff;
+    }    
+    .submenu a {
+      padding-left: 40px;
+      font-size: 14px;
     }
     .main-content {
       margin-left: 250px;
