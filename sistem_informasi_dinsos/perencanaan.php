@@ -1,11 +1,13 @@
 <?php
+$currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DINSOS-PM | Dashboard</title>
+  <title>DINSOS-PM | Perencanaan</title>
+
   <!-- Bootstrap 5 CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
@@ -34,10 +36,10 @@
     .sidebar a:hover, .sidebar a.active {
       background-color: #343a40;
       color: #fff;
-    }    
+    }
     .submenu a {
       padding-left: 40px;
-      font-size: 14px;
+      font-size: 13px;
     }
     .main-content {
       margin-left: 250px;
@@ -45,12 +47,11 @@
     .navbar {
       background-color: #fff;
       border-bottom: 1px solid #dee2e6;
-    }      
+    }
     .account-dropdown {
       position: relative;
       display: inline-block;
     }
-
     .account-dropdown .dropdown-content {
       display: none;
       position: absolute;
@@ -62,38 +63,17 @@
       border-radius: 10px;
       z-index: 10;
     }
-
-    .account-dropdown .dropdown-content p {
-      margin: 8px 0;
-      padding: 5px 10px;
-    }
-
-    .account-dropdown .dropdown-content a {
-      color: black;
-      text-decoration: none;
-    }
-
-    .account-dropdown .dropdown-content a:hover {
-      color: #007bff;
-    }
-
-    /* Saat ikon 👤 di-hover, tampilkan dropdown */
     .account-dropdown:hover .dropdown-content {
       display: block;
     }
-
-    /* Styling tambahan opsional */
     .account-btn {
       background: none;
       border: none;
       font-size: 1.5rem;
     }
-
-    .account-btn:hover {
-      cursor: pointer;
-    }
   </style>
 </head>
+
 <body>
 
 <!-- Sidebar -->
@@ -102,18 +82,18 @@
 <!-- Main Content -->
 <div class="main-content">
 
-  <!-- Navbar -->
+  <!-- Navbar (SAMA PERSIS DENGAN DASHBOARD) -->
   <nav class="navbar navbar-expand-lg navbar-light d-flex mt-0">
     <div class="container-fluid">
-      <h5 class="mb-0">Dashboard</h5>
-      <span class="date">
+      <h5 class="mb-0">Keuangan dan Perencanaan</h5>
+
+      <span class="date" id="currentDateTime">
         <i class="bi bi-clock"></i> Mon, 01 Jan 2025, 08.30 AM
       </span>
 
       <div class="d-flex align-items-center">
         <i class="bi bi-bell me-3 fs-5"></i>
 
-        <!-- Account Dropdown -->
         <div class="account-dropdown position-relative">
           <button class="btn account-btn d-flex align-items-center">
             <i class="bi bi-person-circle fs-4 me-2"></i>
@@ -124,204 +104,130 @@
             <p><strong>Administrator</strong></p>
             <p>admin@dinsos.go.id</p>
             <p>0856736263</p>
-            <p><a class="login-logout" href="#">Logout</a></p>
+            <p><a href="#">Logout</a></p>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Dashboard Cards -->
+  <!-- ISI HALAMAN -->
   <div class="container mt-2">
-    <div class="row g-3">
 
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6><i class="bi bi-cash-stack fs-4 mx-2"></i> Total income in a month</h6>
-            <h4 class="d-flex justify-content-end text-primary">Rp. 125.000.000</h4>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6><i class="bi bi-people fs-4 mx-2"></i> Total Users</h6>
-            <h3 class="d-flex justify-content-end">248</h3>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6><i class="bi bi-cart4 fs-4 mx-2"></i> Orders Today</h6>
-            <h3 class="d-flex justify-content-end">17</h3>
-            <small class="text-muted">+17 today</small>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Grafik (dummy canvas) -->
-  <div class="container mt-2">
-    <div class="row g-3">
-
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">
-            Produk Terlaris Bulan Ini
-          </div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">
-            Tren Penjualan Bulanan
-          </div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Table Preview -->
-  <div class="container mt-2">
     <div class="card shadow-sm border-0">
       <div class="card-header bg-white">
-        <h6 class="mb-0">Recent Orders</h6>
+        <h6 class="mb-0">
+          <i class="bi bi-clipboard-check me-2"></i>
+          Form Perencanaan Kegiatan
+        </h6>
       </div>
 
       <div class="card-body">
-        <table class="table table-hover table-borderless">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Customer</th>
-              <th>Program</th>
-              <th>Total</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Ahmad</td>
-              <td>Bantuan Sembako</td>
-              <td>Rp 500.000</td>
-              <td>2025-01-02</td>
-              <td>Selesai</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Siti</td>
-              <td>BLT Tahap II</td>
-              <td>Rp 1.000.000</td>
-              <td>2025-01-02</td>
-              <td>Proses</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Budi</td>
-              <td>Bantuan Pendidikan</td>
-              <td>Rp 750.000</td>
-              <td>2025-01-01</td>
-              <td>Menunggu</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+        <form method="POST">
 
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label class="form-label">Nama Kegiatan</label>
+              <input type="text" class="form-control" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Bidang / Seksi</label>
+              <select class="form-select" required>
+                <option value="">-- Pilih --</option>
+                <option>Seksi Rehabilitasi Sosial</option>
+                <option>Seksi Perlindungan & Jaminan Sosial</option>
+                <option>Seksi Pemberdayaan Sosial</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Deskripsi Kegiatan</label>
+              <textarea class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Bulan</label>
+              <select class="form-select">
+                <option>Januari</option>
+                <option>Februari</option>
+                <option>Maret</option>
+                <option>April</option>
+                <option>Mei</option>
+                <option>Juni</option>
+                <option>Juli</option>
+                <option>Agustus</option>
+                <option>September</option>
+                <option>Oktober</option>
+                <option>November</option>
+                <option>Desember</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Triwulan</label>
+              <select class="form-select">
+                <option>Triwulan I</option>
+                <option>Triwulan II</option>
+                <option>Triwulan III</option>
+                <option>Triwulan IV</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Anggaran (Rp)</label>
+  <input
+    type="number"
+    name="anggaran"
+    class="form-control"
+    placeholder="Contoh: 10000000"
+    required
+  >
 </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <div class="col-12 text-end mt-3">
+              <button class="btn btn-primary">
+                <i class="bi bi-save"></i> Simpan
+              </button>
+            </div>
 
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-      const label_jual = <?= json_encode($label_jual); ?>;
-      const dataValues = <?= json_encode($data_jual); ?>;
-      const productLabels = <?= json_encode($labels); ?>;
-      const productData   = <?= json_encode($data); ?>;
-  </script>
-  <script>
-  const ctx = document.getElementById('chartPenjualan').getContext('2d');
+document.addEventListener("DOMContentLoaded", function () {
 
-  new Chart(ctx, {
-      type: 'line',
-      data: {
-          labels: label_jual,
-          datasets: [{
-              label: 'Pendapatan',
-              data: dataValues,
-              borderWidth: 2,
-              tension: 0.4
-          }]
-      },
-      options: {
-          responsive: true,
-          scales: {
-              y: {
-                  beginAtZero: true,
-                  grid: {
-                      display: false   // ❌ matikan grid Y
-                  }
-              },
-              x: {
-                  grid: {
-                      display: false   // ❌ matikan grid X
-                  }
-              }
-          }
-      }
-  });
+  function updateDateTime() {
+    const el = document.getElementById("currentDateTime");
+    if (!el) return; // pengaman
 
+    const now = new Date();
+    const options = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
 
-  const ctx2 = document.getElementById('chartProduk').getContext('2d');
+    el.innerHTML = `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
+  }
 
-new Chart(ctx2, {
-    type: 'bar',
-    data: {
-        labels: productLabels,
-        datasets: [{
-            label: 'Jumlah Dipesan',
-            data: productData,
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { display: false }
-            },
-            x: {
-                grid: { display: false }
-            }
-        }
-    }
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
 });
-  </script>
+</script>
 </body>
 </html>

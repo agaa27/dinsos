@@ -37,7 +37,7 @@
     }
     .submenu a {
       padding-left: 40px;
-      font-size: 14px;
+      font-size: 13px;
     }
     .main-content {
       margin-left: 250px;
@@ -106,7 +106,7 @@
   <nav class="navbar navbar-expand-lg navbar-light d-flex mt-0">
     <div class="container-fluid">
       <h5 class="mb-0">Dashboard</h5>
-      <span class="date">
+      <span id="currentDateTime" class="date">
         <i class="bi bi-clock"></i> Mon, 01 Jan 2025, 08.30 AM
       </span>
 
@@ -323,5 +323,32 @@ new Chart(ctx2, {
     }
 });
   </script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  function updateDateTime() {
+    const el = document.getElementById("currentDateTime");
+    if (!el) return; // pengaman
+
+    const now = new Date();
+    const options = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+
+    el.innerHTML = `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
+  }
+
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
+});
+</script>
 </body>
 </html>
