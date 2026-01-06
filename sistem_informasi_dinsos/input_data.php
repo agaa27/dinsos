@@ -14,6 +14,7 @@ if (isset($_POST['submit'])){
           (sasaran_strategis, indikator_kinerja, satuan, target_tahunan, tahun, bidang)
           VALUES
           ('$sasaran','$indikator','$satuan','$target','$tahun','$bidang')";
+          
 
   if (mysqli_query($conn, $sql)) {
       echo "<script>
@@ -31,42 +32,15 @@ if (isset($_POST['submit'])){
 
 
 $sql = "
-    SELECT
-    i.sasaran_strategis,
-    i.indikator_kinerja AS indikator,
-    i.satuan,
-    i.target_tahunan AS target,
-    i.tahun,
-
-    rt.triwulan,
-    rt.realisasi,
-
-    -- Persentase capaian indikator
-    ROUND(
-        CASE 
-            WHEN i.target_tahunan > 0 
-            THEN (rt.realisasi / i.target_tahunan) * 100
-            ELSE 0
-        END
-    , 2) AS persentase,
-
-    rt.pagu_anggaran,
-    rt.realisasi_anggaran,
-
-    -- Persentase realisasi anggaran
-    ROUND(
-        CASE 
-            WHEN rt.pagu_anggaran > 0
-            THEN (rt.realisasi_anggaran / rt.pagu_anggaran) * 100
-            ELSE 0
-        END
-    , 2) AS persentase_anggaran
-
-    FROM indikator i
-    LEFT JOIN realisasi_triwulan rt 
-        ON rt.indikator_id = i.id
-    WHERE i.bidang = 'Perencanaan dan Keuangan'
-    ORDER BY i.created_at DESC;
+    SELECT 
+        id,
+        sasaran_strategis,
+        indikator_kinerja,
+        satuan,
+        target_tahunan AS target,
+        bidang
+    FROM indikator
+    ORDER BY created_at DESC
 ";
 
 $query = mysqli_query($conn, $sql);
@@ -204,18 +178,18 @@ while ($row = mysqli_fetch_assoc($query)) {
       </div>
     </div>
   </nav>
-
+    <div class="m-0 ms-3" style="margin-bottom: -20px;"><p>Kegiatan/Indikator Terakhir</p></div>    
   <!-- Table Preview -->
     <div class="container mt-4">          
           <div id="toolbar">
             <button id="btn-add" class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#tambahKegiatan">
-              <i class="bi bi-plus-lg"></i> Add New Order
+              <i class="bi bi-plus-lg"></i> Tambah Kegiatan/Indikator
             </button>
           </div>
 
-          <table class="table table-dark table-hover table-responsive small"
+          <table class="table table-light table-hover table-responsive small"
           data-toggle="table" 
           data-search="true" 
           data-pagination="true" 
@@ -224,34 +198,24 @@ while ($row = mysqli_fetch_assoc($query)) {
             <thead>
               <tr>
                 <th>#</th>
+                <th>ID</th>
                 <th>Sasaran Strategis</th>
                 <th>Indikator</th>
                 <th>Satuan</th>
-                <th>Target</th>               
-                <th>Realisasi</th>               
-                <th>Persentase</th>               
-                <th>Pagu Anggaran</th>               
-                <th>Realisasi Anggaran</th>               
-                <th>Persentase Anggaran</th>               
-                <th>TW</th>               
-                <th>Tahun</th>               
+                <th>Target</th>
+                <th>Bidang</th>                
               </tr>
             </thead>
             <tbody>
               <?php $no = 1; foreach($data as $n) : ?>
               <tr>
                 <td><?=  $no; ?></td>
+                <td><?= $n['id']; ?></td>
                 <td><?= $n['sasaran_strategis'];  ?></td>
-                <td><?= $n['indikator'];  ?></td>
+                <td><?= $n['indikator_kinerja'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
                 <td><?= $n['target'];  ?></td>
-                <td><?= $n['realisasi'];  ?></td>           
-                <td><?= $n['persentase'];  ?></td>          
-                <td><?= $n['pagu_anggaran'];  ?></td>           
-                <td><?= $n['realisasi_anggaran'];  ?></td>           
-                <td><?= $n['persentase_anggaran'];  ?></td>           
-                <td><?= $n['triwulan'];  ?></td>           
-                <td><?= $n['tahun'];  ?></td>           
+                <td><?= $n['bidang'];  ?></td>           
                 <?php $no++; ?>               
               </tr>
               <?php endforeach; ?>

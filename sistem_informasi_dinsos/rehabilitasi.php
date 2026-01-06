@@ -252,14 +252,13 @@
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     };
     document.getElementById('currentDateTime').innerHTML =
       `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
   }
   updateDateTime();
-  setInterval(updateDateTime, 1000);
+  setInterval(updateDateTime, 60*1000);
 </script>
 
 </body>
