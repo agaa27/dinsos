@@ -1,20 +1,98 @@
+<?php
+require 'config/database.php';
+session_start();
+
+if (isset($_POST['submit'])){  
+  $sasaran   = $_POST['sasaran_strategis'];
+  $indikator = $_POST['indikator_kinerja'];
+  $satuan    = $_POST['satuan'];
+  $target    = $_POST['target_tahunan'];
+  $tahun     = $_POST['tahun'];
+  $bidang    = $_POST['bidang'];
+
+  $sql = "INSERT INTO indikator
+          (sasaran_strategis, indikator_kinerja, satuan, target_tahunan, tahun, bidang)
+          VALUES
+          ('$sasaran','$indikator','$satuan','$target','$tahun','$bidang')";
+
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>
+            alert('data berhasil ditambah');
+        </script>";
+  } else {
+      echo "<script>
+            alert('data gagal ditambah: " . mysqli_error($conn) . "');
+        </script>";
+  }
+
+  header("Location: input_data.php");
+}
+
+
+
+$sql = "
+    SELECT
+    i.sasaran_strategis,
+    i.indikator_kinerja AS indikator,
+    i.satuan,
+    i.target_tahunan AS target,
+    i.tahun,
+
+    rt.triwulan,
+    rt.realisasi,
+
+    -- Persentase capaian indikator
+    ROUND(
+        CASE 
+            WHEN i.target_tahunan > 0 
+            THEN (rt.realisasi / i.target_tahunan) * 100
+            ELSE 0
+        END
+    , 2) AS persentase,
+
+    rt.pagu_anggaran,
+    rt.realisasi_anggaran,
+
+    -- Persentase realisasi anggaran
+    ROUND(
+        CASE 
+            WHEN rt.pagu_anggaran > 0
+            THEN (rt.realisasi_anggaran / rt.pagu_anggaran) * 100
+            ELSE 0
+        END
+    , 2) AS persentase_anggaran
+
+    FROM indikator i
+    LEFT JOIN realisasi_triwulan rt 
+        ON rt.indikator_id = i.id
+    WHERE i.bidang = 'Perencanaan dan Keuangan'
+    ORDER BY i.created_at DESC;
+";
+
+$query = mysqli_query($conn, $sql);
+
+$data = [];
+while ($row = mysqli_fetch_assoc($query)) {
+    $data[] = $row;
+}
+
+?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DINSOS-PM | Rekapitulasi Bantuan Sosial</title>
+  <title>DINSOS-PM | Perencanaan</title>
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+
 
   <style>
-    body { background-color: #f8f9fa; }
-    .main-content { margin-left: 250px; }
-    .navbar { background-color: #fff; border-bottom: 1px solid #dee2e6; }
-    .card-summary h4 { font-weight: bold; }
+    body {
+      background-color: #f8f9fa;
+    }
     .sidebar {
       width: 250px;
       height: 100vh;
@@ -46,15 +124,10 @@
       background-color: #fff;
       border-bottom: 1px solid #dee2e6;
     }
-    .navbar {
-      background-color: #fff;
-      border-bottom: 1px solid #dee2e6;
-    }      
     .account-dropdown {
       position: relative;
       display: inline-block;
     }
-
     .account-dropdown .dropdown-content {
       display: none;
       position: absolute;
@@ -66,37 +139,14 @@
       border-radius: 10px;
       z-index: 10;
     }
-
-    .account-dropdown .dropdown-content p {
-      margin: 8px 0;
-      padding: 5px 10px;
-    }
-
-    .account-dropdown .dropdown-content a {
-      color: black;
-      text-decoration: none;
-    }
-
-    .account-dropdown .dropdown-content a:hover {
-      color: #007bff;
-    }
-
-    /* Saat ikon 👤 di-hover, tampilkan dropdown */
     .account-dropdown:hover .dropdown-content {
       display: block;
     }
-
-    /* Styling tambahan opsional */
     .account-btn {
       background: none;
       border: none;
       font-size: 1.5rem;
     }
-
-    .account-btn:hover {
-      cursor: pointer;
-    }     
-
   </style>
 </head>
 
@@ -105,21 +155,40 @@
 <!-- Sidebar -->
 <?php include "includes/sidebar.php"; ?>
 
+<!-- Main Content -->
 <div class="main-content">
 
+    <?php if (isset($_SESSION['success'])): ?>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i>
+        <?= $_SESSION['success']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <?php unset($_SESSION['success']); endif; ?>
+
+      <?php if (isset($_SESSION['error'])): ?>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        <?= $_SESSION['error']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <?php unset($_SESSION['error']); endif; ?>
+
+
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light d-flex mt-0">
+  <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-      <h5 class="mb-0">Rekapitulasi</h5>
-      <span class="date">
-        <i class="bi bi-clock"></i> Mon, 01 Jan 2025, 08.30 AM
+      <h5 class="mb-0">Perencanaan</h5>
+
+      <!-- Realtime Clock -->
+      <span class="date" id="currentDateTime">
+        <i class="bi bi-clock"></i> --
       </span>
 
       <div class="d-flex align-items-center">
         <i class="bi bi-bell me-3 fs-5"></i>
 
-        <!-- Account Dropdown -->
-        <div class="account-dropdown position-relative">
+        <div class="account-dropdown">
           <button class="btn account-btn d-flex align-items-center">
             <i class="bi bi-person-circle fs-4 me-2"></i>
             <h6 class="mb-0">Hello, Administrator</h6>
@@ -129,169 +198,162 @@
             <p><strong>Administrator</strong></p>
             <p>admin@dinsos.go.id</p>
             <p>0856736263</p>
-            <p><a class="login-logout" href="#">Logout</a></p>
+            <p><a href="#">Logout</a></p>
           </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- FILTER -->
-  <div class="container mt-3">
-    <div class="card shadow-sm border-0">
-      <div class="card-body">
-        <form class="row g-3">
+  <!-- Table Preview -->
+    <div class="container mt-4">          
+         
+          <table class="table table-dark table-hover table-responsive small"
+          data-toggle="table" 
+          data-search="true" 
+          data-pagination="true" 
+          data-toolbar="#toolbar"
+          style="background-color: #343a40;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sasaran Strategis</th>
+                <th>Indikator</th>
+                <th>Satuan</th>
+                <th>Target</th>               
+                <th>Realisasi</th>               
+                <th>Persentase</th>               
+                <th>Pagu Anggaran</th>               
+                <th>Realisasi Anggaran</th>               
+                <th>Persentase Anggaran</th>               
+                <th>TW</th>               
+                <th>Tahun</th>               
+              </tr>
+            </thead>
+            <tbody>
+              <?php $no = 1; foreach($data as $n) : ?>
+              <tr>
+                <td><?=  $no; ?></td>
+                <td><?= $n['sasaran_strategis'];  ?></td>
+                <td><?= $n['indikator'];  ?></td>
+                <td><?= $n['satuan'];  ?></td>
+                <td><?= $n['target'];  ?></td>
+                <td><?= $n['realisasi'];  ?></td>           
+                <td><?= $n['persentase'];  ?></td>          
+                <td><?= $n['pagu_anggaran'];  ?></td>           
+                <td><?= $n['realisasi_anggaran'];  ?></td>           
+                <td><?= $n['persentase_anggaran'];  ?></td>           
+                <td><?= $n['triwulan'];  ?></td>           
+                <td><?= $n['tahun'];  ?></td>           
+                <?php $no++; ?>               
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- end main-content -->
 
-          <div class="col-md-3">
-            <label class="form-label">Periode Awal</label>
-            <input type="date" class="form-control">
+
+<div class="modal fade" id="tambahKegiatan" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Indikator Kinerja</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <form action="" method="POST">
+        <div class="modal-body">
+
+          <!-- Sasaran Strategis -->
+          <div class="mb-3">
+            <label class="form-label">Sasaran Strategis</label>
+            <textarea name="sasaran_strategis" class="form-control" rows="2" required></textarea>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Periode Akhir</label>
-            <input type="date" class="form-control">
+          <!-- Indikator Kinerja -->
+          <div class="mb-3">
+            <label class="form-label">Indikator Kinerja</label>
+            <textarea name="indikator_kinerja" class="form-control" rows="2" required></textarea>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Program Bantuan</label>
-            <select class="form-select">
-              <option>Semua Program</option>
-              <option>Bantuan Sembako</option>
-              <option>BLT</option>
-              <option>Bantuan Pendidikan</option>
+          <div class="row">
+            <!-- Satuan -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Satuan</label>
+              <input type="text" name="satuan" class="form-control" placeholder="%, Orang, Lembaga" required>
+            </div>
+
+            <!-- Target Tahunan -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Target Tahunan</label>
+              <input type="number" step="0.01" name="target_tahunan" class="form-control" required>
+            </div>
+
+            <!-- Tahun -->
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Tahun</label>
+              <input type="number" name="tahun" class="form-control" value="2024" required>
+            </div>
+          </div>
+
+          <!-- Bidang -->
+          <div class="mb-3">
+            <label class="form-label">Bidang</label>
+            <select name="bidang" class="form-select" required>
+              <option value="">-- Pilih Bidang --</option>
+              <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
+              <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
+              <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+              <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
+              <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select class="form-select">
-              <option>Semua Status</option>
-              <option>Disetujui</option>
-              <option>Diproses</option>
-              <option>Ditolak</option>
-            </select>
-          </div>
-
-          <div class="col-md-12 d-flex justify-content-end gap-2">
-            <button class="btn btn-primary">
-              <i class="bi bi-filter"></i> Tampilkan
-            </button>
-            <button class="btn btn-success">
-              <i class="bi bi-file-earmark-excel"></i> Export Excel
-            </button>
-            <button class="btn btn-danger">
-              <i class="bi bi-file-earmark-pdf"></i> Export PDF
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUMMARY REKAP -->
-  <div class="container mt-3">
-    <div class="row g-3">
-
-      <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
-          <div class="card-body">
-            <small>Total Pengajuan</small>
-            <h4 class="text-primary">1.245</h4>
-            <small class="text-muted">Data dummy</small>
-          </div>
         </div>
-      </div>
 
-      <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
-          <div class="card-body">
-            <small>Disetujui</small>
-            <h4 class="text-success">980</h4>
-            <small class="text-muted">Data dummy</small>
-          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" name="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Simpan
+          </button>
         </div>
-      </div>
 
-      <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
-          <div class="card-body">
-            <small>Diproses</small>
-            <h4 class="text-warning">185</h4>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
-          <div class="card-body">
-            <small>Ditolak</small>
-            <h4 class="text-danger">80</h4>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
+      </form>
 
     </div>
   </div>
-
-  <!-- TABEL REKAP -->
-  <div class="container mt-3 mb-4">
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-white">
-        <h6 class="mb-0">Tabel Rekapitulasi Bantuan Sosial</h6>
-      </div>
-
-      <div class="card-body table-responsive">
-        <table class="table table-bordered table-striped align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Nama Penerima</th>
-              <th>Program</th>
-              <th>Wilayah</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-              <th>Nominal</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Ahmad</td>
-              <td>Bantuan Sembako</td>
-              <td>Kecamatan A</td>
-              <td>2025-01-02</td>
-              <td><span class="badge bg-success">Disetujui</span></td>
-              <td>Rp 500.000</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Siti</td>
-              <td>BLT</td>
-              <td>Kecamatan B</td>
-              <td>2025-01-02</td>
-              <td><span class="badge bg-warning">Diproses</span></td>
-              <td>Rp 1.000.000</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Budi</td>
-              <td>Bantuan Pendidikan</td>
-              <td>Kecamatan C</td>
-              <td>2025-01-01</td>
-              <td><span class="badge bg-danger">Ditolak</span></td>
-              <td>Rp 750.000</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+
+<!-- Realtime Clock Script -->
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    const options = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    };
+    document.getElementById('currentDateTime').innerHTML =
+      `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
+
 </body>
 </html>

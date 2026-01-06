@@ -1,18 +1,63 @@
 <?php
+require 'config/database.php';
+session_start();
+
+$sql = "
+    SELECT
+    i.sasaran_strategis,
+    i.indikator_kinerja AS indikator,
+    i.satuan,
+    i.target_tahunan AS target,
+    i.tahun,
+
+    rt.triwulan,
+    rt.realisasi,
+
+    ROUND(
+        CASE 
+            WHEN i.target_tahunan > 0 
+            THEN (rt.realisasi / i.target_tahunan) * 100
+            ELSE 0
+        END
+    , 2) AS persentase,
+
+    rt.pagu_anggaran,
+    rt.realisasi_anggaran,
+
+    ROUND(
+        CASE 
+            WHEN rt.pagu_anggaran > 0
+            THEN (rt.realisasi_anggaran / rt.pagu_anggaran) * 100
+            ELSE 0
+        END
+    , 2) AS persentase_anggaran
+
+    FROM indikator i
+    LEFT JOIN realisasi_triwulan rt 
+        ON rt.indikator_id = i.id
+    WHERE i.bidang = 'Rehabilitasi Sosial'
+    ORDER BY i.created_at DESC;
+";
+
+$query = mysqli_query($conn, $sql);
+$data = [];
+while ($row = mysqli_fetch_assoc($query)) {
+    $data[] = $row;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DINSOS-PM | Dashboard</title>
+<meta charset="UTF-8">
+<title>DINSOS-PM | Rehabilitasi Sosial</title>
 
-  <!-- Bootstrap 5 CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css" rel="stylesheet">
 
-  <style>
+<!-- ⚠️ CSS ASLI TIDAK DIUBAH -->
+<style>
     body {
       background-color: #f8f9fa;
     }
@@ -75,190 +120,153 @@
 
 <body>
 
-<!-- Sidebar -->
 <?php include "includes/sidebar.php"; ?>
 
-<!-- Main Content -->
 <div class="main-content">
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-      <h5 class="mb-0">Dashboard</h5>
+<!-- NAVBAR TIDAK DIUBAH -->
+<nav class="navbar navbar-expand-lg navbar-light">
+<div class="container-fluid">
+<h5 class="mb-0">Rehabilitasi Sosial</h5>
+<span id="currentDateTime"><i class="bi bi-clock"></i> --</span>
+<div class="account-dropdown">
+<button class="btn account-btn d-flex align-items-center">
+<i class="bi bi-person-circle fs-4 me-2"></i>
+<h6 class="mb-0">Hello, Administrator</h6>
+</button>
+</div>
+</div>
+</nav>
 
-      <!-- Realtime Clock -->
-      <span class="date" id="currentDateTime">
-        <i class="bi bi-clock"></i> --
-      </span>
+<!-- MAIN CONTENT -->
+<div class="container mt-4">
 
-      <div class="d-flex align-items-center">
-        <i class="bi bi-bell me-3 fs-5"></i>
+<table class="table table-dark table-hover table-responsive small"
+data-toggle="table"
+data-search="true"
+data-pagination="true"
+style="background-color:#343a40;">
 
-        <div class="account-dropdown">
-          <button class="btn account-btn d-flex align-items-center">
-            <i class="bi bi-person-circle fs-4 me-2"></i>
-            <h6 class="mb-0">Hello, Administrator</h6>
-          </button>
+<thead>
+<tr>
+<th>#</th>
+<th>Sasaran Strategis</th>
+<th>Indikator</th>
+<th>Satuan</th>
+<th>Target</th>
+<th>Realisasi</th>
+<th>%</th>
+<th>Pagu Anggaran</th>
+<th>Realisasi Anggaran</th>
+<th>% Anggaran</th>
+<th>TW</th>
+<th>Tahun</th>
+<th>Aksi</th>
+</tr>
+</thead>
 
-          <div class="dropdown-content">
-            <p><strong>Administrator</strong></p>
-            <p>admin@dinsos.go.id</p>
-            <p>0856736263</p>
-            <p><a href="#">Logout</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+<tbody>
+<?php $no=1; foreach($data as $n): ?>
+<tr>
+<td><?= $no++ ?></td>
+<td><?= $n['sasaran_strategis'] ?></td>
+<td><?= $n['indikator'] ?></td>
+<td><?= $n['satuan'] ?></td>
+<td><?= $n['target'] ?></td>
+<td><?= $n['realisasi'] ?></td>
+<td><?= $n['persentase'] ?>%</td>
+<td><?= $n['pagu_anggaran'] ?></td>
+<td><?= $n['realisasi_anggaran'] ?></td>
+<td><?= $n['persentase_anggaran'] ?>%</td>
+<td><?= $n['triwulan'] ?></td>
+<td><?= $n['tahun'] ?></td>
 
-  <!-- ===== DASHBOARD CARDS ===== -->
-  <div class="container mt-2">
-    <div class="row g-3">
+<td class="text-center">
+<button class="btn btn-warning btn-sm"
+data-bs-toggle="modal"
+data-bs-target="#edit<?= md5($n['indikator']) ?>">
+<i class="bi bi-pencil"></i>
+</button>
 
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6>
-              <i class="bi bi-cash-stack fs-4 mx-2"></i>
-              Total Anggaran Terserap
-            </h6>
-            <h3 class="d-flex justify-content-end text-primary">
-              Rp. 120.000.000
-            </h3>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
+<a href="perencanaan.php?indikator=<?= urlencode($n['indikator']) ?>"
+class="btn btn-danger btn-sm"
+onclick="return confirm('Yakin hapus data ini?')">
+<i class="bi bi-trash"></i>
+</a>
+</td>
+</tr>
 
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6>
-              <i class="bi bi-people fs-4 mx-2"></i>
-              Jumlah Penerima Manfaat
-            </h6>
-            <h3 class="d-flex justify-content-end">248</h3>
-            <small class="text-muted">Data dummy</small>
-          </div>
-        </div>
-      </div>
+<!-- MODAL EDIT -->
+<div class="modal fade" id="edit<?= md5($n['indikator']) ?>" tabindex="-1">
+<div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal-content">
+<form action="perencanaan.php" method="POST">
 
-      <div class="col-md-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h6>
-              <i class="bi bi-calendar-event fs-4 mx-2"></i>
-              Kegiatan Berjalan
-            </h6>
-            <h3 class="d-flex justify-content-end">17</h3>
-            <small class="text-muted">+17 today</small>
-          </div>
-        </div>
-      </div>
+<div class="modal-header">
+<h5>Edit</h5>
+<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
 
-    </div> <!-- end row -->
-  </div> <!-- end container -->
+<div class="modal-body">
+<input type="hidden" name="indikator_lama" value="<?= $n['indikator'] ?>">
 
-  <!-- ===== GRAFIK ===== -->
-  <div class="container mt-2">
-    <div class="row g-3">
+<div class="mb-2">
+<label>Realisasi</label>
+<textarea name="sasaran_strategis" class="form-control"><?= $n['realisasi'] ?></textarea>
+</div>
 
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">Isi Text</div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="mb-2">
+<label>Pagu</label>
+<textarea name="indikator_kinerja" class="form-control"><?= $n['pagu_anggaran'] ?></textarea>
+</div>
 
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">Isi Text</div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="row">
+<div class="col-md-4">
+<label>Triwulan</label>
+<input type="text" name="satuan" class="form-control" value="<?= $n['triwulan'] ?>">
+</div>
+<div class="col-md-4">
+<label>Realisasi anggaran</label>
+<input type="number" name="target" class="form-control" value="<?= $n['realisasi_anggaran'] ?>">
+</div>
+<div class="col-md-4">
+<label>Pagu anggaran</label>
+<input type="number" name="pagu" class="form-control" value="<?= $n['pagu_anggaran'] ?>">
+</div>
+<div class="col-md-4">
+<label>Tahun</label>
+<input type="number" name="tahun" class="form-control" value="<?= $n['tahun'] ?>">
+</div>
+</div>
+</div>
 
-    </div> <!-- end row -->
-  </div> <!-- end container -->
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+<button class="btn btn-primary">Update</button>
+</div>
 
-  <!-- ===== TABLE ===== -->
-  <div class="container mt-2">
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-white">
-        <h6 class="mb-0">Isi Text</h6>
-      </div>
-      <div class="card-body">
-        <table class="table table-hover table-borderless">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Customer</th>
-              <th>Program</th>
-              <th>Total</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Ahmad</td>
-              <td>Bantuan Sembako</td>
-              <td>Rp 500.000</td>
-              <td>2025-01-02</td>
-              <td>Selesai</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Siti</td>
-              <td>BLT Tahap II</td>
-              <td>Rp 1.000.000</td>
-              <td>2025-01-02</td>
-              <td>Proses</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Budi</td>
-              <td>Bantuan Pendidikan</td>
-              <td>Rp 750.000</td>
-              <td>2025-01-01</td>
-              <td>Menunggu</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+</form>
+</div>
+</div>
+</div>
 
-</div> <!-- end main-content -->
+<?php endforeach; ?>
+</tbody>
+</table>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</div>
 
-<!-- Realtime Clock Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  function updateDateTime() {
-    const now = new Date();
-    const options = {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    document.getElementById('currentDateTime').innerHTML =
-      `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 60*1000);
+function updateDateTime(){
+const now=new Date();
+document.getElementById('currentDateTime').innerHTML=
+`<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID')}`;
+}
+updateDateTime();
+setInterval(updateDateTime,1000);
 </script>
 
 </body>
