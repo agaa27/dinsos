@@ -2,17 +2,50 @@
 require 'config/database.php';
 session_start();
 
+if (isset($_POST['submit'])){  
+  $sasaran   = $_POST['sasaran_strategis'];
+  $indikator = $_POST['indikator_kinerja'];
+  $satuan    = $_POST['satuan'];
+  $target    = $_POST['target_tahunan'];
+  $tahun     = $_POST['tahun'];
+  $bidang    = $_POST['bidang'];
+
+  $sql = "INSERT INTO indikator
+          (sasaran_strategis, indikator_kinerja, satuan, target_tahunan, tahun, bidang)
+          VALUES
+          ('$sasaran','$indikator','$satuan','$target','$tahun','$bidang')";
+
+  if (mysqli_query($conn, $sql)) {
+      echo "<script>
+            alert('data berhasil ditambah');
+        </script>";
+  } else {
+      echo "<script>
+            alert('data gagal ditambah: " . mysqli_error($conn) . "');
+        </script>";
+  }
+
+  header("Location: input_data.php");
+}
+
+
+
 $sql = "
     SELECT
+    i.id as indikator_id,
     i.sasaran_strategis,
     i.indikator_kinerja AS indikator,
     i.satuan,
+    i.program,
     i.target_tahunan AS target,
     i.tahun,
 
+
+    rt.id as rt_id,
     rt.triwulan,
     rt.realisasi,
 
+    -- Persentase capaian indikator
     ROUND(
         CASE 
             WHEN i.target_tahunan > 0 
@@ -24,6 +57,7 @@ $sql = "
     rt.pagu_anggaran,
     rt.realisasi_anggaran,
 
+    -- Persentase realisasi anggaran
     ROUND(
         CASE 
             WHEN rt.pagu_anggaran > 0
@@ -40,24 +74,102 @@ $sql = "
 ";
 
 $query = mysqli_query($conn, $sql);
+
 $data = [];
 while ($row = mysqli_fetch_assoc($query)) {
     $data[] = $row;
 }
-?>
 
+
+if (isset($_POST['update'])) {
+
+
+    $indikator_id       = $_POST['indikator_id'];
+    $triwulan           = $_POST['triwulan'];
+    $realisasi          = $_POST['realisasi'];
+    $pagu_anggaran      = $_POST['pagu_anggaran'];
+    $realisasi_anggaran = $_POST['realisasi_anggaran'];
+
+    /* CEK: data triwulan sudah ada atau belum */
+    $cek = $conn->prepare("
+        SELECT id
+        FROM realisasi_triwulan
+        WHERE indikator_id = ?
+          AND triwulan = ?
+    ");
+    $cek->bind_param("ii", $indikator_id, $triwulan);
+    $cek->execute();
+    $cek->store_result();
+
+    if ($cek->num_rows > 0) {
+
+        // UPDATE
+        $sql = "
+            UPDATE realisasi_triwulan
+            SET
+                realisasi = ?,
+                pagu_anggaran = ?,
+                realisasi_anggaran = ?
+            WHERE indikator_id = ?
+              AND triwulan = ?
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(
+            "dddii",
+            $realisasi,
+            $pagu_anggaran,
+            $realisasi_anggaran,
+            $indikator_id,
+            $triwulan
+        );
+
+    } else {
+
+        // INSERT
+        $sql = "
+            INSERT INTO realisasi_triwulan
+            (id,indikator_id, triwulan, realisasi, pagu_anggaran, realisasi_anggaran)
+            VALUES ('', ?, ?, ?, ?, ?)
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(
+            "iiddd",
+            $indikator_id,
+            $triwulan,
+            $realisasi,
+            $pagu_anggaran,
+            $realisasi_anggaran
+        );
+
+    }
+
+    $stmt->execute();
+    echo "<script>
+                alert('Order berhasil diperbarui!');
+                window.location.href = 'perencanaan.php';
+              </script>";
+
+  }
+        
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>DINSOS-PM | Keuangan dan Perencanaan</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DINSOS-PM | Dashboard</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
 
-<!-- ⚠️ CSS ASLI TIDAK DIUBAH -->
-<style>
+
+  <style>
     body {
       background-color: #f8f9fa;
     }
@@ -120,153 +232,262 @@ while ($row = mysqli_fetch_assoc($query)) {
 
 <body>
 
+<!-- Sidebar -->
 <?php include "includes/sidebar.php"; ?>
 
+<!-- Main Content -->
 <div class="main-content">
 
-<!-- NAVBAR TIDAK DIUBAH -->
-<nav class="navbar navbar-expand-lg navbar-light">
-<div class="container-fluid">
-<h5 class="mb-0">Keuangan dan Perencanaan</h5>
-<span id="currentDateTime"><i class="bi bi-clock"></i> --</span>
-<div class="account-dropdown">
-<button class="btn account-btn d-flex align-items-center">
-<i class="bi bi-person-circle fs-4 me-2"></i>
-<h6 class="mb-0">Hello, Administrator</h6>
-</button>
-</div>
-</div>
-</nav>
+    <?php if (isset($_SESSION['success'])): ?>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i>
+        <?= $_SESSION['success']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <?php unset($_SESSION['success']); endif; ?>
 
-<!-- MAIN CONTENT -->
-<div class="container mt-4">
+      <?php if (isset($_SESSION['error'])): ?>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        <?= $_SESSION['error']; ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <?php unset($_SESSION['error']); endif; ?>
 
-<table class="table table-dark table-hover table-responsive small"
-data-toggle="table"
-data-search="true"
-data-pagination="true"
-style="background-color:#343a40;">
 
-<thead>
-<tr>
-<th>#</th>
-<th>Sasaran Strategis</th>
-<th>Indikator</th>
-<th>Satuan</th>
-<th>Target</th>
-<th>Realisasi</th>
-<th>%</th>
-<th>Pagu Anggaran</th>
-<th>Realisasi Anggaran</th>
-<th>% Anggaran</th>
-<th>TW</th>
-<th>Tahun</th>
-<th>Aksi</th>
-</tr>
-</thead>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+      <h5 class="mb-0">Dashboard</h5>
 
-<tbody>
-<?php $no=1; foreach($data as $n): ?>
-<tr>
-<td><?= $no++ ?></td>
-<td><?= $n['sasaran_strategis'] ?></td>
-<td><?= $n['indikator'] ?></td>
-<td><?= $n['satuan'] ?></td>
-<td><?= $n['target'] ?></td>
-<td><?= $n['realisasi'] ?></td>
-<td><?= $n['persentase'] ?>%</td>
-<td><?= $n['pagu_anggaran'] ?></td>
-<td><?= $n['realisasi_anggaran'] ?></td>
-<td><?= $n['persentase_anggaran'] ?>%</td>
-<td><?= $n['triwulan'] ?></td>
-<td><?= $n['tahun'] ?></td>
+      <!-- Realtime Clock -->
+      <span class="date" id="currentDateTime">
+        <i class="bi bi-clock"></i> --
+      </span>
 
-<td class="text-center">
-<button class="btn btn-warning btn-sm"
-data-bs-toggle="modal"
-data-bs-target="#edit<?= md5($n['indikator']) ?>">
-<i class="bi bi-pencil"></i>
-</button>
+      <div class="d-flex align-items-center">
+        <i class="bi bi-bell me-3 fs-5"></i>
 
-<a href="perencanaan.php?indikator=<?= urlencode($n['indikator']) ?>"
-class="btn btn-danger btn-sm"
-onclick="return confirm('Yakin hapus data ini?')">
-<i class="bi bi-trash"></i>
-</a>
-</td>
-</tr>
+        <div class="account-dropdown">
+          <button class="btn account-btn d-flex align-items-center">
+            <i class="bi bi-person-circle fs-4 me-2"></i>
+            <h6 class="mb-0">Hello, Administrator</h6>
+          </button>
 
-<!-- MODAL EDIT -->
-<div class="modal fade" id="edit<?= md5($n['indikator']) ?>" tabindex="-1">
-<div class="modal-dialog modal-lg modal-dialog-centered">
-<div class="modal-content">
-<form action="perencanaan.php" method="POST">
+          <div class="dropdown-content">
+            <p><strong>Administrator</strong></p>
+            <p>admin@dinsos.go.id</p>
+            <p>0856736263</p>
+            <p><a href="#">Logout</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-<div class="modal-header">
-<h5>Edit</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-</div>
+  <!-- Table Preview -->
+    <div class="container mt-4">          
+          <div id="toolbar" class="mb-2 d-flex gap-2">
+            <select id="filterTahun" class="form-select form-select-sm w-auto">
+              <option value="">Semua Tahun</option>
+                <?php
+                $tahunUnik = array_unique(array_column($data, 'tahun'));
+                foreach ($tahunUnik as $tahun):
+                ?>
+                  <option value="<?= $tahun ?>"><?= $tahun ?></option>
+                <?php endforeach ?>
+            </select>
 
-<div class="modal-body">
-<input type="hidden" name="indikator_lama" value="<?= $n['indikator'] ?>">
+            <select id="filterTW" class="form-select form-select-sm w-auto">
+              <option value="">Semua TW</option>
+              <option value="1">TW I</option>
+              <option value="2">TW II</option>
+              <option value="3">TW III</option>
+              <option value="4">TW IV</option>
+            </select>
+          </div>
 
-<div class="mb-2">
-<label>Realisasi</label>
-<textarea name="sasaran_strategis" class="form-control"><?= $n['realisasi'] ?></textarea>
-</div>
+          <table class="table table-dark table-hover table-responsive small"
+          data-toggle="table" 
+          data-search="true" 
+          data-pagination="true" 
+          data-toolbar="#toolbar"
+          style="background-color: #343a40;">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th data-field="sasaran_strategis">Sasaran Strategis</th>
+                <th data-field="indikator_kinerja">Indikator</th>
+                <th data-field="program">Program</th>
+                <th data-field="satuan">Satuan</th>
+                <th data-field="target">Target TW</th>
+                <th data-field="realisasi">Realisasi</th>
+                <th data-field="persentase">%</th>
+                <th data-field="pagu_anggaran">Pagu</th>
+                <th data-field="realisasi_anggaran">Realisasi Anggaran</th>
+                <th data-field="persentase_anggaran">% Anggaran</th>
+                <th data-field="triwulan">TW</th>
+                <th data-field="tahun">Tahun</th>
+                <th>aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php $no = 1; foreach($data as $n) : ?>
+              <tr>
+                <td><?=  $no; ?></td>
+                <td><?= $n['sasaran_strategis'];  ?></td>
+                <td><?= $n['indikator'];  ?></td>
+                <td><?= $n['program'];  ?></td>
+                <td><?= $n['satuan'];  ?></td>
+                <td><?= $n['target'];  ?></td>
+                <td><?= $n['realisasi'];  ?></td>           
+                <td><?= $n['persentase'];  ?></td>          
+                <td><?= $n['pagu_anggaran'];  ?></td>           
+                <td><?= $n['realisasi_anggaran'];  ?></td>           
+                <td><?= $n['persentase_anggaran'];  ?></td> 
+                <td><?= $n['triwulan'];  ?></td> 
+                <td><?= $n['tahun'];  ?></td> 
+                <td>
+                 <!-- Tombol Edit -->
+                <button 
+                  class="btn btn-warning btn-sm tombolEdit"
+                  data-id="<?= $n['indikator_id']; ?>"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalEdit">
+                  <i class="bi bi-pencil"></i>
+                </button>
 
-<div class="mb-2">
-<label>Pagu</label>
-<textarea name="indikator_kinerja" class="form-control"><?= $n['pagu_anggaran'] ?></textarea>
-</div>
 
-<div class="row">
-<div class="col-md-4">
-<label>Triwulan</label>
-<input type="text" name="satuan" class="form-control" value="<?= $n['triwulan'] ?>">
-</div>
-<div class="col-md-4">
-<label>Realisasi anggaran</label>
-<input type="number" name="target" class="form-control" value="<?= $n['realisasi_anggaran'] ?>">
-</div>
-<div class="col-md-4">
-<label>Pagu anggaran</label>
-<input type="number" name="pagu" class="form-control" value="<?= $n['pagu_anggaran'] ?>">
-</div>
-<div class="col-md-4">
-<label>Tahun</label>
-<input type="number" name="tahun" class="form-control" value="<?= $n['tahun'] ?>">
-</div>
-</div>
-</div>
+                <a href="hapusData.php?id=<?= $n['indikator_id']; ?>" class="btn btn-danger btn-sm rounded-5" onclick="return confirm('Yakin hapus order ini?')"><i class="bi bi-trash"></i></a>
+                </td>        
+                <?php $no++; ?>               
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- end main-content -->
 
-<div class="modal-footer">
-<button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-<button class="btn btn-primary">Update</button>
-</div>
 
-</form>
-</div>
-</div>
-</div>
 
-<?php endforeach; ?>
-</tbody>
-</table>
+<div class="modal fade" id="modalEdit" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5>Edit Data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+                    <!-- modal edit -->
+          <form method="post" action="">
 
-</div>
-</div>
+            <!-- HIDDEN -->
+            <input type="hidden" name="indikator_id" id="indikator_id">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- VISIBLE -->
+            <div class="mb-2">
+            <label>Realisasi</label>
+            <textarea name="realisasi" class="form-control" id="realisasi"></textarea>
+            </div>
 
+            <div class="row">
+            <div class="col-md-4">
+            <label>Triwulan</label>
+            <input type="text" name="triwulan" class="form-control">
+            </div>
+            <div class="col-md-4">
+            <label>Realisasi anggaran</label>
+            <input type="realisasi_anggaran" name="realisasi_anggaran" class="form-control">
+            </div>
+            <div class="col-md-4">
+            <label>Pagu anggaran</label>
+            <input type="number" name="pagu_anggaran" class="form-control">
+            </div>
+            
+            <button type="submit" name="update" class="btn btn-primary mt-3">
+              Update
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+
+<!-- Realtime Clock Script -->
 <script>
-function updateDateTime(){
-const now=new Date();
-document.getElementById('currentDateTime').innerHTML=
-`<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID')}`;
-}
-updateDateTime();
-setInterval(updateDateTime,1000);
+  function updateDateTime() {
+    const now = new Date();
+    const options = {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      // second: '2-digit'
+    };
+    document.getElementById('currentDateTime').innerHTML =
+      `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 60*1000);
+
+  const $table = $('table');
+
+$('#filterTahun, #filterTW').on('change', function () {
+    const tahun = $('#filterTahun').val();
+    const tw = $('#filterTW').val();
+
+    let filters = {};
+
+    if (tahun && tahun !== '') {
+        filters.tahun = tahun;
+    }
+
+    if (tw && tw !== '') {
+        filters.triwulan = tw;
+    }
+
+    // Jika tidak ada filter → reset
+    if (Object.keys(filters).length === 0) {
+        $table.bootstrapTable('clearFilterControl');
+        return;
+    }
+
+    $table.bootstrapTable('filterBy', filters);
+});
+
+
+  $(document).on('click', '.tombolEdit', function () {
+    let id = $(this).data('id');
+
+    $.ajax({
+        url: 'get_data_indikator.php',
+        type: 'POST',
+        data: { id: id },
+        dataType: 'json',
+        success: function (d) {
+            $('#indikator_id').val(d.indikator_id);
+
+            $('#realisasi').val(d.realisasi);
+            $('#target').val(d.target_tahunan);
+            $('#triwulan').val(d.triwulan);
+            $('#realisasi_anggaran').val(d.realisasi_anggaran);
+            $('#pagu_anggaran').val(d.pagu_anggaran);
+            $('#tahun').val(d.tahun);
+        }
+    });
+});
+
+
 </script>
 
 </body>

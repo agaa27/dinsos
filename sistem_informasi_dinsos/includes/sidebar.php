@@ -32,7 +32,7 @@ $bidangOpen = in_array($currentPage, [
   
   <a href="input_data.php"
      class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-pie-chart-fill"></i> Input Data
+    <i class="bi bi-clipboard-data"></i> Input Data
   </a>
 
   <!-- DROPDOWN SEKRETARIAT -->

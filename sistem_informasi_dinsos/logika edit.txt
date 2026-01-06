@@ -1,0 +1,39 @@
+$sql = "
+    SELECT
+    i.id,
+    i.sasaran_strategis,
+    i.indikator_kinerja AS indikator,
+    i.satuan,
+    i.target_tahunan AS target,
+    i.tahun,
+
+    rt.triwulan,
+    rt.realisasi,
+
+    -- Persentase capaian indikator
+    ROUND(
+        CASE 
+            WHEN i.target_tahunan > 0 
+            THEN (rt.realisasi / i.target_tahunan) * 100
+            ELSE 0
+        END
+    , 2) AS persentase,
+
+    rt.pagu_anggaran,
+    rt.realisasi_anggaran,
+
+    -- Persentase realisasi anggaran
+    ROUND(
+        CASE 
+            WHEN rt.pagu_anggaran > 0
+            THEN (rt.realisasi_anggaran / rt.pagu_anggaran) * 100
+            ELSE 0
+        END
+    , 2) AS persentase_anggaran
+
+    FROM indikator i
+    LEFT JOIN realisasi_triwulan rt 
+        ON rt.indikator_id = i.id
+    WHERE i.bidang = 'Perencanaan dan Keuangan'
+    ORDER BY i.created_at DESC;
+";

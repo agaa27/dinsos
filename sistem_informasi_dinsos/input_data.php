@@ -37,6 +37,7 @@ $sql = "
         sasaran_strategis,
         indikator_kinerja,
         satuan,
+        program,
         target_tahunan AS target,
         bidang
     FROM indikator
@@ -201,6 +202,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <th>ID</th>
                 <th>Sasaran Strategis</th>
                 <th>Indikator</th>
+                <th>Program</th>
                 <th>Satuan</th>
                 <th>Target</th>
                 <th>Bidang</th>                
@@ -213,6 +215,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= $n['id']; ?></td>
                 <td><?= $n['sasaran_strategis'];  ?></td>
                 <td><?= $n['indikator_kinerja'];  ?></td>
+                <td><?= $n['program'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
                 <td><?= $n['target'];  ?></td>
                 <td><?= $n['bidang'];  ?></td>           
