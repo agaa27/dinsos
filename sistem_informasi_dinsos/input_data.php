@@ -5,15 +5,16 @@ session_start();
 if (isset($_POST['submit'])){  
   $sasaran   = $_POST['sasaran_strategis'];
   $indikator = $_POST['indikator_kinerja'];
+  $program = $_POST['program'];
   $satuan    = $_POST['satuan'];
   $target    = $_POST['target_tahunan'];
   $tahun     = $_POST['tahun'];
   $bidang    = $_POST['bidang'];
 
   $sql = "INSERT INTO indikator
-          (sasaran_strategis, indikator_kinerja, satuan, target_tahunan, tahun, bidang)
+          (sasaran_strategis, indikator_kinerja, program, satuan, target_tahunan, tahun, bidang)
           VALUES
-          ('$sasaran','$indikator','$satuan','$target','$tahun','$bidang')";
+          ('$sasaran','$indikator', '$program','$satuan','$target','$tahun','$bidang')";
           
 
   if (mysqli_query($conn, $sql)) {
@@ -254,6 +255,11 @@ while ($row = mysqli_fetch_assoc($query)) {
           <div class="mb-3">
             <label class="form-label">Indikator Kinerja</label>
             <textarea name="indikator_kinerja" class="form-control" rows="2" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Program</label>
+            <textarea name="program" class="form-control" rows="2" required></textarea>
           </div>
 
           <div class="row">
