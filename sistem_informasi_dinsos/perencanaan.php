@@ -488,7 +488,7 @@ body {
 
         <!-- Filter Form Card -->
         <div class="card mb-4">
-            <div class="card-header">
+            <div class="card-header bg-secondary">
                 <h5 class="mb-0">
                     <i class="bi bi-funnel me-2"></i>Filter Data
                 </h5>
@@ -542,7 +542,7 @@ body {
 
         <!-- Data Table Card -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header bg-secondary">
                 <h5 class="mb-0">
                     <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran
                 </h5>
