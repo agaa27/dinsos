@@ -108,10 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if ($stmt->execute()) {
     $_SESSION['success'] = 'Data berhasil disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+    header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
   } else {
     $_SESSION['error'] = 'Data gagal disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+    header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
   }
 
   $stmt->close();
