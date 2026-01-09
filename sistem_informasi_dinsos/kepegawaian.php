@@ -643,13 +643,15 @@ body {
                 <?php endfor; ?>
 
                 <!-- Tombol Input -->
-                <div class="text-end">
-                    <button class="btn btn-success"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalRealisasi">
-                        <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
-                    </button>
-                </div>
+                <?php if ($_SESSION['role'] === 'umum_kepegawaian'): ?>
+                    <div class="text-end">
+                        <button class="btn btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalRealisasi">
+                            <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
+                        </button>
+                    </div>
+                <?php endif; ?>
 
                 <?php endif; ?>
             </div>

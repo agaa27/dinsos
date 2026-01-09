@@ -1,6 +1,14 @@
 <?php
-session_start();
+session_start(); // Mulai session agar bisa dihapus
+
+// ---- Hapus semua data session ----
+$_SESSION = array();
+
+
+// ---- Akhiri session ----
 session_destroy();
-header('Location: index.php');
-exit();
+
+// ---- Redirect ke login.php ----
+header("Location: index.php");
+exit;
 ?>

@@ -92,7 +92,7 @@
             <p><strong>Administrator</strong></p>
             <p>admin@dinsos.go.id</p>
             <p>0856736263</p>
-            <p><a href="#">Logout</a></p>
+            <p><a href="logout.php">Logout</a></p>
           </div>
         </div>
       </div>

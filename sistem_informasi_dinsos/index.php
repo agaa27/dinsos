@@ -28,8 +28,6 @@ if (isset($_POST['submit'])) {
             // Set session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['nama'] = $user['nama'];
-            $_SESSION['jabatan'] = $user['jabatan'];
             $_SESSION['role'] = $user['role'];
             
             // Redirect ke dashboard
