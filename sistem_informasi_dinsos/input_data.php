@@ -2,33 +2,80 @@
 require 'config/database.php';
 session_start();
 
-if (isset($_POST['submit'])){  
-  $sasaran   = $_POST['sasaran_strategis'];
-  $indikator = $_POST['indikator_kinerja'];
-  $program = $_POST['program'];
-  $satuan    = $_POST['satuan'];
-  $target    = $_POST['target_tahunan'];
-  $tahun     = $_POST['tahun'];
-  $bidang    = $_POST['bidang'];
 
-  $sql = "INSERT INTO indikator
-          (sasaran_strategis, indikator_kinerja, program, satuan, target_tahunan, tahun, bidang)
-          VALUES
-          ('$sasaran','$indikator', '$program','$satuan','$target','$tahun','$bidang')";
+require 'config/database.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $sasaran   = $_POST['sasaran'];
+    $indikator = $_POST['indikator'];
+    $satuan    = $_POST['satuan'];
+    $target    = $_POST['target'];
+    $tahun     = $_POST['tahun'];
+    $bidang    = $_POST['bidang'];
+    $program   = $_POST['program'];
+    $pagu      = $_POST['pagu_anggaran'];
+
+    $sql = "INSERT INTO kegiatan 
+            (sasaran_strategis, indikator_kinerja, satuan, target, tahun, bidang, program, pagu_anggaran)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param(
+      "sssdissd",
+      $sasaran,
+      $indikator,
+      $satuan,
+      $target,
+      $tahun,
+      $bidang,
+      $program,
+      $pagu
+  );
+
+    if ($stmt->execute()) {
+        echo "<script>
+//             alert('data berhasil ditambah');
+//         </script>";
+        header("Location: input_data.php");
+        exit;
+    } else {
+        echo "<script>
+//             alert('data gagal ditambah');
+//         </script>";
+        header("Location: input_data.php");
+    }
+}
+
+
+
+// if (isset($_POST['submit'])){  
+//   $sasaran   = $_POST['sasaran_strategis'];
+//   $indikator = $_POST['indikator_kinerja'];
+//   $program = $_POST['program'];
+//   $satuan    = $_POST['satuan'];
+//   $target    = $_POST['target_tahunan'];
+//   $tahun     = $_POST['tahun'];
+//   $bidang    = $_POST['bidang'];
+
+//   $sql = "INSERT INTO indikator
+//           (sasaran_strategis, indikator_kinerja, program, satuan, target_tahunan, tahun, bidang)
+//           VALUES
+//           ('$sasaran','$indikator', '$program','$satuan','$target','$tahun','$bidang')";
           
 
-  if (mysqli_query($conn, $sql)) {
-      echo "<script>
-            alert('data berhasil ditambah');
-        </script>";
-  } else {
-      echo "<script>
-            alert('data gagal ditambah: " . mysqli_error($conn) . "');
-        </script>";
-  }
+//   if (mysqli_query($conn, $sql)) {
+//       echo "<script>
+//             alert('data berhasil ditambah');
+//         </script>";
+//   } else {
+//       echo "<script>
+//             alert('data gagal ditambah: " . mysqli_error($conn) . "');
+//         </script>";
+//   }
 
-  header("Location: input_data.php");
-}
+//   header("Location: input_data.php");
+// }
 
 
 
@@ -39,9 +86,11 @@ $sql = "
         indikator_kinerja,
         satuan,
         program,
-        target_tahunan AS target,
+        target,
+        tahun,
+        pagu_anggaran,
         bidang
-    FROM indikator
+    FROM kegiatan
     ORDER BY created_at DESC
 ";
 
@@ -134,22 +183,6 @@ while ($row = mysqli_fetch_assoc($query)) {
 <!-- Main Content -->
 <div class="main-content">
 
-    <?php if (isset($_SESSION['success'])): ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle"></i>
-        <?= $_SESSION['success']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['success']); endif; ?>
-
-      <?php if (isset($_SESSION['error'])): ?>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle"></i>
-        <?= $_SESSION['error']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['error']); endif; ?>
-
 
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light">
@@ -206,6 +239,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <th>Program</th>
                 <th>Satuan</th>
                 <th>Target</th>
+                <th>Pagu</th>
                 <th>Bidang</th>                
               </tr>
             </thead>
@@ -219,6 +253,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= $n['program'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
                 <td><?= $n['target'];  ?></td>
+                <td><?= $n['pagu_anggaran'];  ?></td>
                 <td><?= $n['bidang'];  ?></td>           
                 <?php $no++; ?>               
               </tr>
@@ -248,13 +283,13 @@ while ($row = mysqli_fetch_assoc($query)) {
           <!-- Sasaran Strategis -->
           <div class="mb-3">
             <label class="form-label">Sasaran Strategis</label>
-            <textarea name="sasaran_strategis" class="form-control" rows="2" required></textarea>
+            <textarea name="sasaran" class="form-control" rows="2" required></textarea>
           </div>
 
           <!-- Indikator Kinerja -->
           <div class="mb-3">
             <label class="form-label">Indikator Kinerja</label>
-            <textarea name="indikator_kinerja" class="form-control" rows="2" required></textarea>
+            <textarea name="indikator" class="form-control" rows="2" required></textarea>
           </div>
           
           <div class="mb-3">
@@ -271,14 +306,19 @@ while ($row = mysqli_fetch_assoc($query)) {
 
             <!-- Target Tahunan -->
             <div class="col-md-4 mb-3">
-              <label class="form-label">Target Tahunan</label>
-              <input type="number" step="0.01" name="target_tahunan" class="form-control" required>
+              <label class="form-label">Target</label>
+              <input type="number" step="0.01" name="target" class="form-control" required>
             </div>
 
             <!-- Tahun -->
             <div class="col-md-4 mb-3">
               <label class="form-label">Tahun</label>
               <input type="number" name="tahun" class="form-control" value="2024" required>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Pagu Anggaran</label>
+              <input type="number" name="pagu_anggaran" class="form-control" placeholder="Rp. " required>
             </div>
           </div>
 
