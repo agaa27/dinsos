@@ -10,7 +10,7 @@ $qIndikator = $conn->query("
 
 /* Ambil tahun (unik / tidak double) */
 $qTahun = $conn->query("
-    SELECT DISTINCT tahun 
+    SELECT DISTINCT tahun   
     FROM kegiatan 
     ORDER BY tahun DESC
 ");
@@ -460,12 +460,21 @@ body {
     <!-- Main Content -->
     <div class="content-wrapper">
         <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
                 <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Triwulan
             </h2>
         </div>
-
+        <!-- Tombol Input -->
+                <?php if ($_SESSION['role'] === 'Perencanaan dan Keuangan'): ?>
+                    <div class="text-start mb-1">
+                        <button class="btn btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalRealisasi">
+                            <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
+                        </button>
+                    </div>
+                <?php endif; ?>
         <!-- Alert Messages Section -->
         <?php if (isset($_SESSION['success'])): ?>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -497,44 +506,49 @@ body {
             <div class="card-body">
                 <form method="GET" action="" class="row g-3">
 
-                    <!-- Dropdown Indikator -->
-                    <div class="col-md-6">
-                        <label class="form-label">Indikator Kinerja</label>
-                        <select name="indikator_id" class="form-select" required>
-                            <option value="">-- Pilih Indikator --</option>
-                            <?php while ($row = $qIndikator->fetch_assoc()) : ?>
-                                <option value="<?= $row['id']; ?>"
-                                    <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                                    <?= htmlspecialchars($row['indikator_kinerja']); ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
+        <div class="row g-1 align-items-end">
 
-                    <!-- Dropdown Tahun -->
-                    <div class="col-md-3">
-                        <label class="form-label">Tahun</label>
-                        <select name="tahun" class="form-select" required>
-                            <option value="">-- Pilih Tahun --</option>
-                            <?php while ($row = $qTahun->fetch_assoc()) : ?>
-                                <option value="<?= $row['tahun']; ?>"
-                                    <?= ($_GET['tahun'] ?? '') == $row['tahun'] ? 'selected' : ''; ?>>
-                                    <?= $row['tahun']; ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
+    <!-- Dropdown Indikator -->
+    <div class="col-md-6">
+        <label class="form-label">Indikator Kinerja</label>
+        <select name="indikator_id" class="form-select" required>
+            <option value="">-- Pilih Indikator --</option>
+            <?php while ($row = $qIndikator->fetch_assoc()) : ?>
+                <option value="<?= $row['id']; ?>"
+                    <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
+                    <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+    </div>
 
-                    <!-- Tombol -->
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-search me-1"></i> Tampilkan
-                        </button>
-                    </div>
+    <!-- Dropdown Tahun -->
+    <div class="col-md-3">
+        <label class="form-label">Tahun</label>
+        <select name="tahun" class="form-select" required>
+            <option value="">-- Pilih Tahun --</option>
+            <?php while ($row = $qTahun->fetch_assoc()) : ?>
+                <option value="<?= $row['tahun']; ?>"
+                    <?= ($_GET['tahun'] ?? '') == $row['tahun'] ? 'selected' : ''; ?>>
+                    <?= $row['tahun']; ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+    </div>
 
-                </form>
-            </div>
-        </div>
+    <!-- Tombol -->
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">
+            <i class="bi bi-search me-1"></i> Tampilkan
+        </button>
+
+        <a href="perencanaan.php" class="btn btn-success flex-fill">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </a>
+    </div>
+
+</div>
+
 
 
         <!-- Data Table Card -->
@@ -638,17 +652,7 @@ body {
                     </div>
                 <?php endfor; ?>
 
-                <!-- Tombol Input -->
-                <?php if ($_SESSION['role'] === 'Perencanaan dan Keuangan'): ?>
-                    <div class="text-end">
-                        <button class="btn btn-success"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalRealisasi">
-                            <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
-                        </button>
-                    </div>
-                <?php endif; ?>
-
+            
 
                 <?php endif; ?>
             </div>
