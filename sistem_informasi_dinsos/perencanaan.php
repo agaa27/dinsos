@@ -1,9 +1,6 @@
 <?php
 require 'config/database.php';
 session_start();
-// var_dump($_SESSION);die();
-//TAMPIL DATA DROPDOWN INDIKATOR DAN TAHUN
-/* Ambil indikator khusus bidang Perencanaan dan Keuangan */
 $qIndikator = $conn->query("
     SELECT id, indikator_kinerja 
     FROM kegiatan 
@@ -22,14 +19,14 @@ $qTahun = $conn->query("
 // AMBIL DATA KEGIATAN
 $data = null;
 
-if (isset($_GET['indikator_id'], $_GET['tahun'])) {
+if (isset($_GET['indikator_id'])) {
 
     $stmt = $conn->prepare("
         SELECT *
         FROM kegiatan
-        WHERE id = ? AND tahun = ?
+        WHERE id = ?
     ");
-    $stmt->bind_param("ii", $_GET['indikator_id'], $_GET['tahun']);
+    $stmt->bind_param("i", $_GET['indikator_id']);
     $stmt->execute();
 
     $data = $stmt->get_result()->fetch_assoc();
@@ -642,7 +639,7 @@ body {
                 <?php endfor; ?>
 
                 <!-- Tombol Input -->
-                <?php if ($_SESSION['role'] === 'perencanaan_keuangan'): ?>
+                <?php if ($_SESSION['role'] === 'Perencanaan dan Keuangan'): ?>
                     <div class="text-end">
                         <button class="btn btn-success"
                             data-bs-toggle="modal"
@@ -694,7 +691,7 @@ body {
                   <input type="number" step="0.01"
                          name="paguTW<?= $i; ?>"
                          class="form-control"
-                         value="<?= $data["paguTW{$i}"]; ?>">
+                         value="Rp <?= number_format($tw[$i]['sisa'], 0, ',', '.'); ?>">
                 </div>
 
                 <!-- Realisasi Target -->

@@ -643,7 +643,7 @@ body {
                 <?php endfor; ?>
 
                 <!-- Tombol Input -->
-                <?php if ($_SESSION['role'] === 'umum_kepegawaian'): ?>
+                <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
                     <div class="text-end">
                         <button class="btn btn-success"
                             data-bs-toggle="modal"
