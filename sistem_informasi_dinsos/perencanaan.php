@@ -52,6 +52,7 @@ if ($data) {
 
     $tw = [];
     $total_realisasi = 0;
+    $total_realisasi_target = 0;
 
     for ($i = 1; $i <= 4; $i++) {
 
@@ -59,6 +60,7 @@ if ($data) {
         $pagu      = (float) ($data["paguTW{$i}"] ?? 0);
         $realisasi = (float) ($data["realisasi_anggaranTW{$i}"] ?? 0);
         $total_realisasi += $realisasi;
+        $total_realisasi_target += $realisasiT;
 
         $tw[$i] = [
             'pagu'       => $pagu ?: null,
@@ -67,6 +69,7 @@ if ($data) {
 
             // sisa pagu tahunan (akumulatif)
             'sisa'       => $pagu_tahunan - $total_realisasi,
+            'sisa_target'       => $target - $total_realisasi_target,
 
             // persentase terhadap pagu tahunan
             'persentase' => ($pagu_tahunan > 0 && $realisasi > 0)
@@ -606,10 +609,7 @@ body {
 
                         <h6 class="mb-2">Triwulan <?= $i; ?></h6>
 
-                        <?php if ($tw[$i]['pagu'] === null): ?>
-                            <span class="text-muted">Belum ada pagu</span>
-
-                        <?php elseif ($tw[$i]['realisasi'] === null): ?>
+                        <?php if ($tw[$i]['realisasi'] === null): ?>
                             <ul class="mb-0">
                                 <li>Pagu Anggaran:
                                     <strong>
@@ -624,7 +624,7 @@ body {
                         <?php else: ?>
                             <ul class="mb-0">
                                 <li>
-                                    Realisasi:
+                                    Realisasi Target:
                                     <strong>
                                         <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
@@ -634,10 +634,8 @@ body {
                                     <strong><?= $tw[$i]['persentase_target']; ?>%</strong>
                                 </li>
                                 <li>
-                                    Pagu Anggaran:
-                                    <strong>
-                                        Rp <?= number_format($tw[$i]['pagu'], 0, ',', '.'); ?>
-                                    </strong>
+                                    Sisa Target:
+                                    <strong><?= $tw[$i]['sisa_target']. " " . $data['satuan']; ?></strong>
                                 </li>
                                 <li>
                                     Realisasi Anggaran:

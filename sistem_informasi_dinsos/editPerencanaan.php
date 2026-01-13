@@ -73,49 +73,103 @@ if ($data) {
     }
 }
 
-//UPDATE HANDLER
+$realisasi = '';
+$realisasi_anggaran = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['tw'])) {
 
-  $id = intval($_POST['id']);
-  $tahun = intval($_POST['tahun']);
+    $indikator_id = intval($_GET['indikator_id']);
+    $tahun        = intval($_GET['tahun']);
+    $tw_ke        = intval($_GET['tw']);
 
-  // Tangkap data TW 1–4
-  for ($i = 1; $i <= 4; $i++) {
-    $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
-    $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
-    $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
-  }
+    $qCek = $conn->prepare("
+        SELECT realisasiTW$tw_ke, realisasi_anggaranTW$tw_ke
+        FROM kegiatan
+        WHERE id = ? AND tahun = ? 
+        LIMIT 1
+    ");
+    $qCek->bind_param("ii", $indikator_id, $tahun);
+    $qCek->execute();
+    $res = $qCek->get_result();
 
-  // Query update
-  $sql = "UPDATE kegiatan SET
-            paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
-            paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
-            paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
-            paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
-          WHERE id = ?";
-
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param(
-    "ddddddddddddi",
-    $paguTW[1], $realisasiTW[1], $anggaranTW[1],
-    $paguTW[2], $realisasiTW[2], $anggaranTW[2],
-    $paguTW[3], $realisasiTW[3], $anggaranTW[3],
-    $paguTW[4], $realisasiTW[4], $anggaranTW[4],
-    $id
-  );
-
-  if ($stmt->execute()) {
-    $_SESSION['success'] = 'Data berhasil disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-  } else {
-    $_SESSION['error'] = 'Data gagal disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-  }
-
-  $stmt->close();
-  $conn->close();
+    if ($res->num_rows > 0) {
+        $row = $res->fetch_assoc();
+        $realisasi    = $row['realisasiTW'.$tw_ke];
+        $realisasi_anggaran = $row['realisasi_anggaranTW'.$tw_ke];
+    }
 }
+
+// UPDATE HANDLER 
+if (isset($_POST['submit_realisasi'])) {
+
+    $id = intval($_POST['indikator_id']);
+    $tahun        = intval($_POST['tahun']);
+    $tw_ke        = intval($_POST['tw']);
+    $fisik        = intval($_POST['realisasi_fisik']);
+    $anggaran     = intval($_POST['realisasi_anggaran']);
+
+        // UPDATE
+        $update = $conn->prepare("
+            UPDATE kegiatan
+            SET realisasiTW$tw_ke = ?, realisasi_anggaranTW$tw_ke = ?
+            WHERE id = ? AND tahun = ? 
+        ");
+        $update->bind_param(
+            "iiii",
+            $fisik,
+            $anggaran,
+            $id,
+            $tahun
+        );
+        $update->execute();
+
+    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+    exit;
+}
+
+
+//UPDATE HANDLER
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+//   $id = intval($_POST['id']);
+//   $tahun = intval($_POST['tahun']);
+
+//   // Tangkap data TW 1–4
+//   for ($i = 1; $i <= 4; $i++) {
+//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
+//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
+//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
+//   }
+
+//   // Query update
+//   $sql = "UPDATE kegiatan SET
+//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
+//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
+//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
+//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
+//           WHERE id = ?";
+
+//   $stmt = $conn->prepare($sql);
+//   $stmt->bind_param(
+//     "ddddddddddddi",
+//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
+//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
+//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
+//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
+//     $id
+//   );
+
+//   if ($stmt->execute()) {
+//     $_SESSION['success'] = 'Data berhasil disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   } else {
+//     $_SESSION['error'] = 'Data gagal disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   }
+
+//   $stmt->close();
+//   $conn->close();
+// }
 
 ?>
 
@@ -439,17 +493,27 @@ body {
             </h2>
         </div>
         
+    <div class="text-start mb-1">
+        <a class="btn btn-success" href="Perencanaan.php">
+            <i class="bi bi-arrow-bar-left"></i> Kembali
+        </a>
+    </div>
+
         <!-- Filter Form Card -->
 <div class="card mb-4 shadow-sm">
+
+    <!-- Header -->
     <div class="card-header bg-secondary text-white">
         <h5 class="mb-0">
-            <i class="bi bi-funnel me-2"></i>Pilih Data
+            <i class="bi bi-funnel me-2"></i>Pilih Data & Detail
         </h5>
         <small>Pilih indikator, tahun, dan triwulan</small>
     </div>
 
     <div class="card-body">
-        <form method="GET" action="" class="row g-3 align-items-end">
+
+        <!-- FORM FILTER -->
+        <form method="GET" action="" class="row g-3 align-items-end mb-4">
 
             <!-- Dropdown Indikator -->
             <div class="col-md-5">
@@ -499,59 +563,77 @@ body {
             </div>
 
         </form>
+
+        <!-- GARIS PEMBATAS -->
+        <hr>
+
+        <!-- DETAIL DATA -->
+        <?php if (!$data): ?>
+            <div class="text-muted text-center py-4">
+                Indikator tidak ada
+            </div>
+        <?php else: ?>
+
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <strong>Target:</strong><br>
+                    <?= htmlspecialchars($data['target']) . " " . htmlspecialchars($data['satuan']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Sisa Target:</strong><br>
+                    <?= number_format($tw[4]['sisa_target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Pagu Anggaran Tahunan:</strong><br>
+                    Rp <?= htmlspecialchars($data['pagu_anggaran']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Sisa Pagu Anggaran:</strong><br>
+                    Rp <?= number_format($tw[4]['sisa'], 0, ',', '.'); ?>
+                </li>
+            </ul>
+
+            <hr>
+
+            <h6 class="mb-3">
+                <i class="bi bi-pencil-square me-1"></i>Input Realisasi
+            </h6>
+
+            <form method="POST" class="row g-3">
+
+                <input type="hidden" name="indikator_id" value="<?= $_GET['indikator_id']; ?>">
+                <input type="hidden" name="tahun" value="<?= $_GET['tahun']; ?>">
+                <input type="hidden" name="tw" value="<?= $_GET['tw']; ?>"> 
+
+                <div class="col-md-5">
+                    <label class="form-label">Realisasi Target</label>
+                    <input type="number"
+                        name="realisasi_fisik"
+                        class="form-control"
+                        value="<?= htmlspecialchars($realisasi); ?>"
+                        required>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label">Realisasi Anggaran</label>
+                    <input type="number"
+                        name="realisasi_anggaran"
+                        class="form-control"
+                        value="<?= htmlspecialchars($realisasi_anggaran); ?>"
+                        required>
+                </div>
+
+                <div class="col-md-2 d-grid align-items-end">
+                    <button type="submit" name="submit_realisasi" class="btn btn-success">
+                        <i class="bi bi-save me-1"></i>Simpan
+                    </button>
+                </div>
+
+            </form>
+        <?php endif; ?>
+
     </div>
 </div>
-
-
-        <div class="card">
-            <div class="card-header bg-secondary">
-                <h5 class="mb-0">
-                    <i class="bi bi-clipboard-data me-2"></i>Detail Data
-                </h5>
-            </div>
-
-            <div class="card-body">
-                  <?php if (!$data): ?>
-                    <div class="text-muted text-center py-4">
-                        indikator tidak ada
-                    </div>
-                <?php else: ?>
-
-                <!-- Informasi Utama -->
-                <ul class="list-group mb-4">
-                    <li class="list-group-item">
-                        <strong>Sasaran:</strong><br>
-                        <?= htmlspecialchars($data['sasaran_strategis']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Indikator:</strong><br>
-                        <?= htmlspecialchars($data['indikator_kinerja']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Program:</strong><br>
-                        <?= htmlspecialchars($data['program']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Target:</strong><br>
-                        <?= htmlspecialchars($data['target']) . " " . htmlspecialchars($data['satuan']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Sisa Target:</strong><br>
-                        <?= number_format($tw[4]['sisa_target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
-                        <?= htmlspecialchars($data['pagu_anggaran']); ?>
-                    </li>
-                    <li class="list-group-item">
-                        <strong>Sisa Pagu Anggaran:</strong> <br>Rp 
-                        <?= number_format($tw[4]['sisa'], 0, ',', '.'); ?>
-                    </li>
-                </ul>
-                <?php endif; ?>      
-            </div>
-            
-        </div>
 
         
 
