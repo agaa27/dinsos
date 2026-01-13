@@ -615,11 +615,7 @@ body {
 
                         <?php if ($tw[$i]['realisasi'] === null): ?>
                             <ul class="mb-0">
-                                <li>Pagu Anggaran:
-                                    <strong>
-                                        Rp <?= number_format($tw[$i]['pagu'], 0, ',', '.'); ?>
-                                    </strong>
-                                </li>
+                                
                                 <li class="text-muted">
                                     Belum ada realisasi
                                 </li>

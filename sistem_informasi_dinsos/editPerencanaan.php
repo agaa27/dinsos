@@ -95,9 +95,11 @@ if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['tw'
     if ($res->num_rows > 0) {
         $row = $res->fetch_assoc();
         $realisasi    = $row['realisasiTW'.$tw_ke];
-        $realisasi_anggaran = $row['realisasi_anggaranTW'.$tw_ke];
+        $realisasi_anggaran = (int) $row['realisasi_anggaranTW'.$tw_ke];
+        
     }
 }
+
 // UPDATE HANDLER 
 if (isset($_POST['submit_realisasi'])) {
 
@@ -611,14 +613,15 @@ body {
                         required>
                 </div>
 
-                <div class="col-md-5">
-                    <label class="form-label">Realisasi Anggaran</label>
-                    <input type="number"
-                        name="realisasi_anggaran"
-                        class="form-control"
-                        value="<?= htmlspecialchars($realisasi_anggaran); ?>"
-                        required>
-                </div>
+              <div class="col-md-5">
+                <label class="form-label">Realisasi Anggaran</label>
+                <input type="text"
+                    name="realisasi_anggaran"
+                    class="form-control"
+                    value="<?= number_format($realisasi_anggaran, 0, ',', '.'); ?>"
+                    required>
+            </div>
+
 
                 <div class="col-md-2 d-grid align-items-end">
                     <button type="submit" name="submit_realisasi" class="btn btn-success">
