@@ -453,7 +453,6 @@ body {
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
-            <h5 class="mb-0">Pemberdayaan Sosial</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
@@ -489,7 +488,7 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Triwulan
+                <i class="bi bi-pencil-fill success me-3"></i>Edit Data per-Triwulan
             </h2>
         </div>
         
@@ -558,7 +557,7 @@ body {
             <!-- Tombol -->
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i> Load Data
+                    <i class="bi bi-caret-down"></i> Tampilkan
                 </button>
             </div>
 

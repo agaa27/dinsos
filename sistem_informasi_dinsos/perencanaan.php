@@ -440,7 +440,7 @@ body {
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
-            <h5 class="mb-0">Pemberdayaan Sosial</h5>
+            <h5 class="mb-0">Perencanaan dan Keuangan</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
@@ -600,6 +600,10 @@ body {
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
                         <?= htmlspecialchars($data['pagu_anggaran']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Tahun:</strong> <br>Rp : 
+                        <?= htmlspecialchars($data['tahun']); ?>
                     </li>
                 </ul>
 

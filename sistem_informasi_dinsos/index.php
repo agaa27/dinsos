@@ -15,6 +15,7 @@ if (isset($_POST['submit'])) {
     
     
     
+    
     // Cek kredensial (contoh sederhana, ganti dengan query database yang aman)
     $query = "SELECT * FROM users WHERE username = ?";
     $stmt = mysqli_prepare($conn, $query);
