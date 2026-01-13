@@ -98,7 +98,6 @@ if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['tw'
         $realisasi_anggaran = $row['realisasi_anggaranTW'.$tw_ke];
     }
 }
-
 // UPDATE HANDLER 
 if (isset($_POST['submit_realisasi'])) {
 
@@ -126,7 +125,6 @@ if (isset($_POST['submit_realisasi'])) {
     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
     exit;
 }
-
 
 //UPDATE HANDLER
 // if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -576,7 +574,7 @@ body {
             <ul class="list-group">
                 <li class="list-group-item">
                     <strong>Target:</strong><br>
-                    <?= htmlspecialchars($data['target']) . " " . htmlspecialchars($data['satuan']); ?>
+                    <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Sisa Target:</strong><br>
@@ -584,7 +582,7 @@ body {
                 </li>
                 <li class="list-group-item">
                     <strong>Pagu Anggaran Tahunan:</strong><br>
-                    Rp <?= htmlspecialchars($data['pagu_anggaran']); ?>
+                    Rp <?= number_format($data['pagu_anggaran'], 0, ',', '.'); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Sisa Pagu Anggaran:</strong><br>
@@ -609,7 +607,7 @@ body {
                     <input type="number"
                         name="realisasi_fisik"
                         class="form-control"
-                        value="<?= htmlspecialchars($realisasi); ?>"
+                        value="<?= number_format($realisasi, 0, '.', ','); ?>"
                         required>
                 </div>
 

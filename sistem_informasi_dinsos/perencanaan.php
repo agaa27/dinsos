@@ -595,14 +595,14 @@ body {
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
-                        <?= htmlspecialchars($data['target']) . " " . htmlspecialchars($data['satuan']); ?>
+                        <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
-                        <?= htmlspecialchars($data['pagu_anggaran']); ?>
+                        <?= number_format($data['pagu_anggaran'], 0, ',', '.'); ?>
                     </li>
                     <li class="list-group-item">
-                        <strong>Tahun:</strong> <br>Rp : 
+                        <strong>Tahun:</strong> <br> 
                         <?= htmlspecialchars($data['tahun']); ?>
                     </li>
                 </ul>
