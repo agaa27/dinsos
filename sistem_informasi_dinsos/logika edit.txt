@@ -1,39 +1,39 @@
-$sql = "
-    SELECT
-    i.id,
-    i.sasaran_strategis,
-    i.indikator_kinerja AS indikator,
-    i.satuan,
-    i.target_tahunan AS target,
-    i.tahun,
+CREATE TABLE kegiatan (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    sasaran_strategis VARCHAR(255),
+    indikator_kinerja VARCHAR(255),
+    satuan VARCHAR(50),
+    target DECIMAL(10,2),
+    tahun YEAR(4),
+    bidang VARCHAR(100),
+    program VARCHAR(255),
+    pagu_anggaran DECIMAL(15,2),
 
-    rt.triwulan,
-    rt.realisasi,
+    realisasi_bulan1 DECIMAL(15,2),
+    realisasi_bulan2 DECIMAL(15,2),
+    realisasi_bulan3 DECIMAL(15,2),
+    realisasi_bulan4 DECIMAL(15,2),
+    realisasi_bulan5 DECIMAL(15,2),
+    realisasi_bulan6 DECIMAL(15,2),
+    realisasi_bulan7 DECIMAL(15,2),
+    realisasi_bulan8 DECIMAL(15,2),
+    realisasi_bulan9 DECIMAL(15,2),
+    realisasi_bulan10 DECIMAL(15,2),
+    realisasi_bulan11 DECIMAL(15,2),
+    realisasi_bulan12 DECIMAL(15,2),
 
-    -- Persentase capaian indikator
-    ROUND(
-        CASE 
-            WHEN i.target_tahunan > 0 
-            THEN (rt.realisasi / i.target_tahunan) * 100
-            ELSE 0
-        END
-    , 2) AS persentase,
+    realisasi_anggaran_bulan1 DECIMAL(15,2),
+    realisasi_anggaran_bulan2 DECIMAL(15,2),
+    realisasi_anggaran_bulan3 DECIMAL(15,2),
+    realisasi_anggaran_bulan4 DECIMAL(15,2),
+    realisasi_anggaran_bulan5 DECIMAL(15,2),
+    realisasi_anggaran_bulan6 DECIMAL(15,2),
+    realisasi_anggaran_bulan7 DECIMAL(15,2),
+    realisasi_anggaran_bulan8 DECIMAL(15,2),
+    realisasi_anggaran_bulan9 DECIMAL(15,2),
+    realisasi_anggaran_bulan10 DECIMAL(15,2),
+    realisasi_anggaran_bulan11 DECIMAL(15,2),
+    realisasi_anggaran_bulan12 DECIMAL(15,2),
 
-    rt.pagu_anggaran,
-    rt.realisasi_anggaran,
-
-    -- Persentase realisasi anggaran
-    ROUND(
-        CASE 
-            WHEN rt.pagu_anggaran > 0
-            THEN (rt.realisasi_anggaran / rt.pagu_anggaran) * 100
-            ELSE 0
-        END
-    , 2) AS persentase_anggaran
-
-    FROM indikator i
-    LEFT JOIN realisasi_triwulan rt 
-        ON rt.indikator_id = i.id
-    WHERE i.bidang = 'Perencanaan dan Keuangan'
-    ORDER BY i.created_at DESC;
-";
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

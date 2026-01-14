@@ -7,20 +7,9 @@ $qIndikator = $conn->query("
     WHERE bidang = 'Perencanaan dan Keuangan'
     ORDER BY indikator_kinerja ASC
 ");
-$qIndikatorModal = $conn->query("
-    SELECT id, indikator_kinerja 
-    FROM kegiatan 
-    WHERE bidang = 'Perencanaan dan Keuangan'
-    ORDER BY indikator_kinerja ASC
-");
 
 /* Ambil tahun (unik / tidak double) */
 $qTahun = $conn->query("
-    SELECT DISTINCT tahun   
-    FROM kegiatan 
-    ORDER BY tahun DESC
-");
-$qTahunModal = $conn->query("
     SELECT DISTINCT tahun   
     FROM kegiatan 
     ORDER BY tahun DESC
@@ -35,9 +24,9 @@ if (isset($_GET['indikator_id'])) {
     $stmt = $conn->prepare("
         SELECT *
         FROM kegiatan
-        WHERE id = ?
+        WHERE id = ? AND tahun = ?
     ");
-    $stmt->bind_param("i", $_GET['indikator_id']);
+    $stmt->bind_param("ii", $_GET['indikator_id'], $_GET['tahun']);
     $stmt->execute();
 
     $data = $stmt->get_result()->fetch_assoc();
@@ -47,86 +36,99 @@ if (isset($_GET['indikator_id'])) {
 if ($data) {
 
     $pagu_tahunan = (float) $data['pagu_anggaran'];
-    $target = (float) $data['target'];
-    $satuan = (float) $data['satuan'];
+    $target       = (float) $data['target'];
+    $satuan       = $data['satuan'];
 
     $tw = [];
-    $total_realisasi = 0;
-    $total_realisasi_target = 0;
+    $total_realisasi_anggaran = 0;
+    $total_realisasi_target   = 0;
 
-    for ($i = 1; $i <= 4; $i++) {
+    // Mapping bulan per triwulan
+    $mapping_tw = [
+        1 => [1, 2, 3],
+        2 => [4, 5, 6],
+        3 => [7, 8, 9],
+        4 => [10, 11, 12],
+    ];
 
-        $realisasiT      = (float) ($data["realisasiTW{$i}"] ?? 0);
-        $pagu      = (float) ($data["paguTW{$i}"] ?? 0);
-        $realisasi = (float) ($data["realisasi_anggaranTW{$i}"] ?? 0);
-        $total_realisasi += $realisasi;
-        $total_realisasi_target += $realisasiT;
+    foreach ($mapping_tw as $i => $bulan_list) {
+
+        $realisasi_anggaran_tw = 0;
+        $realisasi_target_tw   = 0;
+
+        foreach ($bulan_list as $bulan) {
+            $realisasi_target_tw   += (float) ($data["realisasi_bulan{$bulan}"] ?? 0);
+            $realisasi_anggaran_tw += (float) ($data["realisasi_anggaran_bulan{$bulan}"] ?? 0);
+        }
+
+        // Akumulasi tahunan
+        $total_realisasi_anggaran += $realisasi_anggaran_tw;
+        $total_realisasi_target   += $realisasi_target_tw;
 
         $tw[$i] = [
-            'pagu'       => $pagu ?: null,
-            'realisasi'  => $realisasi ?: null,
-            'realisasiT'  => $realisasiT ?: null,
+            'realisasi'   => $realisasi_anggaran_tw ?: null,
+            'realisasiT'  => $realisasi_target_tw ?: null,
 
-            // sisa pagu tahunan (akumulatif)
-            'sisa'       => $pagu_tahunan - $total_realisasi,
-            'sisa_target'       => $target - $total_realisasi_target,
+            // sisa tahunan (akumulatif)
+            'sisa'        => $pagu_tahunan - $total_realisasi_anggaran,
+            'sisa_target' => $target - $total_realisasi_target,
 
             // persentase terhadap pagu tahunan
-            'persentase' => ($pagu_tahunan > 0 && $realisasi > 0)
-                            ? round(($realisasi / $pagu_tahunan) * 100, 2)
-                            : null,
-            
-                            // persentase terhadap pagu tahunan
-            'persentase_target' => ($realisasiT > 0 && $target > 0)
-                            ? round(($realisasiT / $target) * 100, 2)
-                            : null
+            'persentase' => ($pagu_tahunan > 0 && $realisasi_anggaran_tw > 0)
+                ? round(($total_realisasi_anggaran / $pagu_tahunan) * 100, 2)
+                : null,
+
+            // persentase terhadap target
+            'persentase_target' => ($target > 0 && $realisasi_target_tw > 0)
+                ? round(($total_realisasi_target / $target) * 100, 2)
+                : null
         ];
     }
 }
 
-//UPDATE HANDLER
+// //UPDATE HANDLER
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  $id = intval($_POST['id']);
-  $tahun = intval($_POST['tahun']);
+//   $id = intval($_POST['id']);
+//   $tahun = intval($_POST['tahun']);
 
-  // Tangkap data TW 1–4
-  for ($i = 1; $i <= 4; $i++) {
-    $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
-    $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
-    $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
-  }
+//   // Tangkap data TW 1–4
+//   for ($i = 1; $i <= 4; $i++) {
+//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
+//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
+//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
+//   }
 
-  // Query update
-  $sql = "UPDATE kegiatan SET
-            paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
-            paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
-            paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
-            paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
-          WHERE id = ?";
+//   // Query update
+//   $sql = "UPDATE kegiatan SET
+//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
+//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
+//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
+//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
+//           WHERE id = ?";
 
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param(
-    "ddddddddddddi",
-    $paguTW[1], $realisasiTW[1], $anggaranTW[1],
-    $paguTW[2], $realisasiTW[2], $anggaranTW[2],
-    $paguTW[3], $realisasiTW[3], $anggaranTW[3],
-    $paguTW[4], $realisasiTW[4], $anggaranTW[4],
-    $id
-  );
+//   $stmt = $conn->prepare($sql);
+//   $stmt->bind_param(
+//     "ddddddddddddi",
+//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
+//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
+//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
+//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
+//     $id
+//   );
 
-  if ($stmt->execute()) {
-    $_SESSION['success'] = 'Data berhasil disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-  } else {
-    $_SESSION['error'] = 'Data gagal disimpan';
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-  }
+//   if ($stmt->execute()) {
+//     $_SESSION['success'] = 'Data berhasil disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   } else {
+//     $_SESSION['error'] = 'Data gagal disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   }
 
-  $stmt->close();
-  $conn->close();
-}
+//   $stmt->close();
+//   $conn->close();
+// }
 
 ?>
 
@@ -610,17 +612,13 @@ body {
                 <!-- Realisasi per TW -->
                 <?php for ($i = 1; $i <= 4; $i++): ?>
                     <div class="border rounded p-3 mb-3">
-
                         <h6 class="mb-2">Triwulan <?= $i; ?></h6>
-
                         <?php if ($tw[$i]['realisasi'] === null): ?>
-                            <ul class="mb-0">
-                                
+                            <ul class="mb-0">                                
                                 <li class="text-muted">
                                     Belum ada realisasi
                                 </li>
                             </ul>
-
                         <?php else: ?>
                             <ul class="mb-0">
                                 <li>
@@ -658,9 +656,6 @@ body {
 
                     </div>
                 <?php endfor; ?>
-
-            
-
                 <?php endif; ?>
             </div>
         </div>
