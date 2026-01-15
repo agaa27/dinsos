@@ -1,0 +1,138 @@
+
+tombolDetailOrder
+
+<button data-detail_id="<?= $n['order_id'] ?>"
+    class="btn btn-light btn-sm rounded-5 border tombolDetailOrder"
+    data-bs-toggle="modal"
+    data-bs-target="#orderDetailModal">
+    <i class="bi bi-eye"></i>
+</button> 
+
+
+
+Modal Detail Order
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Detail Order #<span id="orderIdTitle"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="orderInfo">
+          <p><strong>Customer:</strong> <span id="customerName"></span></p>
+          <p><strong>Metode Pembayaran:</strong> <span id="paymentMethod"></span></p>
+          <p><strong>Status Pembayaran:</strong> <span id="paymentStatus"></span></p>
+          <p><strong>Status Pesanan:</strong> <span id="orderStatus"></span></p>
+          <p><strong>Sumber Pesanan:</strong> <span id="orderSource"></span></p>
+          <p><strong>Waktu pemesanan:</strong> <span id="orderDate"></span></p>
+        </div>
+        <hr>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Menu</th>
+              <th>Kategori</th>
+              <th>Qty</th>
+              <th>Harga</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="orderItemsTable">
+            
+          </tbody>
+        </table>
+        <div class="text-end">
+          <strong>Total: Rp <span id="orderTotal"></span></strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+script detail
+
+$(function(){
+
+        $(document).on('click', '.tombolDetailOrder', function() {
+
+          const detail_id = $(this).data('detail_id');
+          
+          $.ajax({
+            url: 'get_data.php',
+            data: {detail_id : detail_id},
+            method: 'post',
+            dataType: 'json',
+            success: function(data){
+              FirstRow = data[0];
+              let rows = "";
+              let n = 1;
+              $('#customerName').html(FirstRow.customer_name),
+              $('#paymentMethod').html(FirstRow.payment_method),
+              $('#paymentStatus').html(FirstRow.payment_status),
+              $('#orderStatus').html(FirstRow.status),
+              $('#orderDate').html(FirstRow.created_at),
+              $('#orderSource').html(FirstRow.order_source),
+              $('#orderTotal').html(FirstRow.total_price),
+
+              $.each(data, function(i, item) {
+                    rows += `
+                        <tr>
+                            <td>${n}</td>
+                            <td>${item.menu_name}</td>
+                            <td>${item.category}</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.menu_price}</td>
+                            <td>${item.subtotal}</td> 
+                        </tr>
+                    `;
+                    n++;
+                });
+
+                $("#orderItemsTable").html(rows);
+            }
+          });
+
+        });
+
+      });
+
+
+
+get_data.php
+
+if (isset($_POST['detail_id'])){
+    $oID = $_POST['detail_id'];
+    $stmt = $conn->prepare("SELECT 
+          o.order_id,
+          u.name AS customer_name,
+          m.name AS menu_name,
+          m.category,
+          m.price AS menu_price,
+          oi.quantity,
+          (m.price * oi.quantity) AS subtotal,
+          o.total_price,
+          o.payment_method,
+          o.payment_status,
+          o.order_source,
+          o.status,
+          o.created_at
+      FROM orders o
+      JOIN users u ON o.user_id = u.user_id
+      JOIN order_items oi ON o.order_id = oi.order_id
+      JOIN menu m ON oi.menu_id = m.menu_id
+      WHERE o.order_id = ?");
+    $stmt->bind_param("i", $oID);
+    $stmt->execute();
+    
+    $result = $stmt->get_result();
+    
+    $data = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $data[] = $row;
+    }
+
+    echo json_encode($data);
+}

@@ -1,6 +1,12 @@
 <?php
 require 'config/database.php';
 session_start();
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
+
 $qIndikator = $conn->query("
     SELECT id, indikator_kinerja 
     FROM kegiatan 
@@ -36,54 +42,68 @@ if (isset($_GET['indikator_id'])) {
 if ($data) {
 
     $pagu_tahunan = (float) $data['pagu_anggaran'];
-    $target = (float) $data['target'];
-    $satuan = (float) $data['satuan'];
+    $target       = (float) $data['target'];
+    $satuan       = $data['satuan'];
 
     $tw = [];
-    $total_realisasi = 0;
-    $total_realisasi_target = 0;
+    $total_realisasi_anggaran = 0;
+    $total_realisasi_target   = 0;
 
-    for ($i = 1; $i <= 4; $i++) {
+    // Mapping bulan per triwulan
+    $mapping_tw = [
+        1 => [1, 2, 3],
+        2 => [4, 5, 6],
+        3 => [7, 8, 9],
+        4 => [10, 11, 12],
+    ];
 
-        $realisasiT      = (float) ($data["realisasiTW{$i}"] ?? 0);
-        $pagu      = (float) ($data["paguTW{$i}"] ?? 0);
-        $realisasi = (float) ($data["realisasi_anggaranTW{$i}"] ?? 0);
-        $total_realisasi += $realisasi;
-        $total_realisasi_target += $realisasiT;
+    foreach ($mapping_tw as $i => $bulan_list) {
+
+        $realisasi_anggaran_tw = 0;
+        $realisasi_target_tw   = 0;
+
+        foreach ($bulan_list as $bulan) {
+            $realisasi_target_tw   += (float) ($data["realisasi_bulan{$bulan}"] ?? 0);
+            $realisasi_anggaran_tw += (float) ($data["realisasi_anggaran_bulan{$bulan}"] ?? 0);
+        }
+
+        // Akumulasi tahunan
+        $total_realisasi_anggaran += $realisasi_anggaran_tw;
+        $total_realisasi_target   += $realisasi_target_tw;
 
         $tw[$i] = [
-            'pagu'       => $pagu ?: null,
-            'realisasi'  => $realisasi ?: null,
-            'realisasiT'  => $realisasiT ?: null,
+            'realisasi'   => $realisasi_anggaran_tw ?: null,
+            'realisasiT'  => $realisasi_target_tw ?: null,
 
-            // sisa pagu tahunan (akumulatif)
-            'sisa'       => $pagu_tahunan - $total_realisasi,
-            'sisa_target'       => $target - $total_realisasi_target,
+            // sisa tahunan (akumulatif)
+            'sisa'        => $pagu_tahunan - $total_realisasi_anggaran,
+            'sisa_target' => $target - $total_realisasi_target,
 
             // persentase terhadap pagu tahunan
-            'persentase' => ($pagu_tahunan > 0 && $realisasi > 0)
-                            ? round(($realisasi / $pagu_tahunan) * 100, 2)
-                            : null,
-            
-                            // persentase terhadap pagu tahunan
-            'persentase_target' => ($realisasiT > 0 && $target > 0)
-                            ? round(($realisasiT / $target) * 100, 2)
-                            : null
+            'persentase' => ($pagu_tahunan > 0 && $realisasi_anggaran_tw > 0)
+                ? round(($total_realisasi_anggaran / $pagu_tahunan) * 100, 2)
+                : null,
+
+            // persentase terhadap target
+            'persentase_target' => ($target > 0 && $realisasi_target_tw > 0)
+                ? round(($total_realisasi_target / $target) * 100, 2)
+                : null
         ];
     }
 }
 
+
 $realisasi = '';
 $realisasi_anggaran = '';
 
-if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['tw'])) {
+if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['bulan'])) {
 
     $indikator_id = intval($_GET['indikator_id']);
     $tahun        = intval($_GET['tahun']);
-    $tw_ke        = intval($_GET['tw']);
+    $bulan_ke        = intval($_GET['bulan']);
 
     $qCek = $conn->prepare("
-        SELECT realisasiTW$tw_ke, realisasi_anggaranTW$tw_ke
+        SELECT realisasi_bulan$bulan_ke, realisasi_anggaran_bulan$bulan_ke
         FROM kegiatan
         WHERE id = ? AND tahun = ? 
         LIMIT 1
@@ -94,8 +114,8 @@ if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['tw'
 
     if ($res->num_rows > 0) {
         $row = $res->fetch_assoc();
-        $realisasi    = $row['realisasiTW'.$tw_ke];
-        $realisasi_anggaran = (int) $row['realisasi_anggaranTW'.$tw_ke];
+        $realisasi    = $row['realisasi_bulan'.$bulan_ke];
+        $realisasi_anggaran = (int) $row['realisasi_anggaran_bulan'.$bulan_ke];
         
     }
 }
@@ -105,14 +125,14 @@ if (isset($_POST['submit_realisasi'])) {
 
     $id = intval($_POST['indikator_id']);
     $tahun        = intval($_POST['tahun']);
-    $tw_ke        = intval($_POST['tw']);
+    $bulan_ke        = intval($_POST['bulan']);
     $fisik        = intval($_POST['realisasi_fisik']);
     $anggaran     = intval($_POST['realisasi_anggaran']);
 
         // UPDATE
         $update = $conn->prepare("
             UPDATE kegiatan
-            SET realisasiTW$tw_ke = ?, realisasi_anggaranTW$tw_ke = ?
+            SET realisasi_bulan$bulan_ke = ?, realisasi_anggaran_bulan$bulan_ke = ?
             WHERE id = ? AND tahun = ? 
         ");
         $update->bind_param(
@@ -493,7 +513,7 @@ body {
         </div>
         
     <div class="text-start mb-1">
-        <a class="btn btn-success" href="Perencanaan.php">
+        <a class="btn btn-success" href="perencanaan.php">
             <i class="bi bi-arrow-bar-left"></i> Kembali
         </a>
     </div>
@@ -545,12 +565,20 @@ body {
             <!-- Dropdown Triwulan -->
             <div class="col-md-2">
                 <label class="form-label">Triwulan</label>
-                <select name="tw" class="form-select" required>
-                    <option value="">-- Pilih TW --</option>
-                    <option value="1" <?= ($_GET['tw'] ?? '') == '1' ? 'selected' : ''; ?>>TW 1</option>
-                    <option value="2" <?= ($_GET['tw'] ?? '') == '2' ? 'selected' : ''; ?>>TW 2</option>
-                    <option value="3" <?= ($_GET['tw'] ?? '') == '3' ? 'selected' : ''; ?>>TW 3</option>
-                    <option value="4" <?= ($_GET['tw'] ?? '') == '4' ? 'selected' : ''; ?>>TW 4</option>
+                <select name="bulan" class="form-select" required>
+                    <option value="">-- Pilih Bulan --</option>
+                    <option value="1" <?= ($_GET['bulan'] ?? '') == '1' ? 'selected' : ''; ?>>Bulan 1</option>
+                    <option value="2" <?= ($_GET['bulan'] ?? '') == '2' ? 'selected' : ''; ?>>Bulan 2</option>
+                    <option value="3" <?= ($_GET['bulan'] ?? '') == '3' ? 'selected' : ''; ?>>Bulan 3</option>
+                    <option value="4" <?= ($_GET['bulan'] ?? '') == '4' ? 'selected' : ''; ?>>Bulan 4</option>
+                    <option value="5" <?= ($_GET['bulan'] ?? '') == '5' ? 'selected' : ''; ?>>Bulan 5</option>
+                    <option value="6" <?= ($_GET['bulan'] ?? '') == '6' ? 'selected' : ''; ?>>Bulan 6</option>
+                    <option value="7" <?= ($_GET['bulan'] ?? '') == '7' ? 'selected' : ''; ?>>Bulan 7</option>
+                    <option value="8" <?= ($_GET['bulan'] ?? '') == '8' ? 'selected' : ''; ?>>Bulan 8</option>
+                    <option value="9" <?= ($_GET['bulan'] ?? '') == '9' ? 'selected' : ''; ?>>Bulan 9</option>
+                    <option value="10" <?= ($_GET['bulan'] ?? '') == '10' ? 'selected' : ''; ?>>Bulan 10</option>
+                    <option value="11" <?= ($_GET['bulan'] ?? '') == '11' ? 'selected' : ''; ?>>Bulan 11</option>
+                    <option value="12" <?= ($_GET['bulan'] ?? '') == '12' ? 'selected' : ''; ?>>Bulan 12</option>
                 </select>
             </div>
 
@@ -602,32 +630,43 @@ body {
 
                 <input type="hidden" name="indikator_id" value="<?= $_GET['indikator_id']; ?>">
                 <input type="hidden" name="tahun" value="<?= $_GET['tahun']; ?>">
-                <input type="hidden" name="tw" value="<?= $_GET['tw']; ?>"> 
+                <input type="hidden" name="bulan" value="<?= $_GET['bulan']; ?>"> 
 
-                <div class="col-md-5">
-                    <label class="form-label">Realisasi Target</label>
-                    <input type="number"
-                        name="realisasi_fisik"
-                        class="form-control"
-                        value="<?= number_format($realisasi, 0, '.', ','); ?>"
-                        required>
-                </div>
+                <?php if (isset($_GET['bulan'])):  ?>
+                    <div class="col-md-5">
+                        <label class="form-label">Realisasi Target</label>
+                        <input type="number"
+                            name="realisasi_fisik"
+                            class="form-control"
+                            value="<?= number_format($realisasi, 0, '.', ','); ?>"
+                            required>
+                    </div>
 
-              <div class="col-md-5">
-                <label class="form-label">Realisasi Anggaran</label>
-                <input type="text"
-                    name="realisasi_anggaran"
-                    class="form-control"
-                    value="<?= number_format($realisasi_anggaran, 0, ',', '.'); ?>"
-                    required>
-            </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Realisasi Anggaran</label>
+                        <input type="text"
+                            name="realisasi_anggaran"
+                            class="form-control"
+                            value="<?= number_format($realisasi_anggaran, 0, ',', '.'); ?>"
+                            required>
+                    </div>
+
+                    <div class="col-md-2 d-grid align-items-end">
+                        <button type="submit" name="submit_realisasi" class="btn btn-success">
+                            <i class="bi bi-save me-1"></i>Simpan
+                        </button>
+                    </div>
+                
+
+                <?php else : ?>
+                    <div class="text-muted text-center py-4">
+                        Pilih bulan yang mau diisi terlebih dahulu
+                    </div>
+
+                <?php  endif;  ?>
 
 
-                <div class="col-md-2 d-grid align-items-end">
-                    <button type="submit" name="submit_realisasi" class="btn btn-success">
-                        <i class="bi bi-save me-1"></i>Simpan
-                    </button>
-                </div>
+                
 
             </form>
         <?php endif; ?>
