@@ -564,21 +564,21 @@ body {
 
             <!-- Dropdown Triwulan -->
             <div class="col-md-2">
-                <label class="form-label">Triwulan</label>
+                <label class="form-label">Bulan</label>
                 <select name="bulan" class="form-select" required>
                     <option value="">-- Pilih Bulan --</option>
-                    <option value="1" <?= ($_GET['bulan'] ?? '') == '1' ? 'selected' : ''; ?>>Bulan 1</option>
-                    <option value="2" <?= ($_GET['bulan'] ?? '') == '2' ? 'selected' : ''; ?>>Bulan 2</option>
-                    <option value="3" <?= ($_GET['bulan'] ?? '') == '3' ? 'selected' : ''; ?>>Bulan 3</option>
-                    <option value="4" <?= ($_GET['bulan'] ?? '') == '4' ? 'selected' : ''; ?>>Bulan 4</option>
-                    <option value="5" <?= ($_GET['bulan'] ?? '') == '5' ? 'selected' : ''; ?>>Bulan 5</option>
-                    <option value="6" <?= ($_GET['bulan'] ?? '') == '6' ? 'selected' : ''; ?>>Bulan 6</option>
-                    <option value="7" <?= ($_GET['bulan'] ?? '') == '7' ? 'selected' : ''; ?>>Bulan 7</option>
-                    <option value="8" <?= ($_GET['bulan'] ?? '') == '8' ? 'selected' : ''; ?>>Bulan 8</option>
-                    <option value="9" <?= ($_GET['bulan'] ?? '') == '9' ? 'selected' : ''; ?>>Bulan 9</option>
-                    <option value="10" <?= ($_GET['bulan'] ?? '') == '10' ? 'selected' : ''; ?>>Bulan 10</option>
-                    <option value="11" <?= ($_GET['bulan'] ?? '') == '11' ? 'selected' : ''; ?>>Bulan 11</option>
-                    <option value="12" <?= ($_GET['bulan'] ?? '') == '12' ? 'selected' : ''; ?>>Bulan 12</option>
+                    <option value="1" <?= ($_GET['bulan'] ?? '') == '1' ? 'selected' : ''; ?>>Januari</option>
+                    <option value="2" <?= ($_GET['bulan'] ?? '') == '2' ? 'selected' : ''; ?>>Februari</option>
+                    <option value="3" <?= ($_GET['bulan'] ?? '') == '3' ? 'selected' : ''; ?>>Maret</option>
+                    <option value="4" <?= ($_GET['bulan'] ?? '') == '4' ? 'selected' : ''; ?>>April</option>
+                    <option value="5" <?= ($_GET['bulan'] ?? '') == '5' ? 'selected' : ''; ?>>Mei</option>
+                    <option value="6" <?= ($_GET['bulan'] ?? '') == '6' ? 'selected' : ''; ?>>Juni</option>
+                    <option value="7" <?= ($_GET['bulan'] ?? '') == '7' ? 'selected' : ''; ?>>Juli</option>
+                    <option value="8" <?= ($_GET['bulan'] ?? '') == '8' ? 'selected' : ''; ?>>Agustus</option>
+                    <option value="9" <?= ($_GET['bulan'] ?? '') == '9' ? 'selected' : ''; ?>>September</option>
+                    <option value="10" <?= ($_GET['bulan'] ?? '') == '10' ? 'selected' : ''; ?>>OKtober</option>
+                    <option value="11" <?= ($_GET['bulan'] ?? '') == '11' ? 'selected' : ''; ?>>November</option>
+                    <option value="12" <?= ($_GET['bulan'] ?? '') == '12' ? 'selected' : ''; ?>>Desember</option>
                 </select>
             </div>
 

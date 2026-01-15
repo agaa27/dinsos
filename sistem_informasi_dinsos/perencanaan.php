@@ -537,6 +537,11 @@ body {
                             <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
                         </a>
                     </div>
+
+                <?php  else: ?>
+                    <div class="text-start mb-1">
+                        <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Perencanaan dan Keuangan</p>
+                    </div>
                 <?php endif; ?>
         <!-- Alert Messages Section -->
         <?php if (isset($_SESSION['success'])): ?>
@@ -716,6 +721,7 @@ body {
                         <?php endif; ?>
 
                         <!-- Tombol Lihat Detail -->
+                         
                         <div class="text-end mt-3">
                             <button
                                 type="button"
@@ -750,12 +756,14 @@ body {
                 <div class="row g-3" id="modalBulanContent"></div>
             </div>
 
-            <div class="modal-footer">
-                <a href="editPerencanaan.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
-                    <i class="bi bi-pencil-square"></i> Edit
-                </a>
-            </div>
-
+            <?php if ($_SESSION['role'] === 'Perencanaan dan Keuangan'): ?>
+                    <div class="modal-footer">
+                        <a href="editPerencanaan.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+                    </div>
+                <?php endif; ?>
+            
         </div>
     </div>
 </div>
@@ -866,6 +874,22 @@ const dataBulan = <?= json_encode($bulan); ?>;
 const mappingTW = <?= json_encode($mapping_tw); ?>;
 const satuan = "<?= $satuan; ?>";
 
+const namaBulan = {
+    1: 'Januari',
+    2: 'Februari',
+    3: 'Maret',
+    4: 'April',
+    5: 'Mei',
+    6: 'Juni',
+    7: 'Juli',
+    8: 'Agustus',
+    9: 'September',
+    10: 'Oktober',
+    11: 'November',
+    12: 'Desember'
+};
+
+
 function openDetailTW(tw) {
 
     // Judul
@@ -880,7 +904,10 @@ function openDetailTW(tw) {
         container.innerHTML += `
             <div class="col-md-4">
                 <div class="border rounded p-3 h-100">
-                    <h6 class="text-center fw-bold mb-3 fs-4 text-success">Bulan ${bln}</h6>
+                    <h6 class="text-center fw-bold mb-3 fs-4 text-success">
+                        ${namaBulan[bln]}
+                    </h6>
+
 
                     <ul class="list-unstyled small mb-0">
                         <li><span class='fs-6 text-primary'><strong>Realisasi Target:</strong>
