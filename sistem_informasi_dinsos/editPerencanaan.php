@@ -144,52 +144,17 @@ if (isset($_POST['submit_realisasi'])) {
         );
         $update->execute();
 
+    $_SESSION['notif'] = [
+        'type' => 'success',
+        'message' => 'Data berhasil disimpan!'
+    ];
+
     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
     exit;
 }
 
-//UPDATE HANDLER
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//  NOTIF 
 
-//   $id = intval($_POST['id']);
-//   $tahun = intval($_POST['tahun']);
-
-//   // Tangkap data TW 1–4
-//   for ($i = 1; $i <= 4; $i++) {
-//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
-//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
-//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
-//   }
-
-//   // Query update
-//   $sql = "UPDATE kegiatan SET
-//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
-//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
-//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
-//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
-//           WHERE id = ?";
-
-//   $stmt = $conn->prepare($sql);
-//   $stmt->bind_param(
-//     "ddddddddddddi",
-//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
-//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
-//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
-//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
-//     $id
-//   );
-
-//   if ($stmt->execute()) {
-//     $_SESSION['success'] = 'Data berhasil disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-//   } else {
-//     $_SESSION['error'] = 'Data gagal disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-//   }
-
-//   $stmt->close();
-//   $conn->close();
-// }
 
 ?>
 
@@ -464,8 +429,9 @@ body {
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
 .bidang-pemberdayaan { background-color: #f39c12; }
+
+
 </style>
-    </style>
 </head>
 <body>
 
@@ -502,6 +468,9 @@ body {
             </div>
         </div>
     </nav>
+
+    
+
 
     <!-- Main Content -->
     <div class="content-wrapper container">
@@ -644,10 +613,10 @@ body {
 
                     <div class="col-md-5">
                         <label class="form-label">Realisasi Anggaran</label>
-                        <input type="text"
+                        <input type="number"
                             name="realisasi_anggaran"
                             class="form-control"
-                            value="<?= number_format($realisasi_anggaran, 0, ',', '.'); ?>"
+                            value="<?= $realisasi_anggaran; ?>"
                             required>
                     </div>
 
@@ -702,6 +671,11 @@ function updateDateTime() {
 // Update waktu setiap detik
 setInterval(updateDateTime, 60*1000);
 updateDateTime(); // Panggil sekali saat pertama kali load
+
+
+
+
+
 </script>
 
 </body>

@@ -479,6 +479,23 @@ body {
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
 .bidang-pemberdayaan { background-color: #f39c12; }
+
+/* notif */
+.notif-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    width: auto;
+    max-width: 90%;
+}
+
+.notif-wrapper .alert {
+    min-width: 300px;
+    text-align: center;
+}
+
 </style>
     </style>
 </head>
@@ -543,22 +560,21 @@ body {
                         <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Perencanaan dan Keuangan</p>
                     </div>
                 <?php endif; ?>
-        <!-- Alert Messages Section -->
-        <?php if (isset($_SESSION['success'])): ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle"></i>
-        <?= $_SESSION['success']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['success']); endif; ?>
 
-      <?php if (isset($_SESSION['error'])): ?>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle"></i>
-        <?= $_SESSION['error']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['error']); endif; ?>
+        <!-- notif  -->
+
+    <?php if (isset($_SESSION['notif'])): ?>
+        <div class="notif-wrapper">
+            <div class="alert alert-<?= $_SESSION['notif']['type']; ?> alert-dismissible fade show auto-close shadow"
+                role="alert">
+                <?= $_SESSION['notif']['message']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        <?php
+        unset($_SESSION['notif']);
+        endif;
+        ?>
 
         <!-- Filter Form Card -->
 <div class="card shadow-sm mb-4 border-0">
@@ -943,6 +959,17 @@ function openDetailTW(tw) {
 }
 
 
+
+// notif 
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        let alert = document.querySelector('.auto-close');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 2000); // durasi 3 detik
+});
 
 
 
