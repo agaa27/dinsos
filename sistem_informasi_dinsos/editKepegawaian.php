@@ -485,7 +485,7 @@ body {
         </div>
         
     <div class="text-start mb-1">
-        <a class="btn btn-success" href="perencanaan.php">
+        <a class="btn btn-success" href="Kepegawaian.php">
             <i class="bi bi-arrow-bar-left"></i> Kembali
         </a>
     </div>

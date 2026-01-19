@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 $qIndikator = $conn->query("
     SELECT id, indikator_kinerja 
     FROM kegiatan 
-    WHERE bidang = 'Perencanaan dan Keuangan'
+    WHERE bidang = 'Perlindungan dan Jaminan Sosial'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY indikator_kinerja ASC
 ");
@@ -19,7 +19,7 @@ $qIndikator = $conn->query("
 $qTahun = $conn->query("
     SELECT DISTINCT tahun   
     FROM kegiatan 
-    WHERE bidang = 'Perencanaan dan Keuangan'
+    WHERE bidang = 'Perlindungan dan Jaminan Sosial'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY tahun DESC
 ");
@@ -152,7 +152,7 @@ if (isset($_POST['submit_realisasi'])) {
         'message' => 'Data berhasil disimpan!'
     ];
 
-    header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+    header("Location: perlindungan.php?indikator_id=$id&tahun=$tahun");
     exit;
 }
 
@@ -427,7 +427,7 @@ body {
     padding-left: 30px;
 }
 /* Warna untuk bidang */
-.bidang-perencanaan { background-color: #3498db; }
+.bidang-perlindungan { background-color: #3498db; }
 .bidang-umum { background-color: #2ecc71; }
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
@@ -485,7 +485,7 @@ body {
         </div>
         
     <div class="text-start mb-1">
-        <a class="btn btn-success" href="perencanaan.php">
+        <a class="btn btn-success" href="perlindungan.php">
             <i class="bi bi-arrow-bar-left"></i> Kembali
         </a>
     </div>

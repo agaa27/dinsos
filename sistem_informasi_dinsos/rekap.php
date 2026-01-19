@@ -35,6 +35,10 @@
       background-color: #343a40;
       color: #fff;
     }
+    .submenu a {
+    padding-left: 40px;
+    font-size: 13px;
+}
     .main-content {
       margin-left: 250px;
     }
