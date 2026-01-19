@@ -8,11 +8,11 @@ error_reporting(E_ALL);
 
 
 $qIndikator = $conn->query("
-    SELECT id, indikator_kinerja 
+    SELECT id, sub_kegiatan 
     FROM kegiatan 
     WHERE bidang = 'Umum dan Kepegawaian'
     AND tahun >= YEAR(CURDATE()) - 4
-    ORDER BY indikator_kinerja ASC
+    ORDER BY sub_kegiatan ASC
 ");
 
 /* Ambil tahun (unik / tidak double) */
@@ -172,10 +172,10 @@ $mapping_tw = [
 
 //   if ($stmt->execute()) {
 //     $_SESSION['success'] = 'Data berhasil disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//     header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
 //   } else {
 //     $_SESSION['error'] = 'Data gagal disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//     header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
 //   }
 
 //   $stmt->close();
@@ -189,7 +189,7 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Realisasi Triwulan - Dinsos Tarakan</title>
+    <title>Input Realisasi pagu dan anggaran - Dinsos Tarakan</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -477,7 +477,7 @@ body {
     padding-left: 30px;
 }
 /* Warna untuk bidang */
-.bidang-perencanaan { background-color: #3498db; }
+.bidang-kepegawaian { background-color: #3498db; }
 .bidang-umum { background-color: #2ecc71; }
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
@@ -519,21 +519,18 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hello, User Name</h6>
+                    <h6 class="mb-0">Hallo, Staff Umum dan Kepegawaian</h6>
                 </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong>User Name</strong>
-                            <p class="mb-0 text-muted small">Role</p>
-                            <p class="mb-0 text-muted small">Bidang</p>
+                            <strong>DINAS SOSIAL</strong>
+                            <p class="mb-0 text-muted small">Staff</p>
+                            <p class="mb-0 text-muted small">Umum dan Kepegawaian</p>
                         </div>
                     </div>
                     <hr class="my-2">
-                    <a href="profile.php" class="dropdown-item">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </a>
                     <a href="logout.php" class="dropdown-item text-danger">
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
@@ -547,7 +544,7 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Triwulan
+                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Pagu dan Anggaran
             </h2>
         </div>
         <!-- Tombol Input -->
@@ -587,7 +584,7 @@ body {
             <div>
                 <h6 class="mb-0 fw-semibold">Filter Data</h6>
                 <small class="opacity-75">
-                    Pilih indikator untuk melihat / mengisi realisasi
+                    Pilih Sub Kegiatan untuk melihat / mengisi realisasi
                 </small>
             </div>
         </div>
@@ -599,14 +596,14 @@ body {
             <!-- Indikator -->
             <div class="col-md-6">
                 <label class="form-label fw-semibold">
-                    Indikator Kinerja
+                    Sub Kegiatan
                 </label>
                 <select name="indikator_id" class="form-select" required>
-                    <option value="">-- Pilih Indikator --</option>
+                    <option value="">-- Pilih Sub Kegiatan --</option>
                     <?php while ($row = $qIndikator->fetch_assoc()) : ?>
                         <option value="<?= $row['id']; ?>"
                             <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                            <?= htmlspecialchars($row['sub_kegiatan']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
@@ -634,7 +631,7 @@ body {
                     <span>Tampilkan</span>
                 </button>
 
-                <a href="perencanaan.php" class="btn btn-outline-success btn-filter">
+                <a href="kepegawaian.php" class="btn btn-outline-success btn-filter">
                     <i class="bi bi-arrow-clockwise"></i>
                     <span>Reset</span>
                 </a>
@@ -652,7 +649,7 @@ body {
         <div class="card">
             <div class="card-header bg-secondary">
                 <h5 class="mb-0">
-                    <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran
+                    <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran Tahunan
                 </h5>
             </div>
 
@@ -660,7 +657,7 @@ body {
 
                 <?php if (!$data): ?>
                     <div class="text-muted text-center py-4">
-                        Pilih indikator dan tahun terlebih dahulu
+                        Sesuaikan filter untuk menampilkan data
                     </div>
                 <?php else: ?>
 
@@ -677,6 +674,14 @@ body {
                     <li class="list-group-item">
                         <strong>Program:</strong><br>
                         <?= htmlspecialchars($data['program']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['kegiatan']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Sub Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['sub_kegiatan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
@@ -706,7 +711,7 @@ body {
                         <?php else: ?>
                             <ul class="mb-0">
                                 <li>
-                                    Realisasi Target:
+                                    Realisasi Kinerja:
                                     <strong>
                                         <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
@@ -765,9 +770,15 @@ body {
         <div class="modal-content">
 
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    Detail Triwulan ke <span id="modalTw">-</span>
-                </h5>
+                <div>
+                    <h5 class="modal-title mb-1">
+                        Detail Triwulan ke <span id="modalTw">-</span>
+                    </h5>
+                    <small>
+                        Sub Kegiatan : <?=$data["sub_kegiatan"];?>
+                    </small>
+                </div>
+
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
@@ -819,7 +830,7 @@ updateDateTime(); // Panggil sekali saat pertama kali load
 // Fungsi untuk konfirmasi hapus
 function confirmDelete(id) {
     if (confirm('Apakah Anda yakin ingin menghapus data realisasi ini?')) {
-        window.location.href = 'perencanaan.php?delete=' + id;
+        window.location.href = 'kepegawaian.php?delete=' + id;
     }
 }
 
@@ -929,7 +940,7 @@ function openDetailTW(tw) {
 
 
                     <ul class="list-unstyled small mb-0">
-                        <li><span class='fs-6 text-primary'><strong>Realisasi Target:</strong>
+                        <li><span class='fs-6 text-primary'><strong>Realisasi Kinerja:</strong>
                             ${b.realisasi_target ?? '-'} ${b.realisasi_target ? satuan : ''}</span>
                         </li>
                         <li><strong>Persentase Target:</strong>

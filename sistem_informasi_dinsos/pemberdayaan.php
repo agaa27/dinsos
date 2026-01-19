@@ -8,11 +8,11 @@ error_reporting(E_ALL);
 
 
 $qIndikator = $conn->query("
-    SELECT id, indikator_kinerja 
+    SELECT id, sub_kegiatan 
     FROM kegiatan 
     WHERE bidang = 'Pemberdayaan Sosial'
     AND tahun >= YEAR(CURDATE()) - 4
-    ORDER BY indikator_kinerja ASC
+    ORDER BY sub_kegiatan ASC
 ");
 
 /* Ambil tahun (unik / tidak double) */
@@ -172,10 +172,10 @@ $mapping_tw = [
 
 //   if ($stmt->execute()) {
 //     $_SESSION['success'] = 'Data berhasil disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//     header("Location: pemberdayaan.php?indikator_id=$id&tahun=$tahun");
 //   } else {
 //     $_SESSION['error'] = 'Data gagal disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//     header("Location: pemberdayaan.php?indikator_id=$id&tahun=$tahun");
 //   }
 
 //   $stmt->close();
@@ -477,7 +477,7 @@ body {
     padding-left: 30px;
 }
 /* Warna untuk bidang */
-.bidang-perencanaan { background-color: #3498db; }
+.bidang-pemberdayaan { background-color: #3498db; }
 .bidang-umum { background-color: #2ecc71; }
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
@@ -519,21 +519,18 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hello, User Name</h6>
+                    <h6 class="mb-0">Hallo, Staff Pemberdayaan Sosial</h6>
                 </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong>User Name</strong>
-                            <p class="mb-0 text-muted small">Role</p>
-                            <p class="mb-0 text-muted small">Bidang</p>
+                            <strong>DINAS SOSIAL</strong>
+                            <p class="mb-0 text-muted small">Staff</p>
+                            <p class="mb-0 text-muted small">Pemberdayaan Sosial</p>
                         </div>
                     </div>
                     <hr class="my-2">
-                    <a href="profile.php" class="dropdown-item">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </a>
                     <a href="logout.php" class="dropdown-item text-danger">
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
@@ -547,13 +544,13 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Triwulan
+                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Pagu dan Anggaran
             </h2>
         </div>
         <!-- Tombol Input -->
                 <?php if ($_SESSION['role'] === 'Pemberdayaan Sosial'): ?>
                     <div class="text-start mb-1">
-                        <a class="btn btn-success" href="editPemberdayaan.php">
+                        <a class="btn btn-success" href="editpemberdayaan.php">
                             <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
                         </a>
                     </div>
@@ -587,7 +584,7 @@ body {
             <div>
                 <h6 class="mb-0 fw-semibold">Filter Data</h6>
                 <small class="opacity-75">
-                    Pilih indikator untuk melihat / mengisi realisasi
+                    Pilih Sub Kegiatan untuk melihat / mengisi realisasi
                 </small>
             </div>
         </div>
@@ -599,14 +596,14 @@ body {
             <!-- Indikator -->
             <div class="col-md-6">
                 <label class="form-label fw-semibold">
-                    Indikator Kinerja
+                    Sub Kegiatan
                 </label>
                 <select name="indikator_id" class="form-select" required>
-                    <option value="">-- Pilih Indikator --</option>
+                    <option value="">-- Pilih Sub Kegiatan --</option>
                     <?php while ($row = $qIndikator->fetch_assoc()) : ?>
                         <option value="<?= $row['id']; ?>"
                             <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                            <?= htmlspecialchars($row['sub_kegiatan']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
@@ -652,7 +649,7 @@ body {
         <div class="card">
             <div class="card-header bg-secondary">
                 <h5 class="mb-0">
-                    <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran
+                    <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran Tahunan
                 </h5>
             </div>
 
@@ -660,7 +657,7 @@ body {
 
                 <?php if (!$data): ?>
                     <div class="text-muted text-center py-4">
-                        Pilih indikator dan tahun terlebih dahulu
+                        Sesuaikan filter untuk menampilkan data
                     </div>
                 <?php else: ?>
 
@@ -677,6 +674,14 @@ body {
                     <li class="list-group-item">
                         <strong>Program:</strong><br>
                         <?= htmlspecialchars($data['program']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['kegiatan']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Sub Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['sub_kegiatan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
@@ -706,7 +711,7 @@ body {
                         <?php else: ?>
                             <ul class="mb-0">
                                 <li>
-                                    Realisasi Target:
+                                    Realisasi Kinerja:
                                     <strong>
                                         <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
@@ -765,9 +770,15 @@ body {
         <div class="modal-content">
 
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title">
-                    Detail Triwulan ke <span id="modalTw">-</span>
-                </h5>
+                <div>
+                    <h5 class="modal-title mb-1">
+                        Detail Triwulan ke <span id="modalTw">-</span>
+                    </h5>
+                    <small>
+                        Sub Kegiatan : <?=$data["sub_kegiatan"];?>
+                    </small>
+                </div>
+
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
@@ -777,7 +788,7 @@ body {
 
             <?php if ($_SESSION['role'] === 'Pemberdayaan Sosial'): ?>
                     <div class="modal-footer">
-                        <a href="editPemberdayaan.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
+                        <a href="editpemberdayaan.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
                             <i class="bi bi-pencil-square"></i> Edit
                         </a>
                     </div>
@@ -929,7 +940,7 @@ function openDetailTW(tw) {
 
 
                     <ul class="list-unstyled small mb-0">
-                        <li><span class='fs-6 text-primary'><strong>Realisasi Target:</strong>
+                        <li><span class='fs-6 text-primary'><strong>Realisasi Kinerja:</strong>
                             ${b.realisasi_target ?? '-'} ${b.realisasi_target ? satuan : ''}</span>
                         </li>
                         <li><strong>Persentase Target:</strong>
