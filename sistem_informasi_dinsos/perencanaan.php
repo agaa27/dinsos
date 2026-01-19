@@ -11,6 +11,7 @@ $qIndikator = $conn->query("
     SELECT id, indikator_kinerja 
     FROM kegiatan 
     WHERE bidang = 'Perencanaan dan Keuangan'
+    AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY indikator_kinerja ASC
 ");
 
@@ -18,6 +19,8 @@ $qIndikator = $conn->query("
 $qTahun = $conn->query("
     SELECT DISTINCT tahun   
     FROM kegiatan 
+    WHERE bidang = 'Perencanaan dan Keuangan'
+    AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY tahun DESC
 ");
 

@@ -252,8 +252,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= $n['indikator_kinerja'];  ?></td>
                 <td><?= $n['program'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
-                <td><?= $n['target'];  ?></td>
-                <td><?= $n['pagu_anggaran'];  ?></td>
+                <td><?= number_format($n['target'], 0, ',', '.');  ?></td>
+                <td><?= number_format($n['pagu_anggaran'], 0, ',', '.');  ?></td>
                 <td><?= $n['bidang'];  ?></td>           
                 <?php $no++; ?>               
               </tr>
@@ -313,7 +313,7 @@ while ($row = mysqli_fetch_assoc($query)) {
             <!-- Tahun -->
             <div class="col-md-4 mb-3">
               <label class="form-label">Tahun</label>
-              <input type="number" name="tahun" class="form-control" value="2024" required>
+              <input type="number" name="tahun" class="form-control" value="<?= date('Y') ?>" required>
             </div>
             
             <div class="col-md-4 mb-3">

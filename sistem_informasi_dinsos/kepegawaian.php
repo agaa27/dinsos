@@ -1,21 +1,26 @@
 <?php
 require 'config/database.php';
 session_start();
-// var_dump($_SESSION);die();
-//TAMPIL DATA DROPDOWN INDIKATOR DAN TAHUN
-/* Ambil indikator khusus bidang Umum dan Kepegawaian */
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
+
 $qIndikator = $conn->query("
     SELECT id, indikator_kinerja 
     FROM kegiatan 
     WHERE bidang = 'Umum dan Kepegawaian'
+    AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY indikator_kinerja ASC
 ");
 
 /* Ambil tahun (unik / tidak double) */
 $qTahun = $conn->query("
-    SELECT DISTINCT tahun 
+    SELECT DISTINCT tahun   
     FROM kegiatan 
     WHERE bidang = 'Umum dan Kepegawaian'
+    AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY tahun DESC
 ");
 
@@ -23,7 +28,7 @@ $qTahun = $conn->query("
 // AMBIL DATA KEGIATAN
 $data = null;
 
-if (isset($_GET['indikator_id'], $_GET['tahun'])) {
+if (isset($_GET['indikator_id'])) {
 
     $stmt = $conn->prepare("
         SELECT *
@@ -39,84 +44,143 @@ if (isset($_GET['indikator_id'], $_GET['tahun'])) {
 //TAMPILKAN DATA PER TRIWULAN
 if ($data) {
 
+    $id = $data['id'];
+    $tahun = $data['tahun'];
     $pagu_tahunan = (float) $data['pagu_anggaran'];
-    $target = (float) $data['target'];
-    $satuan = (float) $data['satuan'];
+    $target       = (float) $data['target'];
+    $satuan       = $data['satuan'];
 
     $tw = [];
-    $total_realisasi = 0;
+    $total_realisasi_anggaran = 0;
+    $total_realisasi_target   = 0;
 
-    for ($i = 1; $i <= 4; $i++) {
+    // Mapping bulan per triwulan
+    $mapping_tw = [
+        1 => [1, 2, 3],
+        2 => [4, 5, 6],
+        3 => [7, 8, 9],
+        4 => [10, 11, 12],
+    ];
 
-        $realisasiT      = (float) ($data["realisasiTW{$i}"] ?? 0);
-        $pagu      = (float) ($data["paguTW{$i}"] ?? 0);
-        $realisasi = (float) ($data["realisasi_anggaranTW{$i}"] ?? 0);
-        $total_realisasi += $realisasi;
+    foreach ($mapping_tw as $i => $bulan_list) {
+
+        $realisasi_anggaran_tw = 0;
+        $realisasi_target_tw   = 0;
+
+        foreach ($bulan_list as $bulan) {
+            $realisasi_target_tw   += (float) ($data["realisasi_bulan{$bulan}"] ?? 0);
+            $realisasi_anggaran_tw += (float) ($data["realisasi_anggaran_bulan{$bulan}"] ?? 0);
+        }
+
+        // Akumulasi tahunan
+        $total_realisasi_anggaran += $realisasi_anggaran_tw;
+        $total_realisasi_target   += $realisasi_target_tw;
 
         $tw[$i] = [
-            'pagu'       => $pagu ?: null,
-            'realisasi'  => $realisasi ?: null,
-            'realisasiT'  => $realisasiT ?: null,
+            'realisasi'   => $realisasi_anggaran_tw ?: null,
+            'realisasiT'  => $realisasi_target_tw ?: null,
 
-            // sisa pagu tahunan (akumulatif)
-            'sisa'       => $pagu_tahunan - $total_realisasi,
+            // sisa tahunan (akumulatif)
+            'sisa'        => $pagu_tahunan - $total_realisasi_anggaran,
+            'sisa_target' => $target - $total_realisasi_target,
 
             // persentase terhadap pagu tahunan
-            'persentase' => ($pagu_tahunan > 0 && $realisasi > 0)
-                            ? round(($realisasi / $pagu_tahunan) * 100, 2)
-                            : null,
-            
-                            // persentase terhadap pagu tahunan
-            'persentase_target' => ($realisasiT > 0 && $target > 0)
-                            ? round(($realisasiT / $target) * 100, 2)
-                            : null
+            'persentase' => ($pagu_tahunan > 0 && $realisasi_anggaran_tw > 0)
+                ? round(($total_realisasi_anggaran / $pagu_tahunan) * 100, 2)
+                : null,
+
+            // persentase terhadap target
+            'persentase_target' => ($target > 0 && $realisasi_target_tw > 0)
+                ? round(($total_realisasi_target / $target) * 100, 2)
+                : null
         ];
     }
 }
 
-//UPDATE HANDLER
+// TAMPIL DATA PER BULAN
+$bulan = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$total_realisasi_target   = 0;
+$total_realisasi_anggaran = 0;
 
-  $id = intval($_POST['id']);
-  $tahun = intval($_POST['tahun']);
 
-  // Tangkap data TW 1–4
-  for ($i = 1; $i <= 4; $i++) {
-    $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
-    $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
-    $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
-  }
+for ($i = 1; $i <= 12; $i++) {
 
-  // Query update
-  $sql = "UPDATE kegiatan SET
-            paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
-            paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
-            paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
-            paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
-          WHERE id = ?";
+    $realisasi_target   = (float) ($data["realisasi_bulan{$i}"] ?? 0);
+    $realisasi_anggaran = (float) ($data["realisasi_anggaran_bulan{$i}"] ?? 0);
 
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param(
-    "ddddddddddddi",
-    $paguTW[1], $realisasiTW[1], $anggaranTW[1],
-    $paguTW[2], $realisasiTW[2], $anggaranTW[2],
-    $paguTW[3], $realisasiTW[3], $anggaranTW[3],
-    $paguTW[4], $realisasiTW[4], $anggaranTW[4],
-    $id
-  );
+    // Akumulasi tahunan
+    $total_realisasi_target   += $realisasi_target;
+    $total_realisasi_anggaran += $realisasi_anggaran;
 
-  if ($stmt->execute()) {
-    $_SESSION['success'] = 'Data berhasil disimpan';
-    header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
-  } else {
-    $_SESSION['error'] = 'Data gagal disimpan';
-    header("Location: kepegawaian.php?indikator_id=$id&tahun=$tahun");
-  }
+    $bulan[$i] = [
+        'realisasi_target'   => $realisasi_target ?: null,
+        'realisasi_anggaran' => $realisasi_anggaran ?: null,
 
-  $stmt->close();
-  $conn->close();
+        'sisa_target'   => $target - $total_realisasi_target,
+        'sisa_anggaran' => $pagu_tahunan - $total_realisasi_anggaran,
+
+        'persentase_target' => ($target > 0 && $total_realisasi_target > 0)
+            ? round(($total_realisasi_target / $target) * 100, 2)
+            : null,
+
+        'persentase_anggaran' => ($pagu_tahunan > 0 && $total_realisasi_anggaran > 0)
+            ? round(($total_realisasi_anggaran / $pagu_tahunan) * 100, 2)
+            : null
+    ];
 }
+
+$mapping_tw = [
+    1 => [1, 2, 3],
+    2 => [4, 5, 6],
+    3 => [7, 8, 9],
+    4 => [10, 11, 12],
+];
+
+
+// //UPDATE HANDLER
+
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+//   $id = intval($_POST['id']);
+//   $tahun = intval($_POST['tahun']);
+
+//   // Tangkap data TW 1–4
+//   for ($i = 1; $i <= 4; $i++) {
+//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
+//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
+//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
+//   }
+
+//   // Query update
+//   $sql = "UPDATE kegiatan SET
+//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
+//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
+//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
+//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
+//           WHERE id = ?";
+
+//   $stmt = $conn->prepare($sql);
+//   $stmt->bind_param(
+//     "ddddddddddddi",
+//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
+//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
+//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
+//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
+//     $id
+//   );
+
+//   if ($stmt->execute()) {
+//     $_SESSION['success'] = 'Data berhasil disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   } else {
+//     $_SESSION['error'] = 'Data gagal disimpan';
+//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
+//   }
+
+//   $stmt->close();
+//   $conn->close();
+// }
 
 ?>
 
@@ -418,6 +482,23 @@ body {
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
 .bidang-pemberdayaan { background-color: #f39c12; }
+
+/* notif */
+.notif-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    width: auto;
+    max-width: 90%;
+}
+
+.notif-wrapper .alert {
+    min-width: 300px;
+    text-align: center;
+}
+
 </style>
     </style>
 </head>
@@ -430,7 +511,7 @@ body {
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
-            <h5 class="mb-0">Pemberdayaan Sosial</h5>
+            <h5 class="mb-0">Umum dan Kepegawaian</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
@@ -464,81 +545,107 @@ body {
     <!-- Main Content -->
     <div class="content-wrapper">
         <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
                 <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Triwulan
             </h2>
         </div>
+        <!-- Tombol Input -->
+                <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
+                    <div class="text-start mb-1">
+                        <a class="btn btn-success" href="editKepegawaian.php">
+                            <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
+                        </a>
+                    </div>
 
-        <!-- Alert Messages Section -->
-        <?php if (isset($_SESSION['success'])): ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle"></i>
-        <?= $_SESSION['success']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['success']); endif; ?>
+                <?php  else: ?>
+                    <div class="text-start mb-1">
+                        <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Umum dan Kepegawaian</p>
+                    </div>
+                <?php endif; ?>
 
-      <?php if (isset($_SESSION['error'])): ?>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle"></i>
-        <?= $_SESSION['error']; ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-      <?php unset($_SESSION['error']); endif; ?>
+        <!-- notif  -->
+
+    <?php if (isset($_SESSION['notif'])): ?>
+        <div class="notif-wrapper">
+            <div class="alert alert-<?= $_SESSION['notif']['type']; ?> alert-dismissible fade show auto-close shadow"
+                role="alert">
+                <?= $_SESSION['notif']['message']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        <?php
+        unset($_SESSION['notif']);
+        endif;
+        ?>
 
         <!-- Filter Form Card -->
-        <div class="card mb-4">
-            <div class="card-header bg-secondary">
-                <h5 class="mb-0">
-                    <i class="bi bi-funnel me-2"></i>Filter Data
-                </h5>
-                <small class="text-white">
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-secondary text-white">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-funnel me-2 fs-5"></i>
+            <div>
+                <h6 class="mb-0 fw-semibold">Filter Data</h6>
+                <small class="opacity-75">
                     Pilih indikator untuk melihat / mengisi realisasi
                 </small>
             </div>
-
-            <div class="card-body">
-                <form method="GET" action="" class="row g-3">
-
-                    <!-- Dropdown Indikator -->
-                    <div class="col-md-6">
-                        <label class="form-label">Indikator Kinerja</label>
-                        <select name="indikator_id" class="form-select" required>
-                            <option value="">-- Pilih Indikator --</option>
-                            <?php while ($row = $qIndikator->fetch_assoc()) : ?>
-                                <option value="<?= $row['id']; ?>"
-                                    <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                                    <?= htmlspecialchars($row['indikator_kinerja']); ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-
-                    <!-- Dropdown Tahun -->
-                    <div class="col-md-3">
-                        <label class="form-label">Tahun</label>
-                        <select name="tahun" class="form-select" required>
-                            <option value="">-- Pilih Tahun --</option>
-                            <?php while ($row = $qTahun->fetch_assoc()) : ?>
-                                <option value="<?= $row['tahun']; ?>"
-                                    <?= ($_GET['tahun'] ?? '') == $row['tahun'] ? 'selected' : ''; ?>>
-                                    <?= $row['tahun']; ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    </div>
-
-                    <!-- Tombol -->
-                    <div class="col-md-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-search me-1"></i> Tampilkan
-                        </button>
-                    </div>
-
-                </form>
-            </div>
         </div>
+    </div>
+
+    <div class="card-body">
+        <form method="GET" action="" class="row g-3 align-items-end">
+
+            <!-- Indikator -->
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                    Indikator Kinerja
+                </label>
+                <select name="indikator_id" class="form-select" required>
+                    <option value="">-- Pilih Indikator --</option>
+                    <?php while ($row = $qIndikator->fetch_assoc()) : ?>
+                        <option value="<?= $row['id']; ?>"
+                            <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
+                            <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <!-- Tahun -->
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">
+                    Tahun
+                </label>
+                <select name="tahun" class="form-select" required>
+                    <option value="">-- Pilih Tahun --</option>
+                    <?php while ($row = $qTahun->fetch_assoc()) : ?>
+                        <option value="<?= $row['tahun']; ?>"
+                            <?= ($_GET['tahun'] ?? '') == $row['tahun'] ? 'selected' : ''; ?>>
+                            <?= $row['tahun']; ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-3 align-items-end">
+                <button type="submit" class="btn btn-primary btn-filter">
+                    <i class="bi bi-search"></i>
+                    <span>Tampilkan</span>
+                </button>
+
+                <a href="perencanaan.php" class="btn btn-outline-success btn-filter">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Reset</span>
+                </a>
+            </div>
+
+
+        </form>
+    </div>
+
+</div>
+
 
 
         <!-- Data Table Card -->
@@ -573,39 +680,33 @@ body {
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
-                        <?= htmlspecialchars($data['target']) . " " . htmlspecialchars($data['satuan']); ?>
+                        <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
-                        <?= htmlspecialchars($data['pagu_anggaran']); ?>
+                        <?= number_format($data['pagu_anggaran'], 0, ',', '.'); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Tahun:</strong> <br> 
+                        <?= htmlspecialchars($data['tahun']); ?>
                     </li>
                 </ul>
 
                 <!-- Realisasi per TW -->
                 <?php for ($i = 1; $i <= 4; $i++): ?>
-                    <div class="border rounded p-3 mb-3">
-
+                    <div class="border rounded p-3 mb-3 position-relative">
                         <h6 class="mb-2">Triwulan <?= $i; ?></h6>
 
-                        <?php if ($tw[$i]['pagu'] === null): ?>
-                            <span class="text-muted">Belum ada pagu</span>
-
-                        <?php elseif ($tw[$i]['realisasi'] === null): ?>
-                            <ul class="mb-0">
-                                <li>Pagu Anggaran:
-                                    <strong>
-                                        Rp <?= number_format($tw[$i]['pagu'], 0, ',', '.'); ?>
-                                    </strong>
-                                </li>
+                        <?php if ($tw[$i]['realisasi'] === null): ?>
+                            <ul class="mb-0">                                
                                 <li class="text-muted">
                                     Belum ada realisasi
                                 </li>
                             </ul>
-
                         <?php else: ?>
                             <ul class="mb-0">
                                 <li>
-                                    Realisasi:
+                                    Realisasi Target:
                                     <strong>
                                         <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
@@ -615,11 +716,10 @@ body {
                                     <strong><?= $tw[$i]['persentase_target']; ?>%</strong>
                                 </li>
                                 <li>
-                                    Pagu Anggaran:
-                                    <strong>
-                                        Rp <?= number_format($tw[$i]['pagu'], 0, ',', '.'); ?>
-                                    </strong>
+                                    Sisa Target:
+                                    <strong><?= $tw[$i]['sisa_target'] . " " . $data['satuan']; ?></strong>
                                 </li>
+                                <hr>
                                 <li>
                                     Realisasi Anggaran:
                                     <strong>
@@ -639,20 +739,19 @@ body {
                             </ul>
                         <?php endif; ?>
 
+                        <!-- Tombol Lihat Detail -->
+                         
+                        <div class="text-end mt-3">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary"
+                                onclick="openDetailTW(<?= $i; ?>)">
+                                <i class="bi bi-eye"></i> Lihat Detail
+                            </button>
+                        </div>
                     </div>
+
                 <?php endfor; ?>
-
-                <!-- Tombol Input -->
-                <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
-                    <div class="text-end">
-                        <button class="btn btn-success"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalRealisasi">
-                            <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
-                        </button>
-                    </div>
-                <?php endif; ?>
-
                 <?php endif; ?>
             </div>
         </div>
@@ -661,80 +760,34 @@ body {
     </div>
 </div>
 
-<!-- Modal Input / Edit Realisasi -->
-<div class="modal fade" id="modalRealisasi" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <form method="POST" action="">
-      <div class="modal-content">
+<div class="modal fade" id="detailtw" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
 
-        <!-- Header -->
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-pencil-square me-2"></i>Input / Edit Realisasi Triwulan
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <!-- Body -->
-        <div class="modal-body">
-
-          <!-- ID kegiatan -->
-          <input type="hidden" name="id" value="<?= $data['id']; ?>">
-          <input type="hidden" name="tahun" value="<?= $data['tahun']; ?>">
-
-          <?php for ($i = 1; $i <= 4; $i++): ?>
-            <div class="border rounded p-3 mb-4">
-              <h6 class="mb-3">Triwulan <?= $i; ?></h6>
-
-              <div class="row g-3">
-
-                <!-- Pagu TW -->
-                <div class="col-md-4">
-                  <label class="form-label">Pagu TW <?= $i; ?></label>
-                  <input type="number" step="0.01"
-                         name="paguTW<?= $i; ?>"
-                         class="form-control"
-                         value="<?= $data["paguTW{$i}"]; ?>">
-                </div>
-
-                <!-- Realisasi Target -->
-                <div class="col-md-4">
-                  <label class="form-label">Realisasi Target</label>
-                  <input type="number" step="0.01"
-                         name="realisasiTW<?= $i; ?>"
-                         class="form-control"
-                         value="<?= $data["realisasiTW{$i}"]; ?>">
-                </div>
-
-                <!-- Realisasi Anggaran -->
-                <div class="col-md-4">
-                  <label class="form-label">Realisasi Anggaran</label>
-                  <input type="number" step="0.01"
-                         name="realisasi_anggaranTW<?= $i; ?>"
-                         class="form-control"
-                         value="<?= $data["realisasi_anggaranTW{$i}"]; ?>">
-                </div>
-
-              </div>
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    Detail Triwulan ke <span id="modalTw">-</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-          <?php endfor; ?>
 
+            <div class="modal-body">
+                <div class="row g-3" id="modalBulanContent"></div>
+            </div>
+
+            <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
+                    <div class="modal-footer">
+                        <a href="editKepegawaian.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+                    </div>
+                <?php endif; ?>
+            
         </div>
-
-        <!-- Footer -->
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save me-1"></i> Simpan Data
-          </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Batal
-          </button>
-        </div>
-
-      </div>
-    </form>
-  </div>
+    </div>
 </div>
+
+
 
 
 <!-- JavaScript Libraries -->
@@ -834,6 +887,95 @@ if (accountDropdown) {
 document.getElementById('addModal')?.addEventListener('shown.bs.modal', function () {
     document.getElementById('modal_triwulan')?.focus();
 });
+
+//detail triwulan
+const dataBulan = <?= json_encode($bulan); ?>;
+const mappingTW = <?= json_encode($mapping_tw); ?>;
+const satuan = "<?= $satuan; ?>";
+
+const namaBulan = {
+    1: 'Januari',
+    2: 'Februari',
+    3: 'Maret',
+    4: 'April',
+    5: 'Mei',
+    6: 'Juni',
+    7: 'Juli',
+    8: 'Agustus',
+    9: 'September',
+    10: 'Oktober',
+    11: 'November',
+    12: 'Desember'
+};
+
+
+function openDetailTW(tw) {
+
+    // Judul
+    document.getElementById('modalTw').innerText = tw;
+
+    const container = document.getElementById('modalBulanContent');
+    container.innerHTML = '';
+
+    mappingTW[tw].forEach(bln => {
+        const b = dataBulan[bln];
+
+        container.innerHTML += `
+            <div class="col-md-4">
+                <div class="border rounded p-3 h-100">
+                    <h6 class="text-center fw-bold mb-3 fs-4 text-success">
+                        ${namaBulan[bln]}
+                    </h6>
+
+
+                    <ul class="list-unstyled small mb-0">
+                        <li><span class='fs-6 text-primary'><strong>Realisasi Target:</strong>
+                            ${b.realisasi_target ?? '-'} ${b.realisasi_target ? satuan : ''}</span>
+                        </li>
+                        <li><strong>Persentase Target:</strong>
+                            ${b.persentase_target ?? '-'}%
+                        </li>
+                        <li><strong>Sisa Target:</strong>
+                            ${b.sisa_target} ${satuan}
+                        </li>
+                        <hr>
+                        <li><span class='fs-6 text-primary'><strong>Realisasi Anggaran:</strong>
+                            ${b.realisasi_anggaran
+                                ? 'Rp ' + Number(b.realisasi_anggaran).toLocaleString('id-ID')
+                                : '-'}</span>
+                        </li>
+                        <li><strong>Persentase Anggaran:</strong>
+                            ${b.persentase_anggaran ?? '-'}%
+                        </li>
+                        <li><strong>Sisa Anggaran:</strong>
+                            Rp ${Number(b.sisa_anggaran).toLocaleString('id-ID')}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    });
+
+    // TAMPILKAN MODAL (MANUAL)
+    const modal = new bootstrap.Modal(document.getElementById('detailtw'));
+    modal.show();
+}
+
+
+
+// notif 
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        let alert = document.querySelector('.auto-close');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 2000); // durasi 3 detik
+});
+
+
+
 </script>
 
 
