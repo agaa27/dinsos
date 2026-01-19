@@ -8,11 +8,11 @@ error_reporting(E_ALL);
 
 
 $qIndikator = $conn->query("
-    SELECT id, indikator_kinerja 
+    SELECT id, sub_kegiatan 
     FROM kegiatan 
     WHERE bidang = 'Perencanaan dan Keuangan'
     AND tahun >= YEAR(CURDATE()) - 4
-    ORDER BY indikator_kinerja ASC
+    ORDER BY sub_kegiatan ASC
 ");
 
 /* Ambil tahun (unik / tidak double) */
@@ -599,14 +599,14 @@ body {
             <!-- Indikator -->
             <div class="col-md-6">
                 <label class="form-label fw-semibold">
-                    Indikator Kinerja
+                    Sub Kegiatan
                 </label>
                 <select name="indikator_id" class="form-select" required>
                     <option value="">-- Pilih Indikator --</option>
                     <?php while ($row = $qIndikator->fetch_assoc()) : ?>
                         <option value="<?= $row['id']; ?>"
                             <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                            <?= htmlspecialchars($row['sub_kegiatan']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
@@ -677,6 +677,14 @@ body {
                     <li class="list-group-item">
                         <strong>Program:</strong><br>
                         <?= htmlspecialchars($data['program']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['kegiatan']); ?>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Sub Kegiatan:</strong><br>
+                        <?= htmlspecialchars($data['sub_kegiatan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>

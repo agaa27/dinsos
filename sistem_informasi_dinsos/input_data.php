@@ -10,6 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sasaran   = $_POST['sasaran'];
     $indikator = $_POST['indikator'];
     $satuan    = $_POST['satuan'];
+    $kegiatan    = $_POST['kegiatan'];
+    $subkegiatan    = $_POST['subkegiatan'];
     $target    = $_POST['target'];
     $tahun     = $_POST['tahun'];
     $bidang    = $_POST['bidang'];
@@ -17,12 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pagu      = $_POST['pagu_anggaran'];
 
     $sql = "INSERT INTO kegiatan 
-            (sasaran_strategis, indikator_kinerja, satuan, target, tahun, bidang, program, pagu_anggaran)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            (sasaran_strategis, indikator_kinerja, satuan, target, tahun, bidang, program, kegiatan, sub_kegiatan, pagu_anggaran)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-      "sssdissd",
+      "sssdissssd",
       $sasaran,
       $indikator,
       $satuan,
@@ -30,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $tahun,
       $bidang,
       $program,
+      $kegiatan,
+      $subkegiatan,
       $pagu
   );
 
@@ -88,6 +92,8 @@ $sql = "
         program,
         target,
         tahun,
+        kegiatan,
+        sub_kegiatan,
         pagu_anggaran,
         bidang
     FROM kegiatan
@@ -212,8 +218,7 @@ while ($row = mysqli_fetch_assoc($query)) {
         </div>
       </div>
     </div>
-  </nav>
-    <div class="m-0 ms-3" style="margin-bottom: -20px;"><p>Kegiatan/Indikator Terakhir</p></div>    
+  </nav>  
   <!-- Table Preview -->
     <div class="container mt-4">          
           <div id="toolbar">
@@ -233,13 +238,15 @@ while ($row = mysqli_fetch_assoc($query)) {
             <thead>
               <tr>
                 <th>#</th>
-                <th>ID</th>
                 <th>Sasaran Strategis</th>
                 <th>Indikator</th>
                 <th>Program</th>
                 <th>Satuan</th>
                 <th>Target</th>
                 <th>Pagu</th>
+                <th>Kegiatan</th>
+                <th>Sub Kegiatan</th>
+                
                 <th>Bidang</th>                
               </tr>
             </thead>
@@ -247,13 +254,14 @@ while ($row = mysqli_fetch_assoc($query)) {
               <?php $no = 1; foreach($data as $n) : ?>
               <tr>
                 <td><?=  $no; ?></td>
-                <td><?= $n['id']; ?></td>
                 <td><?= $n['sasaran_strategis'];  ?></td>
                 <td><?= $n['indikator_kinerja'];  ?></td>
                 <td><?= $n['program'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
                 <td><?= number_format($n['target'], 0, ',', '.');  ?></td>
                 <td><?= number_format($n['pagu_anggaran'], 0, ',', '.');  ?></td>
+                <td><?= $n['kegiatan'];  ?></td>           
+                <td><?= $n['sub_kegiatan'];  ?></td>           
                 <td><?= $n['bidang'];  ?></td>           
                 <?php $no++; ?>               
               </tr>
@@ -295,6 +303,16 @@ while ($row = mysqli_fetch_assoc($query)) {
           <div class="mb-3">
             <label class="form-label">Program</label>
             <textarea name="program" class="form-control" rows="2" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Kegiatan</label>
+            <textarea name="kegiatan" class="form-control" rows="2" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Sub Kegiatan</label>
+            <textarea name="subkegiatan" class="form-control" rows="2" required></textarea>
           </div>
 
           <div class="row">

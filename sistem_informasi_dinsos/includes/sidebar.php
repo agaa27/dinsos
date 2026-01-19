@@ -9,7 +9,7 @@ $menuOpen = in_array($currentPage, [
   'keuangan.php'
 ]);
 
-// Dropdown Bidang / Seksi terbuka jika di halaman seksi
+// Dropdown Bidang /  terbuka jika di halaman seksi
 $bidangOpen = in_array($currentPage, [
   'rehabilitasi.php',
   'perlindungan.php',
@@ -58,7 +58,7 @@ $bidangOpen = in_array($currentPage, [
     </a>
   </div>
 
-  <!-- DROPDOWN BIDANG / SEKSI -->
+  <!-- DROPDOWN BIDANG /  -->
   <a class="d-flex justify-content-between align-items-center mt-2"
      data-bs-toggle="collapse"
      href="#bidangDropdown"
@@ -72,17 +72,17 @@ $bidangOpen = in_array($currentPage, [
   <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>" id="bidangDropdown">
     <a href="rehabilitasi.php"
        class="<?= $currentPage === 'rehabilitasi.php' ? 'active fw-bold text-primary' : '' ?>">
-       Seksi Rehabilitasi Sosial
+        Rehabilitasi Sosial
     </a>
 
     <a href="perlindungan.php"
        class="<?= $currentPage === 'perlindungan.php' ? 'active fw-bold text-primary' : '' ?>">
-       Seksi Perlindungan & Jaminan Sosial
+        Perlindungan & Jaminan Sosial
     </a>
 
     <a href="pemberdayaan.php"
        class="<?= $currentPage === 'pemberdayaan.php' ? 'active fw-bold text-primary' : '' ?>">
-       Seksi Pemberdayaan Sosial
+        Pemberdayaan Sosial
     </a>
   </div>
 
