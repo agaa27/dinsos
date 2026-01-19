@@ -1,3 +1,197 @@
+<?php
+require 'config/database.php';
+session_start();
+
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
+// TOTAL KEGIATAN 
+$query_data_total = "SELECT COUNT(*) AS total_kegiatan FROM kegiatan WHERE tahun = YEAR(CURDATE());";
+$result_data_total = mysqli_query($conn, $query_users_total);
+$row_data_total = mysqli_fetch_assoc($result_data_total);
+$total_data = $row_data_total['total_kegiatan'];
+
+// TOTAL KEGIATAN YANG LEBIH 30%
+$query_data_up_30 = "SELECT 
+    COUNT(*) AS jumlah,
+    sub_kegiatan,
+    bidang,
+    pagu_anggaran,
+    (
+        IFNULL(realisasi_anggaran_bulan1,0) +
+        IFNULL(realisasi_anggaran_bulan2,0) +
+        IFNULL(realisasi_anggaran_bulan3,0) +
+        IFNULL(realisasi_anggaran_bulan4,0) +
+        IFNULL(realisasi_anggaran_bulan5,0) +
+        IFNULL(realisasi_anggaran_bulan6,0) +
+        IFNULL(realisasi_anggaran_bulan7,0) +
+        IFNULL(realisasi_anggaran_bulan8,0) +
+        IFNULL(realisasi_anggaran_bulan9,0) +
+        IFNULL(realisasi_anggaran_bulan10,0) +
+        IFNULL(realisasi_anggaran_bulan11,0) +
+        IFNULL(realisasi_anggaran_bulan12,0)
+    ) AS total_realisasi,
+    ROUND(
+        (
+            (
+                IFNULL(realisasi_anggaran_bulan1,0) +
+                IFNULL(realisasi_anggaran_bulan2,0) +
+                IFNULL(realisasi_anggaran_bulan3,0) +
+                IFNULL(realisasi_anggaran_bulan4,0) +
+                IFNULL(realisasi_anggaran_bulan5,0) +
+                IFNULL(realisasi_anggaran_bulan6,0) +
+                IFNULL(realisasi_anggaran_bulan7,0) +
+                IFNULL(realisasi_anggaran_bulan8,0) +
+                IFNULL(realisasi_anggaran_bulan9,0) +
+                IFNULL(realisasi_anggaran_bulan10,0) +
+                IFNULL(realisasi_anggaran_bulan11,0) +
+                IFNULL(realisasi_anggaran_bulan12,0)
+            ) / pagu_anggaran
+        ) * 100, 2
+    ) AS persentase_realisasi
+FROM kegiatan
+WHERE tahun = YEAR(CURDATE())
+HAVING persentase_realisasi >= 30;
+";
+$result_data_up_30 = mysqli_query($conn, $query_users_total);
+$row_data_up_30 = mysqli_fetch_assoc($result_data_up_30);
+
+// TOTAL KEGIATAN YANG KURANG 30%
+$query_data_down_30 = "SELECT 
+    COUNT(*) AS jumlah,
+    sub_kegiatan,
+    bidang,
+    pagu_anggaran,
+    (
+        IFNULL(realisasi_anggaran_bulan1,0) +
+        IFNULL(realisasi_anggaran_bulan2,0) +
+        IFNULL(realisasi_anggaran_bulan3,0) +
+        IFNULL(realisasi_anggaran_bulan4,0) +
+        IFNULL(realisasi_anggaran_bulan5,0) +
+        IFNULL(realisasi_anggaran_bulan6,0) +
+        IFNULL(realisasi_anggaran_bulan7,0) +
+        IFNULL(realisasi_anggaran_bulan8,0) +
+        IFNULL(realisasi_anggaran_bulan9,0) +
+        IFNULL(realisasi_anggaran_bulan10,0) +
+        IFNULL(realisasi_anggaran_bulan11,0) +
+        IFNULL(realisasi_anggaran_bulan12,0)
+    ) AS total_realisasi,
+    ROUND(
+        (
+            (
+                IFNULL(realisasi_anggaran_bulan1,0) +
+                IFNULL(realisasi_anggaran_bulan2,0) +
+                IFNULL(realisasi_anggaran_bulan3,0) +
+                IFNULL(realisasi_anggaran_bulan4,0) +
+                IFNULL(realisasi_anggaran_bulan5,0) +
+                IFNULL(realisasi_anggaran_bulan6,0) +
+                IFNULL(realisasi_anggaran_bulan7,0) +
+                IFNULL(realisasi_anggaran_bulan8,0) +
+                IFNULL(realisasi_anggaran_bulan9,0) +
+                IFNULL(realisasi_anggaran_bulan10,0) +
+                IFNULL(realisasi_anggaran_bulan11,0) +
+                IFNULL(realisasi_anggaran_bulan12,0)
+            ) / pagu_anggaran
+        ) * 100, 2
+    ) AS persentase_realisasi
+FROM kegiatan
+WHERE tahun = YEAR(CURDATE())
+HAVING persentase_realisasi >= 30;
+";
+$result_data_down_30 = mysqli_query($conn, $query_users_total);
+$row_data_down_30 = mysqli_fetch_assoc($result_data_down_30);
+
+// TOTAL PAGU ANGGARAN 
+$query_pagu_anggaran = "SELECT SUM(pagu_anggaran) AS total_pagu_anggaran FROM kegiatan WHERE tahun = YEAR(CURDATE());";
+$result_pagu_anggaran = mysqli_query($conn, $query_users_total);
+$row_pagu_anggaran = mysqli_fetch_assoc($result_pagu_anggaran);
+$total_pagu_anggaran = $row_pagu_anggaran['total_pagu_anggaran'];
+
+// TOTAL ANGGARAN YANG SUDAH DI PAKE
+$query_anggaran_used = "SELECT 
+    SUM(
+        IFNULL(realisasi_anggaran_bulan1,0) +
+        IFNULL(realisasi_anggaran_bulan2,0) +
+        IFNULL(realisasi_anggaran_bulan3,0) +
+        IFNULL(realisasi_anggaran_bulan4,0) +
+        IFNULL(realisasi_anggaran_bulan5,0) +
+        IFNULL(realisasi_anggaran_bulan6,0) +
+        IFNULL(realisasi_anggaran_bulan7,0) +
+        IFNULL(realisasi_anggaran_bulan8,0) +
+        IFNULL(realisasi_anggaran_bulan9,0) +
+        IFNULL(realisasi_anggaran_bulan10,0) +
+        IFNULL(realisasi_anggaran_bulan11,0) +
+        IFNULL(realisasi_anggaran_bulan12,0)
+    ) AS total_realisasi,
+    ROUND(
+        (
+            SUM(
+                IFNULL(realisasi_anggaran_bulan1,0) +
+                IFNULL(realisasi_anggaran_bulan2,0) +
+                IFNULL(realisasi_anggaran_bulan3,0) +
+                IFNULL(realisasi_anggaran_bulan4,0) +
+                IFNULL(realisasi_anggaran_bulan5,0) +
+                IFNULL(realisasi_anggaran_bulan6,0) +
+                IFNULL(realisasi_anggaran_bulan7,0) +
+                IFNULL(realisasi_anggaran_bulan8,0) +
+                IFNULL(realisasi_anggaran_bulan9,0) +
+                IFNULL(realisasi_anggaran_bulan10,0) +
+                IFNULL(realisasi_anggaran_bulan11,0) +
+                IFNULL(realisasi_anggaran_bulan12,0)
+            ) / SUM(pagu_anggaran)
+        ) * 100, 2
+    ) AS persentase_realisasi
+FROM kegiatan
+WHERE tahun = YEAR(CURDATE());
+";
+$result_anggaran_used = mysqli_query($conn, $query_users_total);
+$row_anggaran_used = mysqli_fetch_assoc($result_anggaran_used);
+
+// SISA ANGGARAN
+$query_anggaran_left = "SELECT 
+    SUM(
+        IFNULL(realisasi_anggaran_bulan1,0) +
+        IFNULL(realisasi_anggaran_bulan2,0) +
+        IFNULL(realisasi_anggaran_bulan3,0) +
+        IFNULL(realisasi_anggaran_bulan4,0) +
+        IFNULL(realisasi_anggaran_bulan5,0) +
+        IFNULL(realisasi_anggaran_bulan6,0) +
+        IFNULL(realisasi_anggaran_bulan7,0) +
+        IFNULL(realisasi_anggaran_bulan8,0) +
+        IFNULL(realisasi_anggaran_bulan9,0) +
+        IFNULL(realisasi_anggaran_bulan10,0) +
+        IFNULL(realisasi_anggaran_bulan11,0) +
+        IFNULL(realisasi_anggaran_bulan12,0)
+    ) AS total_realisasi,
+    ROUND(
+        (
+            SUM(
+                IFNULL(realisasi_anggaran_bulan1,0) +
+                IFNULL(realisasi_anggaran_bulan2,0) +
+                IFNULL(realisasi_anggaran_bulan3,0) +
+                IFNULL(realisasi_anggaran_bulan4,0) +
+                IFNULL(realisasi_anggaran_bulan5,0) +
+                IFNULL(realisasi_anggaran_bulan6,0) +
+                IFNULL(realisasi_anggaran_bulan7,0) +
+                IFNULL(realisasi_anggaran_bulan8,0) +
+                IFNULL(realisasi_anggaran_bulan9,0) +
+                IFNULL(realisasi_anggaran_bulan10,0) +
+                IFNULL(realisasi_anggaran_bulan11,0) +
+                IFNULL(realisasi_anggaran_bulan12,0)
+            ) / SUM(pagu_anggaran)
+        ) * 100, 2
+    ) AS persentase_realisasi
+FROM kegiatan
+WHERE tahun = YEAR(CURDATE());
+";
+$result_anggaran_left = mysqli_query($conn, $query_users_total);
+$row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
