@@ -512,7 +512,7 @@ body {
                     Sub Kegiatan
                 </label>
                 <select name="indikator_id" class="form-select" required>
-                    <option value="">-- Pilih Indikator --</option>
+                    <option value="">-- Pilih Sub Kegiatan --</option>
                     <?php while ($row = $qIndikator->fetch_assoc()) : ?>
                         <option value="<?= $row['id']; ?>"
                             <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>

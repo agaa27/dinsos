@@ -8,11 +8,11 @@ error_reporting(E_ALL);
 
 
 $qIndikator = $conn->query("
-    SELECT id, indikator_kinerja 
+    SELECT id, sub_kegiatan 
     FROM kegiatan 
     WHERE bidang = 'Perlindungan dan Jaminan Sosial'
     AND tahun >= YEAR(CURDATE()) - 4
-    ORDER BY indikator_kinerja ASC
+    ORDER BY sub_kegiatan ASC
 ");
 
 /* Ambil tahun (unik / tidak double) */
@@ -508,13 +508,15 @@ body {
 
             <!-- Dropdown Indikator -->
             <div class="col-md-5">
-                <label class="form-label">Indikator Kinerja</label>
+                <label class="form-label fw-semibold">
+                    Sub Kegiatan
+                </label>
                 <select name="indikator_id" class="form-select" required>
-                    <option value="">-- Pilih Indikator --</option>
+                    <option value="">-- Pilih Sub Kegiatan --</option>
                     <?php while ($row = $qIndikator->fetch_assoc()) : ?>
                         <option value="<?= $row['id']; ?>"
                             <?= ($_GET['indikator_id'] ?? '') == $row['id'] ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($row['indikator_kinerja']); ?>
+                            <?= htmlspecialchars($row['sub_kegiatan']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
@@ -574,6 +576,22 @@ body {
         <?php else: ?>
 
             <ul class="list-group">
+                <li class="list-group-item">
+                        <strong>Sasaran:</strong><br>
+                        <?= htmlspecialchars($data['sasaran_strategis']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Indikator:</strong><br>
+                    <?= htmlspecialchars($data['indikator_kinerja']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Program:</strong><br>
+                    <?= htmlspecialchars($data['program']); ?>
+                </li>
+                <li class="list-group-item">
+                    <strong>Kegiatan:</strong><br>
+                    <?= htmlspecialchars($data['kegiatan']); ?>
+                </li>
                 <li class="list-group-item">
                     <strong>Target:</strong><br>
                     <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
