@@ -145,49 +145,7 @@ $mapping_tw = [
 ];
 
 
-// //UPDATE HANDLER
 
-// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-//   $id = intval($_POST['id']);
-//   $tahun = intval($_POST['tahun']);
-
-//   // Tangkap data TW 1–4
-//   for ($i = 1; $i <= 4; $i++) {
-//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
-//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
-//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
-//   }
-
-//   // Query update
-//   $sql = "UPDATE kegiatan SET
-//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
-//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
-//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
-//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
-//           WHERE id = ?";
-
-//   $stmt = $conn->prepare($sql);
-//   $stmt->bind_param(
-//     "ddddddddddddi",
-//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
-//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
-//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
-//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
-//     $id
-//   );
-
-//   if ($stmt->execute()) {
-//     $_SESSION['success'] = 'Data berhasil disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-//   } else {
-//     $_SESSION['error'] = 'Data gagal disimpan';
-//     header("Location: perencanaan.php?indikator_id=$id&tahun=$tahun");
-//   }
-
-//   $stmt->close();
-//   $conn->close();
-// }
 
 ?>
 
@@ -196,7 +154,7 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Realisasi Triwulan - Dinsos Tarakan</title>
+    <title>DINSOS PM - Perencanaan dan Keuangan</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
