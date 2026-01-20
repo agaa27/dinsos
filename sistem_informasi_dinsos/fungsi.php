@@ -29,7 +29,7 @@ function upload_file(){
     // }
 
     // rename file agar aman
-    $namaFileBaru = uniqid('bukti_') . '.' . $ekstensi;
+    $namaFileBaru = $namaFile . '.' . $ekstensi;
 
     move_uploaded_file($tmpFile, "img/" . $namaFileBaru);
 
