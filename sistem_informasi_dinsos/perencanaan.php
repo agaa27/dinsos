@@ -464,7 +464,6 @@ body {
     text-align: center;
 }
 
-</style>
     </style>
 </head>
 <body>
@@ -518,7 +517,6 @@ body {
                             <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
                         </a>
                     </div>
-
                 <?php  else: ?>
                     <div class="text-start mb-1">
                         <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Perencanaan dan Keuangan</p>

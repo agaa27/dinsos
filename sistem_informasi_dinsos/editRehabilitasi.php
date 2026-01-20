@@ -454,11 +454,6 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hello, User Name</h6>
-                </button>
-                <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
-                    <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
                 <div class="dropdown-content">
@@ -474,7 +469,6 @@ body {
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
                 </div>
-            </div>
             </div>
         </div>
     </nav>

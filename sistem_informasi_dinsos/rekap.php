@@ -109,7 +109,6 @@ FROM kegiatan
 WHERE tahun = YEAR(CURDATE())
 HAVING persentase_realisasi < 30
 ";
-
 $result = mysqli_query($conn, $sql);
 
 

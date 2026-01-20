@@ -6,12 +6,6 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-if (isset($_SESSION['username'])){
-    $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
-}
-
-
 
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
@@ -144,6 +138,49 @@ $mapping_tw = [
 ];
 
 
+// //UPDATE HANDLER
+
+// if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+//   $id = intval($_POST['id']);
+//   $tahun = intval($_POST['tahun']);
+
+//   // Tangkap data TW 1–4
+//   for ($i = 1; $i <= 4; $i++) {
+//     $paguTW[$i]       = $_POST["paguTW$i"] ?? 0;
+//     $realisasiTW[$i]  = $_POST["realisasiTW$i"] ?? 0;
+//     $anggaranTW[$i]   = $_POST["realisasi_anggaranTW$i"] ?? 0;
+//   }
+
+//   // Query update
+//   $sql = "UPDATE kegiatan SET
+//             paguTW1 = ?, realisasiTW1 = ?, realisasi_anggaranTW1 = ?,
+//             paguTW2 = ?, realisasiTW2 = ?, realisasi_anggaranTW2 = ?,
+//             paguTW3 = ?, realisasiTW3 = ?, realisasi_anggaranTW3 = ?,
+//             paguTW4 = ?, realisasiTW4 = ?, realisasi_anggaranTW4 = ?
+//           WHERE id = ?";
+
+//   $stmt = $conn->prepare($sql);
+//   $stmt->bind_param(
+//     "ddddddddddddi",
+//     $paguTW[1], $realisasiTW[1], $anggaranTW[1],
+//     $paguTW[2], $realisasiTW[2], $anggaranTW[2],
+//     $paguTW[3], $realisasiTW[3], $anggaranTW[3],
+//     $paguTW[4], $realisasiTW[4], $anggaranTW[4],
+//     $id
+//   );
+
+//   if ($stmt->execute()) {
+//     $_SESSION['success'] = 'Data berhasil disimpan';
+//     header("Location: rehabilitasi.php?indikator_id=$id&tahun=$tahun");
+//   } else {
+//     $_SESSION['error'] = 'Data gagal disimpan';
+//     header("Location: rehabilitasi.php?indikator_id=$id&tahun=$tahun");
+//   }
+
+//   $stmt->close();
+//   $conn->close();
+// }
 
 ?>
 
@@ -152,7 +189,7 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DINSOS PM - Rehabilitasi Sosial</title>
+    <title>Input Realisasi Triwulan - Dinsos Tarakan</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -482,14 +519,15 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
+                    <h6 class="mb-0">Hallo, Staff Rehabilitasi Sosial</h6>
                 </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong><?= $jabatan[0]; ?></strong>
-                            <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
+                            <strong>DINAS SOSIAL</strong>
+                            <p class="mb-0 text-muted small">Staff</p>
+                            <p class="mb-0 text-muted small">Rehabilitasi Sosial</p>
                         </div>
                     </div>
                     <hr class="my-2">
@@ -497,7 +535,6 @@ body {
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
                 </div>
-            </div>
             </div>
         </div>
     </nav>
@@ -648,7 +685,7 @@ body {
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
-                        <?= number_format($data['target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                        <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
@@ -676,7 +713,7 @@ body {
                                 <li>
                                     Realisasi Kinerja:
                                     <strong>
-                                        <?= number_format($tw[$i]['realisasiT'], 2, ',', '.') . " " . $data['satuan']; ?> 
+                                        <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
                                 </li>
                                 <li>

@@ -2,10 +2,12 @@
 require 'config/database.php';
 session_start();
 
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
 
-require 'config/database.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (isset($_POST['submit'])) {
 
     $sasaran   = $_POST['sasaran'];
     $indikator = $_POST['indikator'];
@@ -197,7 +199,7 @@ while ($row = mysqli_fetch_assoc($query)) {
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-      <h5 class="mb-0">Dashboard</h5>
+      <h5 class="mb-0">Input Data</h5>
 
       <!-- Realtime Clock -->
       <span class="date" id="currentDateTime">
@@ -208,22 +210,31 @@ while ($row = mysqli_fetch_assoc($query)) {
         <i class="bi bi-bell me-3 fs-5"></i>
 
         <div class="account-dropdown">
-          <button class="btn account-btn d-flex align-items-center">
-            <i class="bi bi-person-circle fs-4 me-2"></i>
-            <h6 class="mb-0">Hello, Administrator</h6>
-          </button>
-
-          <div class="dropdown-content">
-            <p><strong>Administrator</strong></p>
-            <p>admin@dinsos.go.id</p>
-            <p>0856736263</p>
-            <p><a href="#">Logout</a></p>
-          </div>
+            <button class="btn account-btn d-flex align-items-center">
+                <i class="bi bi-person-circle fs-4 me-2"></i>
+                <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
+            </button>
+            <div class="dropdown-content">
+                <div class="d-flex align-items-center p-2">
+                    <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
+                    <div>
+                        <strong><?= $jabatan[0]; ?></strong>
+                        <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
+                    </div>
+                </div>
+                <hr class="my-2">
+                <a href="logout.php" class="dropdown-item text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </a>
+            </div>
         </div>
       </div>
     </div>
   </nav>  
-  <!-- Table Preview -->
+  
+  <?php if ($_SESSION['role'] == 'Admin'):?>
+
+    <!-- Table Preview -->
     <div class="container mt-4">          
           <div id="toolbar">
             <button id="btn-add" class="btn btn-primary"
@@ -267,108 +278,211 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= $n['kegiatan'];  ?></td>           
                 <td><?= $n['sub_kegiatan'];  ?></td>           
                 <td><?= $n['bidang'];  ?></td>
-                <td>
-                  <button class="btn btn-warning btn-sm"
-                    data-bs-toggle="modal"
-                    data-bs-target="#edit<?= $n['id']; ?>">
-                    <i class="bi bi-pencil"></i>
-                  </button>
+                <td class="bg-white">
+                  <div class="d-flex align-items-center gap-1">
+                    <button class="btn btn-primary btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#add<?= $n['id']; ?>">
+                      <i class="bi bi-plus-circle-fill"></i>
+                    </button>
 
-                  <a href="?hapus=<?= $n['id']; ?>"
-                    class="btn btn-danger btn-sm"
-                    onclick="return confirm('Yakin hapus data?')">
-                    <i class="bi bi-trash"></i>
-                  </a>
+                    <button class="btn btn-warning btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#edit<?= $n['id']; ?>">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+
+                    <a href="?hapus=<?= $n['id']; ?>"
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('Yakin hapus data?')">
+                      <i class="bi bi-trash"></i>
+                    </a>
+                  </div>
                 </td>
+
          
                 <?php $no++; ?>               
               </tr>
               <div class="modal fade" id="edit<?= $n['id']; ?>" tabindex="-1">
-                  <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
 
-                      <form method="POST">
-                        <input type="hidden" name="id" value="<?= $n['id']; ?>">
+                    <form method="POST">
+                      <input type="hidden" name="id" value="<?= $n['id']; ?>">
 
-                        <div class="modal-header">
-  <h5 class="modal-title">Edit Data</h5>
-  <button class="btn-close" data-bs-dismiss="modal"></button>
-</div>
+                      <div class="modal-header">
+    
+                        <h5 class="modal-title">Edit Data</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
 
-<div class="modal-body">
+                      <div class="modal-body">
 
-  <div class="mb-3">
-    <label class="form-label">Sasaran Strategis</label>
-    <textarea name="sasaran" class="form-control" rows="2"><?= $n['sasaran_strategis']; ?></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Indikator Kinerja</label>
-    <textarea name="indikator" class="form-control" rows="2"><?= $n['indikator_kinerja']; ?></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Program</label>
-    <textarea name="program" class="form-control" rows="2"><?= $n['program']; ?></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Kegiatan</label>
-    <textarea name="kegiatan" class="form-control" rows="2"><?= $n['kegiatan']; ?></textarea>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Sub Kegiatan</label>
-    <textarea name="subkegiatan" class="form-control" rows="2"><?= $n['sub_kegiatan']; ?></textarea>
-  </div>
-
-  <div class="row">
-    <div class="col-md-4 mb-3">
-      <label class="form-label">Satuan</label>
-      <input type="text" name="satuan" class="form-control" value="<?= $n['satuan']; ?>">
-    </div>
-
-    <div class="col-md-4 mb-3">
-      <label class="form-label">Target</label>
-      <input type="number" name="target" class="form-control" value="<?= $n['target']; ?>">
-    </div>
-
-    <div class="col-md-4 mb-3">
-      <label class="form-label">Tahun</label>
-      <input type="number" name="tahun" class="form-control" value="<?= $n['tahun']; ?>">
-    </div>
-
-    <div class="col-md-4 mb-3">
-      <label class="form-label">Pagu Anggaran</label>
-      <input type="number" name="pagu_anggaran" class="form-control" value="<?= $n['pagu_anggaran']; ?>">
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Bidang</label>
-    <select name="bidang" class="form-select">
-      <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
-      <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
-      <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
-      <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
-      <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
-      <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
-    </select>
-  </div>
-
-</div>
-
-
-                        <div class="modal-footer">
-                          <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                          <button type="submit" name="update" class="btn btn-primary">Update</button>
+                        <div class="mb-3">
+                          <label class="form-label">Sasaran Strategis</label>
+                          <textarea name="sasaran" class="form-control" rows="2"><?= $n['sasaran_strategis']; ?></textarea>
                         </div>
 
-                      </form>
+                        <div class="mb-3">
+                          <label class="form-label">Indikator Kinerja</label>
+                          <textarea name="indikator" class="form-control" rows="2"><?= $n['indikator_kinerja']; ?></textarea>
+                        </div>
 
-                    </div>
+                        <div class="mb-3">
+                          <label class="form-label">Program</label>
+                          <textarea name="program" class="form-control" rows="2"><?= $n['program']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Kegiatan</label>
+                          <textarea name="kegiatan" class="form-control" rows="2"><?= $n['kegiatan']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Sub Kegiatan</label>
+                          <textarea name="subkegiatan" class="form-control" rows="2"><?= $n['sub_kegiatan']; ?></textarea>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Satuan</label>
+                            <input type="text" name="satuan" class="form-control" value="<?= $n['satuan']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Target</label>
+                            <input type="number" name="target" class="form-control" value="<?= $n['target']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Tahun</label>
+                            <input type="number" name="tahun" class="form-control" value="<?= $n['tahun']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Pagu Anggaran</label>
+                            <input type="number" name="pagu_anggaran" class="form-control" value="<?= $n['pagu_anggaran']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Bidang</label>
+                          <select name="bidang" class="form-select">
+                            <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
+                            <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
+                            <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
+                            <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+                            <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
+                            <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" name="update" class="btn btn-primary">Update</button>
+                      </div>
+                    </form>
                   </div>
                 </div>
+              </div>
+                <!-- MODAL EDIT DATA END  -->
+
+<!-- MODAL TAMBAH DATA VERSI MUDAH -->
+                <div class="modal fade" id="add<?= $n['id']; ?>" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+
+                  <!-- $sasaran   = $_POST['sasaran'];
+                  $indikator = $_POST['indikator'];
+                  $program   = $_POST['program'];
+                  $kegiatan  = $_POST['kegiatan'];
+                  $subkegiatan = $_POST['subkegiatan'];
+                  $satuan    = $_POST['satuan'];
+                  $target    = $_POST['target'];
+                  $tahun     = $_POST['tahun'];
+                  $pagu      = $_POST['pagu_anggaran'];
+                  $bidang    = $_POST['bidang']; -->
+
+                    <form method="POST">
+
+                      <div class="modal-header">
+    
+                        <h5 class="modal-title">Tambah Data</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                      </div>
+
+                      <div class="modal-body">
+
+                        <div class="mb-3">
+                          <label class="form-label">Sasaran Strategis</label>
+                          <textarea name="sasaran" class="form-control" rows="2"><?= $n['sasaran_strategis']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Indikator Kinerja</label>
+                          <textarea name="indikator" class="form-control" rows="2"><?= $n['indikator_kinerja']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Program</label>
+                          <textarea name="program" class="form-control" rows="2"><?= $n['program']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Kegiatan</label>
+                          <textarea name="kegiatan" class="form-control" rows="2"><?= $n['kegiatan']; ?></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Sub Kegiatan</label>
+                          <textarea name="subkegiatan" class="form-control" rows="2"><?= $n['sub_kegiatan']; ?></textarea>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Satuan</label>
+                            <input type="text" name="satuan" class="form-control" value="<?= $n['satuan']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Target</label>
+                            <input type="number" name="target" class="form-control" value="<?= $n['target']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Tahun</label>
+                            <input type="number" name="tahun" class="form-control" value="<?= $n['tahun']; ?>">
+                          </div>
+
+                          <div class="col-md-4 mb-3">
+                            <label class="form-label">Pagu Anggaran</label>
+                            <input type="number" name="pagu_anggaran" class="form-control" value="<?= $n['pagu_anggaran']; ?>">
+                          </div>
+                        </div>
+
+                        <div class="mb-3">
+                          <label class="form-label">Bidang</label>
+                          <select name="bidang" class="form-select">
+                            <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
+                            <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
+                            <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
+                            <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+                            <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
+                            <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" name="submit" class="btn btn-primary">Tambah</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+
+<!-- END MODAL TAMBAH DATA VERSI MUDAH -->
 
               <?php endforeach; ?>
             </tbody>
@@ -472,7 +586,9 @@ while ($row = mysqli_fetch_assoc($query)) {
     </div>
   </div>
 </div>
-
+    <?php else : ?>
+      <div class="text-mute d-flex justify-content-center align-items-center vh-100 fs-4"><i class="bi bi-info-circle-fill"></i> Anda tidak punya akses di halaman ini!.</div>
+    <?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
