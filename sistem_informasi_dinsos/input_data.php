@@ -290,31 +290,73 @@ while ($row = mysqli_fetch_assoc($query)) {
                         <input type="hidden" name="id" value="<?= $n['id']; ?>">
 
                         <div class="modal-header">
-                          <h5 class="modal-title">Edit Data</h5>
-                          <button class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
+  <h5 class="modal-title">Edit Data</h5>
+  <button class="btn-close" data-bs-dismiss="modal"></button>
+</div>
 
-                        <div class="modal-body">
-                          <textarea name="sasaran" class="form-control mb-2"><?= $n['sasaran_strategis']; ?></textarea>
-                          <textarea name="indikator" class="form-control mb-2"><?= $n['indikator_kinerja']; ?></textarea>
-                          <textarea name="program" class="form-control mb-2"><?= $n['program']; ?></textarea>
-                          <textarea name="kegiatan" class="form-control mb-2"><?= $n['kegiatan']; ?></textarea>
-                          <textarea name="subkegiatan" class="form-control mb-2"><?= $n['sub_kegiatan']; ?></textarea>
+<div class="modal-body">
 
-                          <input name="satuan" class="form-control mb-2" value="<?= $n['satuan']; ?>">
-                          <input name="target" class="form-control mb-2" value="<?= $n['target']; ?>">
-                          <input name="tahun" class="form-control mb-2" value="<?= $n['tahun']; ?>">
-                          <input name="pagu_anggaran" class="form-control mb-2" value="<?= $n['pagu_anggaran']; ?>">
+  <div class="mb-3">
+    <label class="form-label">Sasaran Strategis</label>
+    <textarea name="sasaran" class="form-control" rows="2"><?= $n['sasaran_strategis']; ?></textarea>
+  </div>
 
-                          <select name="bidang" class="form-select">
-                            <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
-                            <option>Perencanaan dan Keuangan</option>
-                            <option>Umum dan Kepegawaian</option>
-                            <option>Rehabilitasi Sosial</option>
-                            <option>Perlindungan dan Jaminan Sosial</option>
-                            <option>Pemberdayaan Sosial</option>
-                          </select>
-                        </div>
+  <div class="mb-3">
+    <label class="form-label">Indikator Kinerja</label>
+    <textarea name="indikator" class="form-control" rows="2"><?= $n['indikator_kinerja']; ?></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Program</label>
+    <textarea name="program" class="form-control" rows="2"><?= $n['program']; ?></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Kegiatan</label>
+    <textarea name="kegiatan" class="form-control" rows="2"><?= $n['kegiatan']; ?></textarea>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Sub Kegiatan</label>
+    <textarea name="subkegiatan" class="form-control" rows="2"><?= $n['sub_kegiatan']; ?></textarea>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Satuan</label>
+      <input type="text" name="satuan" class="form-control" value="<?= $n['satuan']; ?>">
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Target</label>
+      <input type="number" name="target" class="form-control" value="<?= $n['target']; ?>">
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Tahun</label>
+      <input type="number" name="tahun" class="form-control" value="<?= $n['tahun']; ?>">
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Pagu Anggaran</label>
+      <input type="number" name="pagu_anggaran" class="form-control" value="<?= $n['pagu_anggaran']; ?>">
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Bidang</label>
+    <select name="bidang" class="form-select">
+      <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
+      <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
+      <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
+      <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+      <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
+      <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+    </select>
+  </div>
+
+</div>
+
 
                         <div class="modal-footer">
                           <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
