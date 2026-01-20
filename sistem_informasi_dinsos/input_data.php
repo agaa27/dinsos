@@ -2,106 +2,111 @@
 require 'config/database.php';
 session_start();
 
-
-require 'config/database.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+/* ======================
+   PROSES TAMBAH DATA
+====================== */
+if (isset($_POST['submit'])) {
 
     $sasaran   = $_POST['sasaran'];
     $indikator = $_POST['indikator'];
+    $program   = $_POST['program'];
+    $kegiatan  = $_POST['kegiatan'];
+    $subkegiatan = $_POST['subkegiatan'];
     $satuan    = $_POST['satuan'];
-    $kegiatan    = $_POST['kegiatan'];
-    $subkegiatan    = $_POST['subkegiatan'];
     $target    = $_POST['target'];
     $tahun     = $_POST['tahun'];
-    $bidang    = $_POST['bidang'];
-    $program   = $_POST['program'];
     $pagu      = $_POST['pagu_anggaran'];
+    $bidang    = $_POST['bidang'];
 
     $sql = "INSERT INTO kegiatan 
-            (sasaran_strategis, indikator_kinerja, satuan, target, tahun, bidang, program, kegiatan, sub_kegiatan, pagu_anggaran)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        (sasaran_strategis, indikator_kinerja, program, kegiatan, sub_kegiatan, satuan, target, tahun, pagu_anggaran, bidang)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-      "sssdissssd",
-      $sasaran,
-      $indikator,
-      $satuan,
-      $target,
-      $tahun,
-      $bidang,
-      $program,
-      $kegiatan,
-      $subkegiatan,
-      $pagu
-  );
+        "ssssssidis",
+        $sasaran,
+        $indikator,
+        $program,
+        $kegiatan,
+        $subkegiatan,
+        $satuan,
+        $target,
+        $tahun,
+        $pagu,
+        $bidang
+    );
 
-    if ($stmt->execute()) {
-        echo "<script>
-//             alert('data berhasil ditambah');
-//         </script>";
-        header("Location: input_data.php");
-        exit;
-    } else {
-        echo "<script>
-//             alert('data gagal ditambah');
-//         </script>";
-        header("Location: input_data.php");
-    }
+    $stmt->execute();
+    header("Location: input_data.php");
+    exit;
 }
 
+/* ======================
+   PROSES EDIT DATA
+====================== */
+if (isset($_POST['update'])) {
 
+    $id        = $_POST['id'];
+    $sasaran   = $_POST['sasaran'];
+    $indikator = $_POST['indikator'];
+    $program   = $_POST['program'];
+    $kegiatan  = $_POST['kegiatan'];
+    $subkegiatan = $_POST['subkegiatan'];
+    $satuan    = $_POST['satuan'];
+    $target    = $_POST['target'];
+    $tahun     = $_POST['tahun'];
+    $pagu      = $_POST['pagu_anggaran'];
+    $bidang    = $_POST['bidang'];
 
-// if (isset($_POST['submit'])){  
-//   $sasaran   = $_POST['sasaran_strategis'];
-//   $indikator = $_POST['indikator_kinerja'];
-//   $program = $_POST['program'];
-//   $satuan    = $_POST['satuan'];
-//   $target    = $_POST['target_tahunan'];
-//   $tahun     = $_POST['tahun'];
-//   $bidang    = $_POST['bidang'];
+    $sql = "UPDATE kegiatan SET
+        sasaran_strategis=?,
+        indikator_kinerja=?,
+        program=?,
+        kegiatan=?,
+        sub_kegiatan=?,
+        satuan=?,
+        target=?,
+        tahun=?,
+        pagu_anggaran=?,
+        bidang=?
+        WHERE id=?";
 
-//   $sql = "INSERT INTO indikator
-//           (sasaran_strategis, indikator_kinerja, program, satuan, target_tahunan, tahun, bidang)
-//           VALUES
-//           ('$sasaran','$indikator', '$program','$satuan','$target','$tahun','$bidang')";
-          
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param(
+        "ssssssdidsi",
+        $sasaran,
+        $indikator,
+        $program,
+        $kegiatan,
+        $subkegiatan,
+        $satuan,
+        $target,
+        $tahun,
+        $pagu,
+        $bidang,
+        $id
+    );
 
-//   if (mysqli_query($conn, $sql)) {
-//       echo "<script>
-//             alert('data berhasil ditambah');
-//         </script>";
-//   } else {
-//       echo "<script>
-//             alert('data gagal ditambah: " . mysqli_error($conn) . "');
-//         </script>";
-//   }
+    $stmt->execute();
+    header("Location: input_data.php");
+    exit;
+}
 
-//   header("Location: input_data.php");
-// }
+/* ======================
+   PROSES HAPUS DATA
+====================== */
+if (isset($_GET['hapus'])) {
+    $id = $_GET['hapus'];
+    mysqli_query($conn, "DELETE FROM kegiatan WHERE id='$id'");
+    header("Location: input_data.php");
+    exit;
+}
 
-
-
-$sql = "
-    SELECT 
-        id,
-        sasaran_strategis,
-        indikator_kinerja,
-        satuan,
-        program,
-        target,
-        tahun,
-        kegiatan,
-        sub_kegiatan,
-        pagu_anggaran,
-        bidang
-    FROM kegiatan
-    ORDER BY created_at DESC
-";
-
-$query = mysqli_query($conn, $sql);
-
+/* ======================
+   AMBIL DATA
+====================== */
+$query = mysqli_query($conn, "SELECT * FROM kegiatan ORDER BY created_at DESC");
 $data = [];
 while ($row = mysqli_fetch_assoc($query)) {
     $data[] = $row;
@@ -113,7 +118,7 @@ while ($row = mysqli_fetch_assoc($query)) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DINSOS-PM | Dashboard</title>
+  <title>DINSOS-PM | Input Data</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -186,46 +191,44 @@ while ($row = mysqli_fetch_assoc($query)) {
 <!-- Sidebar -->
 <?php include "includes/sidebar.php"; ?>
 
-<!-- Main Content -->
 <div class="main-content">
-
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light">
-    <div class="container-fluid">
-      <h5 class="mb-0">Dashboard</h5>
-
-      <!-- Realtime Clock -->
-      <span class="date" id="currentDateTime">
-        <i class="bi bi-clock"></i> --
-      </span>
-
-      <div class="d-flex align-items-center">
-        <i class="bi bi-bell me-3 fs-5"></i>
-
-        <div class="account-dropdown">
-          <button class="btn account-btn d-flex align-items-center">
-            <i class="bi bi-person-circle fs-4 me-2"></i>
-            <h6 class="mb-0">Hello, Administrator</h6>
-          </button>
-
-          <div class="dropdown-content">
-            <p><strong>Administrator</strong></p>
-            <p>admin@dinsos.go.id</p>
-            <p>0856736263</p>
-            <p><a href="#">Logout</a></p>
-          </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <h5 class="mb-0">Input Data</h5>
+            <span id="currentDateTime">
+                <i class="bi bi-clock"></i> 
+                <!-- Date & Time will be inserted here -->
+            </span>
+            <div class="account-dropdown">
+                <button class="btn account-btn d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                    <h6 class="mb-0">Hallo, Admin Input Data </h6>
+                </button>
+                <div class="dropdown-content">
+                    <div class="d-flex align-items-center p-2">
+                        <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
+                        <div>
+                            <strong>DINAS SOSIAL</strong>
+                            <p class="mb-0 text-muted small">Admin</p>
+                            <p class="mb-0 text-muted small">Penginputan Data</p>
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    <a href="logout.php" class="dropdown-item text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </nav>  
+    </nav>
   <!-- Table Preview -->
     <div class="container mt-4">          
           <div id="toolbar">
             <button id="btn-add" class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#tambahKegiatan">
-              <i class="bi bi-plus-lg"></i> Tambah Kegiatan/Indikator
+              <i class="bi bi-plus-lg"></i> Tambah Data
             </button>
           </div>
 
@@ -246,8 +249,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <th>Pagu</th>
                 <th>Kegiatan</th>
                 <th>Sub Kegiatan</th>
-                
-                <th>Bidang</th>                
+                <th>Bidang</th>
+                <th>Aksi</th>                  
               </tr>
             </thead>
             <tbody>
@@ -262,9 +265,68 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= number_format($n['pagu_anggaran'], 0, ',', '.');  ?></td>
                 <td><?= $n['kegiatan'];  ?></td>           
                 <td><?= $n['sub_kegiatan'];  ?></td>           
-                <td><?= $n['bidang'];  ?></td>           
+                <td><?= $n['bidang'];  ?></td>
+                <td>
+                  <button class="btn btn-warning btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#edit<?= $n['id']; ?>">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+
+                  <a href="?hapus=<?= $n['id']; ?>"
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Yakin hapus data?')">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+         
                 <?php $no++; ?>               
               </tr>
+              <div class="modal fade" id="edit<?= $n['id']; ?>" tabindex="-1">
+                  <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+
+                      <form method="POST">
+                        <input type="hidden" name="id" value="<?= $n['id']; ?>">
+
+                        <div class="modal-header">
+                          <h5 class="modal-title">Edit Data</h5>
+                          <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                          <textarea name="sasaran" class="form-control mb-2"><?= $n['sasaran_strategis']; ?></textarea>
+                          <textarea name="indikator" class="form-control mb-2"><?= $n['indikator_kinerja']; ?></textarea>
+                          <textarea name="program" class="form-control mb-2"><?= $n['program']; ?></textarea>
+                          <textarea name="kegiatan" class="form-control mb-2"><?= $n['kegiatan']; ?></textarea>
+                          <textarea name="subkegiatan" class="form-control mb-2"><?= $n['sub_kegiatan']; ?></textarea>
+
+                          <input name="satuan" class="form-control mb-2" value="<?= $n['satuan']; ?>">
+                          <input name="target" class="form-control mb-2" value="<?= $n['target']; ?>">
+                          <input name="tahun" class="form-control mb-2" value="<?= $n['tahun']; ?>">
+                          <input name="pagu_anggaran" class="form-control mb-2" value="<?= $n['pagu_anggaran']; ?>">
+
+                          <select name="bidang" class="form-select">
+                            <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
+                            <option>Perencanaan dan Keuangan</option>
+                            <option>Umum dan Kepegawaian</option>
+                            <option>Rehabilitasi Sosial</option>
+                            <option>Perlindungan dan Jaminan Sosial</option>
+                            <option>Pemberdayaan Sosial</option>
+                          </select>
+                        </div>
+
+                        <div class="modal-footer">
+                          <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                          <button type="submit" name="update" class="btn btn-primary">Update</button>
+                        </div>
+
+                      </form>
+
+                    </div>
+                  </div>
+                </div>
+
               <?php endforeach; ?>
             </tbody>
           </table>
@@ -281,7 +343,7 @@ while ($row = mysqli_fetch_assoc($query)) {
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Indikator Kinerja</h5>
+        <h5 class="modal-title">Tambah Data</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
