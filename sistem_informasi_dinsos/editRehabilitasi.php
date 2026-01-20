@@ -6,6 +6,11 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
+
 
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
@@ -451,23 +456,25 @@ body {
                     <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hello, User Name</h6>
                 </button>
+                <div class="account-dropdown">
+                <button class="btn account-btn d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                    <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
+                </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong>User Name</strong>
-                            <p class="mb-0 text-muted small">Role</p>
-                            <p class="mb-0 text-muted small">Bidang</p>
+                            <strong><?= $jabatan[0]; ?></strong>
+                            <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
                     <hr class="my-2">
-                    <a href="profile.php" class="dropdown-item">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </a>
                     <a href="logout.php" class="dropdown-item text-danger">
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
                 </div>
+            </div>
             </div>
         </div>
     </nav>
@@ -594,11 +601,11 @@ body {
                 </li>
                 <li class="list-group-item">
                     <strong>Target:</strong><br>
-                    <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                    <?= number_format($data['target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Sisa Target:</strong><br>
-                    <?= number_format($tw[4]['sisa_target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                    <?= number_format($tw[4]['sisa_target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Pagu Anggaran Tahunan:</strong><br>

@@ -1,4 +1,13 @@
 <?php
+require 'config/database.php';
+session_start();
+
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,18 +92,25 @@
         <i class="bi bi-bell me-3 fs-5"></i>
 
         <div class="account-dropdown">
-          <button class="btn account-btn d-flex align-items-center">
-            <i class="bi bi-person-circle fs-4 me-2"></i>
-            <h6 class="mb-0">Hello, Administrator</h6>
-          </button>
+                <button class="btn account-btn d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                    <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
+                </button>
+                <div class="dropdown-content">
+                    <div class="d-flex align-items-center p-2">
+                        <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
+                        <div>
+                            <strong><?= $jabatan[0]; ?></strong>
+                            <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
+                        </div>
+                    </div>
+                    <hr class="my-2">
+                    <a href="logout.php" class="dropdown-item text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
 
-          <div class="dropdown-content">
-            <p><strong>Administrator</strong></p>
-            <p>admin@dinsos.go.id</p>
-            <p>0856736263</p>
-            <p><a href="logout.php">Logout</a></p>
-          </div>
-        </div>
       </div>
     </div>
   </nav>
@@ -240,14 +256,13 @@
       month: 'short',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     };
     document.getElementById('currentDateTime').innerHTML =
       `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
   }
   updateDateTime();
-  setInterval(updateDateTime, 1000);
+  setInterval(updateDateTime, 60*1000);
 </script>
 
 </body>

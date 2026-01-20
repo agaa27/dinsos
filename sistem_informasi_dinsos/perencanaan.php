@@ -6,6 +6,12 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
+
+
 
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
@@ -116,6 +122,7 @@ for ($i = 1; $i <= 12; $i++) {
     $bulan[$i] = [
         'realisasi_target'   => $realisasi_target ?: null,
         'realisasi_anggaran' => $realisasi_anggaran ?: null,
+        'bukti' => $data["bukti{$i}"] ?? null,
 
         'sisa_target'   => $target - $total_realisasi_target,
         'sisa_anggaran' => $pagu_tahunan - $total_realisasi_anggaran,
@@ -519,15 +526,14 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hallo, Staff Perencanaan dan Keuangan </h6>
+                    <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong>DINAS SOSIAL</strong>
-                            <p class="mb-0 text-muted small">Staff</p>
-                            <p class="mb-0 text-muted small">Perencanaan dan Keuangan</p>
+                            <strong><?= $jabatan[0]; ?></strong>
+                            <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
                     <hr class="my-2">
@@ -685,11 +691,11 @@ body {
                     </li>
                     <li class="list-group-item">
                         <strong>Target:</strong><br>
-                        <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                        <?= number_format($data['target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
-                        <?= number_format($data['pagu_anggaran'], 0, ',', '.'); ?>
+                        <?= number_format($data['pagu_anggaran'], 2, ',', '.'); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Tahun:</strong> <br> 
@@ -713,7 +719,7 @@ body {
                                 <li>
                                     Realisasi Kinerja:
                                     <strong>
-                                        <?= number_format($tw[$i]['realisasiT'], 0, ',', '.') . " " . $data['satuan']; ?> 
+                                        <?= number_format($tw[$i]['realisasiT'], 2, ',', '.') . " " . $data['satuan']; ?> 
                                     </strong>
                                 </li>
                                 <li>
@@ -728,7 +734,7 @@ body {
                                 <li>
                                     Realisasi Anggaran:
                                     <strong>
-                                        Rp <?= number_format($tw[$i]['realisasi'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($tw[$i]['realisasi'], 2, ',', '.'); ?>
                                     </strong>
                                 </li>
                                 <li>
@@ -738,7 +744,7 @@ body {
                                 <li>
                                     Sisa Anggaran:
                                     <strong>
-                                        Rp <?= number_format($tw[$i]['sisa'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($tw[$i]['sisa'], 2, ',', '.'); ?>
                                     </strong>
                                 </li>
                             </ul>
@@ -799,8 +805,6 @@ body {
 </div>
 
 
-
-
 <!-- JavaScript Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
@@ -827,77 +831,7 @@ function updateDateTime() {
 setInterval(updateDateTime, 60*1000);
 updateDateTime(); // Panggil sekali saat pertama kali load
 
-// Fungsi untuk konfirmasi hapus
-function confirmDelete(id) {
-    if (confirm('Apakah Anda yakin ingin menghapus data realisasi ini?')) {
-        window.location.href = 'perencanaan.php?delete=' + id;
-    }
-}
 
-// Validasi pagu tidak melebihi sisa pagu
-function validatePagu(inputId, sisaPagu) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        input.addEventListener('change', function() {
-            const inputValue = parseFloat(this.value) || 0;
-            if (inputValue > sisaPagu) {
-                alert(`Pagu anggaran tidak boleh melebihi sisa pagu yang tersedia (Rp ${sisaPagu.toLocaleString('id-ID')})`);
-                this.value = sisaPagu;
-            }
-        });
-    }
-}
-
-// Validasi realisasi anggaran tidak melebihi pagu anggaran
-function validateRealisasiAnggaran(realisasiId, paguId) {
-    const realisasiInput = document.getElementById(realisasiId);
-    const paguInput = document.getElementById(paguId);
-    
-    if (realisasiInput && paguInput) {
-        realisasiInput.addEventListener('change', function() {
-            const paguAnggaran = parseFloat(paguInput.value) || 0;
-            const realisasiAnggaran = parseFloat(this.value) || 0;
-            
-            if (realisasiAnggaran > paguAnggaran) {
-                alert(`Realisasi anggaran tidak boleh melebihi pagu anggaran (Rp ${paguAnggaran.toLocaleString('id-ID')})`);
-                this.value = paguAnggaran;
-            }
-        });
-    }
-}
-
-// Format angka untuk input uang
-function formatCurrency(input) {
-    input.addEventListener('blur', function() {
-        if (this.value && !isNaN(this.value)) {
-            this.value = parseFloat(this.value).toLocaleString('id-ID', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            });
-        }
-    });
-    
-    input.addEventListener('focus', function() {
-        this.value = this.value.replace(/[^\d]/g, '');
-    });
-}
-
-// Dropdown account hover effect
-const accountDropdown = document.querySelector('.account-dropdown');
-if (accountDropdown) {
-    accountDropdown.addEventListener('mouseenter', function() {
-        this.querySelector('.dropdown-content').style.display = 'block';
-    });
-    
-    accountDropdown.addEventListener('mouseleave', function() {
-        this.querySelector('.dropdown-content').style.display = 'none';
-    });
-}
-
-// Auto-focus ke field pertama saat modal dibuka
-document.getElementById('addModal')?.addEventListener('shown.bs.modal', function () {
-    document.getElementById('modal_triwulan')?.focus();
-});
 
 //detail triwulan
 const dataBulan = <?= json_encode($bulan); ?>;
@@ -937,8 +871,6 @@ function openDetailTW(tw) {
                     <h6 class="text-center fw-bold mb-3 fs-4 text-success">
                         ${namaBulan[bln]}
                     </h6>
-
-
                     <ul class="list-unstyled small mb-0">
                         <li><span class='fs-6 text-primary'><strong>Realisasi Kinerja:</strong>
                             ${b.realisasi_target ?? '-'} ${b.realisasi_target ? satuan : ''}</span>
@@ -960,6 +892,14 @@ function openDetailTW(tw) {
                         </li>
                         <li><strong>Sisa Anggaran:</strong>
                             Rp ${Number(b.sisa_anggaran).toLocaleString('id-ID')}
+                        </li>
+                        <hr>
+                        <li><strong>Bukti Pendukung:</strong>
+                            ${
+                                b.bukti
+                                ? `<a href="img/${b.bukti}" target="_blank">${b.bukti}</a>`
+                                : `<span class="text-muted">-</span>`
+                            }
                         </li>
                     </ul>
                 </div>

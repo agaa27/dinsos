@@ -2,8 +2,10 @@
 require 'config/database.php';
 session_start();
 
-
-require 'config/database.php';
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -204,17 +206,23 @@ while ($row = mysqli_fetch_assoc($query)) {
         <i class="bi bi-bell me-3 fs-5"></i>
 
         <div class="account-dropdown">
-          <button class="btn account-btn d-flex align-items-center">
-            <i class="bi bi-person-circle fs-4 me-2"></i>
-            <h6 class="mb-0">Hello, Administrator</h6>
-          </button>
-
-          <div class="dropdown-content">
-            <p><strong>Administrator</strong></p>
-            <p>admin@dinsos.go.id</p>
-            <p>0856736263</p>
-            <p><a href="#">Logout</a></p>
-          </div>
+            <button class="btn account-btn d-flex align-items-center">
+                <i class="bi bi-person-circle fs-4 me-2"></i>
+                <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
+            </button>
+            <div class="dropdown-content">
+                <div class="d-flex align-items-center p-2">
+                    <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
+                    <div>
+                        <strong><?= $jabatan[0]; ?></strong>
+                        <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
+                    </div>
+                </div>
+                <hr class="my-2">
+                <a href="logout.php" class="dropdown-item text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                </a>
+            </div>
         </div>
       </div>
     </div>
@@ -258,8 +266,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <td><?= $n['indikator_kinerja'];  ?></td>
                 <td><?= $n['program'];  ?></td>
                 <td><?= $n['satuan'];  ?></td>
-                <td><?= number_format($n['target'], 0, ',', '.');  ?></td>
-                <td><?= number_format($n['pagu_anggaran'], 0, ',', '.');  ?></td>
+                <td><?= number_format($n['target'], 2, ',', '.');  ?></td>
+                <td><?= number_format($n['pagu_anggaran'], 2, ',', '.');  ?></td>
                 <td><?= $n['kegiatan'];  ?></td>           
                 <td><?= $n['sub_kegiatan'];  ?></td>           
                 <td><?= $n['bidang'];  ?></td>           

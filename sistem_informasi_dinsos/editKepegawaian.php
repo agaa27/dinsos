@@ -6,6 +6,12 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
+if (isset($_SESSION['username'])){
+    $username = $_SESSION['username'];
+    $jabatan = explode("_", $username);  
+}
+
+
 
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
@@ -594,11 +600,11 @@ body {
                 </li>
                 <li class="list-group-item">
                     <strong>Target:</strong><br>
-                    <?= number_format($data['target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                    <?= number_format($data['target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Sisa Target:</strong><br>
-                    <?= number_format($tw[4]['sisa_target'], 0, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
+                    <?= number_format($tw[4]['sisa_target'], 2, ',', '.') . " " . htmlspecialchars($data['satuan']); ?>
                 </li>
                 <li class="list-group-item">
                     <strong>Pagu Anggaran Tahunan:</strong><br>
