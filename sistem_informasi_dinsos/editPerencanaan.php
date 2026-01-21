@@ -647,7 +647,7 @@ body {
 
                 <?php if (isset($_GET['bulan'])): ?>
 
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-auto">
                         <label class="form-label fw-semibold">Realisasi Target</label>
                         <input type="number"
                             name="realisasi_fisik"
@@ -657,7 +657,7 @@ body {
                             required>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-3 mb-auto">
                         <label class="form-label fw-semibold">Realisasi Anggaran</label>
                         <input type="number"
                             name="realisasi_anggaran"
@@ -692,7 +692,7 @@ body {
                         <?php endif; ?>                        
                     </div>
 
-                    <div class="col-md-2 d-grid">
+                    <div class="col-md-2 d-grid my-auto">
                         <button type="submit" name="submit_realisasi" class="btn btn-success">
                             <i class="bi bi-save me-1"></i>Simpan
                         </button>

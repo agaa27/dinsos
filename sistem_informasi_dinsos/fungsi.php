@@ -33,5 +33,5 @@ function upload_file(){
 
     move_uploaded_file($tmpFile, "img/" . $namaFileBaru);
 
-    return $namaFileBaru;
+    return $namaFile;
 }

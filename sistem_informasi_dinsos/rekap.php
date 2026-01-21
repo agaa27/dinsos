@@ -202,8 +202,15 @@ WHERE tahun = YEAR(CURDATE());
 ";
 $result_anggaran_left = mysqli_query($conn, $query_anggaran_left);
 $row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);
-
-
+ 
+/* Ambil tahun (unik / tidak double) */
+$qTahun = $conn->query("
+    SELECT DISTINCT tahun   
+    FROM kegiatan 
+    WHERE bidang = 'Perencanaan dan Keuangan'
+    AND tahun >= YEAR(CURDATE()) - 4
+    ORDER BY tahun DESC
+");
 
 ?>
 
@@ -356,47 +363,44 @@ $row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);
   <div class="container mt-3">
     <div class="card shadow-sm border-0">
       <div class="card-body">
-        <form class="row g-3">
+        <form class="row g-3" action="export.php" method="get">
 
-          <div class="col-md-3">
-            <label class="form-label">Periode Awal</label>
-            <input type="date" class="form-control">
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">Periode Akhir</label>
-            <input type="date" class="form-control">
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label">Program Bantuan</label>
-            <select class="form-select">
-              <option>Semua Program</option>
-              <option>Bantuan Sembako</option>
-              <option>BLT</option>
-              <option>Bantuan Pendidikan</option>
+          <div class="col-md-4">
+            <label class="form-label">Bidang</label>
+            <select class="form-select" name="bidang">
+              <option>Semua</option>
+              <option>Perencanaan dan Keuangan</option>
+              <option>Umum dan Kepegawaian</option>
+              <option>Rehabilitasi Sosial</option>
+              <option>Perlindungan dan Jaminan Sosial</option>
+              <option>Pemberdayaan Sosial</option>
             </select>
           </div>
 
-          <div class="col-md-3">
-            <label class="form-label">Status</label>
-            <select class="form-select">
-              <option>Semua Status</option>
-              <option>Disetujui</option>
-              <option>Diproses</option>
-              <option>Ditolak</option>
+          <div class="col-md-4">
+            <label class="form-label">Tahun </label>
+            <select name="tahun" class="form-select" required>
+                <option value="">-- Pilih Tahun --</option>
+                <?php while ($row = $qTahun->fetch_assoc()) : ?>
+                    <option value="<?= $row['tahun']; ?>">
+                        <?= $row['tahun']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Realisasi Kinerja Minimal</label>
+            <select class="form-select" name="realisasi_min">
+              <option value="">Semua</option>
+              <option value="30">≥ 30%</option>
+              <option value="50">≥ 50%</option>
             </select>
           </div>
 
           <div class="col-md-12 d-flex justify-content-end gap-2">
-            <button class="btn btn-primary">
-              <i class="bi bi-filter"></i> Tampilkan
-            </button>
             <button class="btn btn-success">
               <i class="bi bi-file-earmark-excel"></i> Export Excel
-            </button>
-            <button class="btn btn-danger">
-              <i class="bi bi-file-earmark-pdf"></i> Export PDF
             </button>
           </div>
 
