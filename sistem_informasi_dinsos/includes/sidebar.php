@@ -2,6 +2,11 @@
 $currentPage = basename($_SERVER['PHP_SELF']);
 $category    = $_GET['category'] ?? '';
 
+$inputOpen = in_array($currentPage, [
+  'input_data.php',
+  'input_undangan.php'
+]);
+
 // Dropdown Sekretariat terbuka jika di menus.php
 $menuOpen = in_array($currentPage, [
   'perencanaan.php',
@@ -30,10 +35,29 @@ $bidangOpen = in_array($currentPage, [
     <i class="bi bi-pie-chart-fill"></i> Rekapitulasi
   </a>
   
-  <a href="input_data.php"
-     class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-clipboard-data"></i> Input Data
+  <!-- DROPDOWN INPUT DATA -->
+  <a class="d-flex justify-content-between align-items-center mt-2"
+    data-bs-toggle="collapse"
+    href="#inputDropdown"
+    role="button"
+    aria-expanded="<?= $inputOpen ? 'true' : 'false' ?>"
+    aria-controls="inputDropdown">
+    <span><i class="bi bi-clipboard-data"></i> Input Data</span>
+    <i class="bi bi-caret-down-fill small"></i>
   </a>
+
+  <div class="collapse submenu <?= $inputOpen ? 'show' : '' ?>" id="inputDropdown">
+    <a href="input_data.php"
+      class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-primary' : '' ?>">
+      Input Kegiatan
+    </a>
+
+    <a href="input_undangan.php"
+      class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-primary' : '' ?>">
+      Input Undangan
+    </a>
+  </div>
+
 
   <!-- DROPDOWN SEKRETARIAT -->
   <a class="d-flex justify-content-between align-items-center"
@@ -85,14 +109,4 @@ $bidangOpen = in_array($currentPage, [
         Pemberdayaan Sosial
     </a>
   </div>
-
-  <!-- <a href="orders.php"
-     class="<?= $currentPage === 'orders.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-cart4"></i> Orders
-  </a>
-
-  <a href="reports.php"
-     class="<?= $currentPage === 'reports.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-file-earmark-text"></i> Reports
-  </a> -->
 </div>
