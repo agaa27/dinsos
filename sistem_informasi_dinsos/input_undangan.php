@@ -290,6 +290,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                     </td>
                                 </tr>
 
+                                
                                 <div class="modal fade" id="edit<?= $u['id']; ?>" tabindex="-1">
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content">
@@ -348,7 +349,8 @@ while ($row = mysqli_fetch_assoc($query)) {
 
                         </tbody>
                     </table>
-
+                    
+                    
                     <div class="modal fade" id="tambahUndangan" tabindex="-1">
                         <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content">
@@ -381,16 +383,60 @@ while ($row = mysqli_fetch_assoc($query)) {
                                             <input type="text" name="pihak_mengundang" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Bidang Yang Terkait</label>
-                                            <select name="bidang_terkait" class="form-select" required>
-                                                <option value="">-- Pilih Bidang --</option>
-                                                <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
-                                                <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
-                                                <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
-                                                <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
-                                                <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
-                                            </select>
+                                        <label class="form-label">Bidang Yang Terkait</label>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Perencanaan dan Keuangan"
+                                            id="bidang1">
+                                          <label class="form-check-label" for="bidang1">
+                                            Perencanaan dan Keuangan
+                                          </label>
                                         </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Umum dan Kepegawaian"
+                                            id="bidang2">
+                                          <label class="form-check-label" for="bidang2">
+                                            Umum dan Kepegawaian
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Rehabilitasi Sosial"
+                                            id="bidang3">
+                                          <label class="form-check-label" for="bidang3">
+                                            Rehabilitasi Sosial
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Perlindungan dan Jaminan Sosial"
+                                            id="bidang4">
+                                          <label class="form-check-label" for="bidang4">
+                                            Perlindungan dan Jaminan Sosial
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Pemberdayaan Sosial"
+                                            id="bidang5">
+                                          <label class="form-check-label" for="bidang5">
+                                            Pemberdayaan Sosial
+                                          </label>
+                                        </div>
+
+                                      </div>
+
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
