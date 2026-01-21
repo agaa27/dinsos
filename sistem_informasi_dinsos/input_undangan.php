@@ -202,7 +202,7 @@ while ($row = mysqli_fetch_assoc($query)) {
 
         <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid">
-                <h5 class="mb-0">Input Data</h5>
+                <h5 class="mb-0">Input Data Surat Undangan</h5>
 
                 <span class="date" id="currentDateTime">
                     <i class="bi bi-clock"></i> --
@@ -399,7 +399,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                             <div class="modal-content">
                                 <form method="POST">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Tambah Undangan</h5>
+                                        <h5 class="modal-title">Tambah Surat Undangan</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">

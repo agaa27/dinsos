@@ -199,7 +199,7 @@ while ($row = mysqli_fetch_assoc($query)) {
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-      <h5 class="mb-0">Input Data</h5>
+      <h5 class="mb-0">Kelola Data Kegiatan per-Bidang</h5>
 
       <!-- Realtime Clock -->
       <span class="date" id="currentDateTime">
@@ -240,7 +240,7 @@ while ($row = mysqli_fetch_assoc($query)) {
             <button id="btn-add" class="btn btn-primary"
               data-bs-toggle="modal"
               data-bs-target="#tambahKegiatan">
-              <i class="bi bi-plus-lg"></i> Tambah Data
+              <i class="bi bi-plus-lg"></i> Tambah Data Kegiatan
             </button>
           </div>
 

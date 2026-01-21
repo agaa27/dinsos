@@ -529,7 +529,7 @@ $qTahun = $conn->query("
 
       <div class="card-body table-responsive">
         <table
-          class="table table-bordered table-striped"
+          class="table table-bordered table-striped small"
           data-toggle="table"
           data-search="true"
           data-pagination="true"
