@@ -7,92 +7,90 @@ if (isset($_SESSION['username'])) {
     $jabatan = explode("_", $username);
 }
 
-if (isset($_POST['update'])) {
-    $id = $_POST['id'];
-    $judul_kegiatan = $_POST['judul_kegiatan'];
-    $tanggal = $_POST['tanggal'];
-    $waktu = $_POST['waktu'];
-    $tempat = $_POST['tempat'];
-    $pihak = $_POST['pihak_mengundang'];
-    $bidang = $_POST['bidang_terkait'];
+if (isset($_POST['submit'])) {
 
-    $stmt = $conn->prepare("
-        UPDATE undangan SET
-          judul_kegiatan=?,
-          tanggal=?,
-          waktu=?,
-          tempat=?,
-          pihak_mengundang=?,
-          bidang_terkait=?
-        WHERE id=?
-    ");
+    // Ambil data dari form
+    $judul_kegiatan   = mysqli_real_escape_string($conn, $_POST['judul_kegiatan']);
+    $tanggal          = $_POST['tanggal'];
+    $waktu            = $_POST['waktu'];
+    $tempat           = mysqli_real_escape_string($conn, $_POST['tempat']);
+    $pihak_mengundang = mysqli_real_escape_string($conn, $_POST['pihak_mengundang']);
 
-    $stmt->bind_param(
-        "ssssssi",
-        $judul_kegiatan,
-        $tanggal,
-        $waktu,
-        $tempat,
-        $pihak,
-        $bidang,
-        $id
-    );
+    // Checkbox bidang terkait
+    if (!empty($_POST['bidang_terkait'])) {
+        $bidang_terkait = implode(', ', $_POST['bidang_terkait']);
+    } else {
+        echo "<script>
+                alert('Minimal pilih satu bidang terkait');
+                history.back();
+              </script>";
+        exit;
+    }
 
-    $stmt->execute();
-    header("Location: input_kegiatan.php");
-    exit;
+    // Query insert
+    $sql = "INSERT INTO undangan
+            (judul_kegiatan, tanggal, waktu, tempat, pihak_mengundang, bidang_terkait, created_at, updated_at)
+            VALUES
+            ('$judul_kegiatan', '$tanggal', '$waktu', '$tempat', '$pihak_mengundang', '$bidang_terkait', NOW(), NOW())";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>
+                alert('Data undangan berhasil disimpan');
+                window.location.href = 'input_undangan.php';
+              </script>";
+    } else {
+        echo "<script>
+                alert('Gagal menyimpan data: " . mysqli_error($conn) . "');
+                history.back();
+              </script>";
+    }
 }
 
 /* ======================
    PROSES EDIT DATA
 ====================== */
 if (isset($_POST['update'])) {
-    $id        = $_POST['id'];
-    $sasaran   = $_POST['sasaran'];
-    $indikator = $_POST['indikator'];
-    $program   = $_POST['program'];
-    $kegiatan  = $_POST['kegiatan'];
-    $subkegiatan = $_POST['subkegiatan'];
-    $satuan    = $_POST['satuan'];
-    $target    = $_POST['target'];
-    $tahun     = $_POST['tahun'];
-    $pagu      = $_POST['pagu_anggaran'];
-    $bidang    = $_POST['bidang'];
 
-    $sql = "UPDATE kegiatan SET
-        sasaran_strategis=?,
-        indikator_kinerja=?,
-        program=?,
-        kegiatan=?,
-        sub_kegiatan=?,
-        satuan=?,
-        target=?,
-        tahun=?,
-        pagu_anggaran=?,
-        bidang=?
-        WHERE id=?";
+    $id               = (int) $_POST['id'];
+    $judul_kegiatan   = mysqli_real_escape_string($conn, $_POST['judul_kegiatan']);
+    $tanggal          = $_POST['tanggal'];
+    $waktu            = $_POST['waktu'];
+    $tempat           = mysqli_real_escape_string($conn, $_POST['tempat']);
+    $pihak_mengundang = mysqli_real_escape_string($conn, $_POST['pihak_mengundang']);
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param(
-        "ssssssdidsi",
-        $sasaran,
-        $indikator,
-        $program,
-        $kegiatan,
-        $subkegiatan,
-        $satuan,
-        $target,
-        $tahun,
-        $pagu,
-        $bidang,
-        $id
-    );
+    // Validasi checkbox
+    if (empty($_POST['bidang_terkait'])) {
+        echo "<script>
+                alert('Minimal pilih satu bidang terkait');
+                history.back();
+              </script>";
+        exit;
+    }
 
-    $stmt->execute();
-    header("Location: input_data.php");
-    exit;
+    $bidang_terkait = implode(', ', $_POST['bidang_terkait']);
+
+    $sql = "UPDATE undangan SET
+              judul_kegiatan   = '$judul_kegiatan',
+              tanggal          = '$tanggal',
+              waktu            = '$waktu',
+              tempat           = '$tempat',
+              pihak_mengundang = '$pihak_mengundang',
+              bidang_terkait   = '$bidang_terkait',
+              updated_at       = NOW()
+            WHERE id = $id";
+
+    if (mysqli_query($conn, $sql)) {
+        echo "<script>
+                alert('Data undangan berhasil diperbarui');
+                window.location.href = 'input_undangan.php';
+              </script>";
+    } else {
+        echo "<script>
+                alert('Gagal update data: " . mysqli_error($conn) . "');
+                history.back();
+              </script>";
+    }
 }
-
 /* ======================
    PROSES HAPUS DATA
 ====================== */
@@ -240,14 +238,25 @@ while ($row = mysqli_fetch_assoc($query)) {
 
             <div class="container mt-4">
 
-                <div id="toolbar-undangan">
+                <div id="toolbar">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tambahUndangan">
                         <i class="bi bi-plus-lg"></i> Tambah Undangan
                     </button>
                 </div>
 
                 <div class="table-responsive">
-                    <table id="table-undangan" class="table table-bordered table-hover table-striped align-middle" data-toggle="table" data-search="true" data-pagination="true" data-page-size="10" data-toolbar="#toolbar-undangan" data-show-columns="true" data-show-refresh="true">
+                    <table id="table-undangan" 
+                    class="table table-bordered table-striped small"
+                    data-toggle="table"
+                    data-search="true"
+                    data-pagination="true"
+                    data-page-size="10"
+                    data-show-columns="true"
+                    data-show-toggle="true"
+                    data-show-refresh="true"
+                    data-resizable="true"
+                    data-mobile-responsive="true"
+                    data-toolbar="#toolbar">
 
                         <thead class="table-light text-center">
                             <tr>
@@ -278,10 +287,10 @@ while ($row = mysqli_fetch_assoc($query)) {
                                     <td><?= htmlspecialchars($u['bidang_terkait']); ?></td>
 
                                     <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-1">
+                                        <div class="d-flex align-items-center gap-1">
                                             <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#edit<?= $u['id']; ?>">
                                                 <i class="bi bi-pencil"></i>
-                                            </button>
+                                            </button>   
 
                                             <a href="?hapus=<?= $u['id']; ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-sm">
                                                 <i class="bi bi-trash"></i>
@@ -291,60 +300,94 @@ while ($row = mysqli_fetch_assoc($query)) {
                                 </tr>
 
                                 
+                                <?php
+                                $bidangTerpilih = explode(', ', $u['bidang_terkait']);
+                                ?>
+
                                 <div class="modal fade" id="edit<?= $u['id']; ?>" tabindex="-1">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <form method="POST">
-                                                <input type="hidden" name="id" value="<?= $u['id']; ?>">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Edit Undangan</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Kegiatan</label>
-                                                        <textarea name="judul_kegiatan" class="form-control" rows="2" required><?= htmlspecialchars($u['judul_kegiatan']); ?></textarea>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Tanggal</label>
-                                                            <input type="date" name="tanggal" class="form-control" value="<?= $u['tanggal']; ?>" required>
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Waktu</label>
-                                                            <input type="time" name="waktu" class="form-control" value="<?= $u['waktu']; ?>" required>
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label class="form-label">Tempat</label>
-                                                            <input type="text" name="tempat" class="form-control" value="<?= htmlspecialchars($u['tempat']); ?>" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Pihak Yang Mengundang</label>
-                                                        <input type="text" name="pihak_mengundang" class="form-control" value="<?= htmlspecialchars($u['pihak_mengundang']); ?>" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Bidang Yang Terkait</label>
-                                                        <select name="bidang_terkait" class="form-select" required>
-                                                            <option value="<?= $u['bidang_terkait']; ?>">
-                                                                <?= $u['bidang_terkait']; ?>
-                                                            </option>
-                                                            <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
-                                                            <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
-                                                            <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
-                                                            <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
-                                                            <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                    <button type="submit" name="update" class="btn btn-primary">Update</button>
-                                                </div>
-                                            </form>
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <form method="POST">
+                                        <input type="hidden" name="id" value="<?= $u['id']; ?>">
+
+                                        <div class="modal-header">
+                                        <h5 class="modal-title">Edit Undangan</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
+
+                                        <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Kegiatan</label>
+                                            <textarea name="judul_kegiatan" class="form-control" rows="2" required><?= htmlspecialchars($u['judul_kegiatan']); ?></textarea>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                            <label class="form-label">Tanggal</label>
+                                            <input type="date" name="tanggal" class="form-control" value="<?= $u['tanggal']; ?>" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                            <label class="form-label">Waktu</label>
+                                            <input type="time" name="waktu" class="form-control" value="<?= $u['waktu']; ?>" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                            <label class="form-label">Tempat</label>
+                                            <input type="text" name="tempat" class="form-control" value="<?= htmlspecialchars($u['tempat']); ?>" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Pihak Yang Mengundang</label>
+                                            <input type="text" name="pihak_mengundang" class="form-control" value="<?= htmlspecialchars($u['pihak_mengundang']); ?>" required>
+                                        </div>
+
+                                        <!-- BIDANG TERKAIT (CHECKBOX) -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Bidang Yang Terkait</label>
+
+                                            <?php
+                                            $daftarBidang = [
+                                            'Perencanaan dan Keuangan',
+                                            'Umum dan Kepegawaian',
+                                            'Rehabilitasi Sosial',
+                                            'Perlindungan dan Jaminan Sosial',
+                                            'Pemberdayaan Sosial',
+                                            'Kepala Sub Bagian',
+                                            'Kepala Bidang',
+                                            'Kepala Dinas'
+                                            ];
+
+                                            foreach ($daftarBidang as $i => $bidang) :
+                                            ?>
+                                            <div class="form-check">
+                                                <input class="form-check-input"
+                                                type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="<?= $bidang; ?>"
+                                                id="editBidang<?= $u['id'] . $i; ?>"
+                                                <?= in_array($bidang, $bidangTerpilih) ? 'checked' : ''; ?>>
+
+                                                <label class="form-check-label" for="editBidang<?= $u['id'] . $i; ?>">
+                                                <?= $bidang; ?>
+                                                </label>
+                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" name="update" class="btn btn-primary">
+                                            <i class="bi bi-save"></i> Update
+                                        </button>
+                                        </div>
+
+                                    </form>
                                     </div>
                                 </div>
+                                </div>
+
                             <?php endforeach; ?>
 
                         </tbody>

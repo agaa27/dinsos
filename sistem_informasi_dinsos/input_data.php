@@ -244,12 +244,17 @@ while ($row = mysqli_fetch_assoc($query)) {
             </button>
           </div>
 
-          <table class="table table-light table-hover table-responsive small"
-          data-toggle="table" 
-          data-search="true" 
-          data-pagination="true" 
-          data-toolbar="#toolbar"
-          style="background-color: #343a40;">
+          <table class="table table-bordered table-striped small"
+                    data-toggle="table"
+                    data-search="true"
+                    data-pagination="true"
+                    data-page-size="10"
+                    data-show-columns="true"
+                    data-show-toggle="true"
+                    data-show-refresh="true"
+                    data-resizable="true"
+                    data-mobile-responsive="true"
+                    data-toolbar="#toolbar">
             <thead>
               <tr>
                 <th>#</th>
