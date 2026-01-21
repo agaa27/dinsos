@@ -8,6 +8,31 @@ if (isset($_SESSION['username'])){
     $jabatan = explode("_", $username);  
 }
 
+//DATA TABEL
+include 'config/database.php';
+
+$data_tabel = "
+SELECT *,
+(
+  COALESCE(realisasi_bulan1,0)+COALESCE(realisasi_bulan2,0)+COALESCE(realisasi_bulan3,0)+
+  COALESCE(realisasi_bulan4,0)+COALESCE(realisasi_bulan5,0)+COALESCE(realisasi_bulan6,0)+
+  COALESCE(realisasi_bulan7,0)+COALESCE(realisasi_bulan8,0)+COALESCE(realisasi_bulan9,0)+
+  COALESCE(realisasi_bulan10,0)+COALESCE(realisasi_bulan11,0)+COALESCE(realisasi_bulan12,0)
+) AS total_realisasi,
+
+(
+  COALESCE(realisasi_anggaran_bulan1,0)+COALESCE(realisasi_anggaran_bulan2,0)+
+  COALESCE(realisasi_anggaran_bulan3,0)+COALESCE(realisasi_anggaran_bulan4,0)+
+  COALESCE(realisasi_anggaran_bulan5,0)+COALESCE(realisasi_anggaran_bulan6,0)+
+  COALESCE(realisasi_anggaran_bulan7,0)+COALESCE(realisasi_anggaran_bulan8,0)+
+  COALESCE(realisasi_anggaran_bulan9,0)+COALESCE(realisasi_anggaran_bulan10,0)+
+  COALESCE(realisasi_anggaran_bulan11,0)+COALESCE(realisasi_anggaran_bulan12,0)
+) AS total_realisasi_anggaran
+FROM kegiatan
+";
+
+$data = mysqli_query($conn, $data_tabel);
+
 
 // TOTAL KEGIATAN 
 $query_data_total = "SELECT COUNT(*) AS total_kegiatan FROM kegiatan WHERE tahun = YEAR(CURDATE());";
@@ -499,52 +524,71 @@ $qTahun = $conn->query("
   <div class="container mt-3 mb-4">
     <div class="card shadow-sm border-0">
       <div class="card-header bg-white">
-        <h6 class="mb-0">Tabel Rekapitulasi Bantuan Sosial</h6>
+        <h6 class="mb-0">Tabel Rekapitulasi Kegiatan Tahunan</h6>
       </div>
 
       <div class="card-body table-responsive">
-        <table class="table table-bordered table-striped align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Nama Penerima</th>
-              <th>Program</th>
-              <th>Wilayah</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-              <th>Nominal</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Ahmad</td>
-              <td>Bantuan Sembako</td>
-              <td>Kecamatan A</td>
-              <td>2025-01-02</td>
-              <td><span class="badge bg-success">Disetujui</span></td>
-              <td>Rp 500.000</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Siti</td>
-              <td>BLT</td>
-              <td>Kecamatan B</td>
-              <td>2025-01-02</td>
-              <td><span class="badge bg-warning">Diproses</span></td>
-              <td>Rp 1.000.000</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Budi</td>
-              <td>Bantuan Pendidikan</td>
-              <td>Kecamatan C</td>
-              <td>2025-01-01</td>
-              <td><span class="badge bg-danger">Ditolak</span></td>
-              <td>Rp 750.000</td>
-            </tr>
-          </tbody>
-        </table>
+        <table
+          class="table table-bordered table-striped"
+          data-toggle="table"
+          data-search="true"
+          data-pagination="true"
+          data-page-size="10"
+          data-show-columns="true"
+          data-show-toggle="true"
+          data-show-refresh="true"
+          data-resizable="true"
+          data-mobile-responsive="true">
+
+        <thead class="table-dark">
+        <tr>
+          <th>No</th>
+          <th data-sortable="true">Bidang</th>
+          <th data-sortable="true">Kegiatan</th>
+          <th data-sortable="true">Sub Kegiatan</th>
+          <th data-sortable="true">Target</th>
+          <th data-sortable="true">Realisasi</th>
+          <th>Sisa Target</th>
+          <th>% Kinerja</th>
+          <th data-sortable="true">Pagu Anggaran</th>
+          <th data-sortable="true">Realisasi Anggaran</th>
+          <th>Sisa Pagu</th>
+          <th>% Anggaran</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <?php
+        $no = 1;
+        while ($row = mysqli_fetch_assoc($data)) {
+
+          $target        = (float) $row['target'];
+          $realisasi     = (float) $row['total_realisasi'];
+          $sisa_target   = $target - $realisasi;
+          $persen_kinerja = $target > 0 ? ($realisasi / $target) * 100 : 0;
+
+          $pagu          = (float) $row['pagu_anggaran'];
+          $realisasi_ang = (float) $row['total_realisasi_anggaran'];
+          $sisa_pagu     = $pagu - $realisasi_ang;
+          $persen_ang    = $pagu > 0 ? ($realisasi_ang / $pagu) * 100 : 0;
+        ?>
+        <tr>
+          <td><?= $no++ ?></td>
+          <td><?= $row['bidang'] ?></td>
+          <td><?= $row['kegiatan'] ?></td>
+          <td><?= $row['sub_kegiatan'] ?></td>
+          <td><?= number_format($target,2) ?></td>
+          <td><?= number_format($realisasi,2) ?></td>
+          <td><?= number_format($sisa_target,2) ?></td>
+          <td><?= number_format($persen_kinerja,2) ?>%</td>
+          <td><?= number_format($pagu,2) ?></td>
+          <td><?= number_format($realisasi_ang,2) ?></td>
+          <td><?= number_format($sisa_pagu,2) ?></td>
+          <td><?= number_format($persen_ang,2) ?>%</td>
+        </tr>
+        <?php } ?>
+        </tbody>
+      </table>
       </div>
     </div>
   </div>
