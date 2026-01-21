@@ -249,7 +249,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <div class="table-responsive">
                     <table id="table-undangan" class="table table-bordered table-hover table-striped align-middle" data-toggle="table" data-search="true" data-pagination="true" data-page-size="10" data-toolbar="#toolbar-undangan" data-show-columns="true" data-show-refresh="true">
 
-                        <thead class="table-dark text-center">
+                        <thead class="table-light text-center">
                             <tr>
                                 <th>No</th>
                                 <th>Kegiatan</th>
@@ -432,6 +432,36 @@ while ($row = mysqli_fetch_assoc($query)) {
                                             id="bidang5">
                                           <label class="form-check-label" for="bidang5">
                                             Pemberdayaan Sosial
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Pemberdayaan Sosial"
+                                            id="bidang5">
+                                          <label class="form-check-label" for="bidang5">
+                                            Kepala Sub Bagian
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Pemberdayaan Sosial"
+                                            id="bidang5">
+                                          <label class="form-check-label" for="bidang5">
+                                            Kepala Dinas
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Pemberdayaan Sosial"
+                                            id="bidang5">
+                                          <label class="form-check-label" for="bidang5">
+                                            Kepala Bidang
                                           </label>
                                         </div>
 
