@@ -581,8 +581,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
                                             value="Kepala Sub Bagian"
-                                            id="bidang5">
-                                          <label class="form-check-label" for="bidang5">
+                                            id="bidang6">
+                                          <label class="form-check-label" for="bidang6">
                                             Kepala Sub Bagian
                                           </label>
                                         </div>
@@ -591,8 +591,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
                                             value="Kepala Dinas"
-                                            id="bidang5">
-                                          <label class="form-check-label" for="bidang5">
+                                            id="bidang7">
+                                          <label class="form-check-label" for="bidang7">
                                             Kepala Dinas
                                           </label>
                                         </div>
@@ -601,8 +601,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
                                             value="Kepala Bidang"
-                                            id="bidang5">
-                                          <label class="form-check-label" for="bidang5">
+                                            id="bidang8">
+                                          <label class="form-check-label" for="bidang8">
                                             Kepala Bidang
                                           </label>
                                         </div>
