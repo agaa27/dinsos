@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 
@@ -853,7 +853,7 @@ function openDetailTW(tw) {
                         <li><strong>Bukti Pendukung:</strong>
                             ${
                                 b.bukti
-                                ? `<a href="img/${b.bukti}" target="_blank">${b.bukti}</a>`
+                                ? `<a href="file bukti/${b.bukti}" target="_blank">${b.bukti}</a>`
                                 : `<span class="text-muted">-</span>`
                             }
                         </li>

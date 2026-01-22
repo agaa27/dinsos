@@ -13,11 +13,10 @@ if (isset($_SESSION['username'])){
 }
 
 
-
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
     FROM kegiatan 
-    WHERE bidang = 'Pemberdayaan Sosial'
+    WHERE bidang = 'Pemberdayaan Masyarakat'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY sub_kegiatan ASC
 ");
@@ -26,7 +25,7 @@ $qIndikator = $conn->query("
 $qTahun = $conn->query("
     SELECT DISTINCT tahun   
     FROM kegiatan 
-    WHERE bidang = 'Pemberdayaan Sosial'
+    WHERE bidang = 'Pemberdayaan Masyarakat'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY tahun DESC
 ");
@@ -177,9 +176,10 @@ if (isset($_POST['submit_realisasi'])) {
         'message' => 'Data berhasil disimpan!'
     ];
 
-    header("Location: pemberdayaan.php?indikator_id=$id&tahun=$tahun");
+    header("Location: pemberdayaanMasyarakat.php?indikator_id=$id&tahun=$tahun");
     exit;
 }
+
 //  NOTIF 
 
 
@@ -451,7 +451,7 @@ body {
     padding-left: 30px;
 }
 /* Warna untuk bidang */
-.bidang-pemberdayaan { background-color: #3498db; }
+.bidang-perencanaan { background-color: #3498db; }
 .bidang-umum { background-color: #2ecc71; }
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
@@ -473,11 +473,6 @@ body {
             <div class="account-dropdown">
                 <button class="btn account-btn d-flex align-items-center">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hello, User Name</h6>
-                </button>
-                <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
-                    <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
                 <div class="dropdown-content">
@@ -493,7 +488,6 @@ body {
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
                 </div>
-            </div>
             </div>
         </div>
     </nav>
@@ -511,7 +505,7 @@ body {
         </div>
         
     <div class="text-start mb-1">
-        <a class="btn btn-success" href="pemberdayaan.php">
+        <a class="btn btn-success" href="pemberdayaanMasyarakat.php">
             <i class="bi bi-arrow-bar-left"></i> Kembali
         </a>
     </div>
@@ -713,6 +707,7 @@ body {
                 <?php endif; ?>
 
             </form>
+
         <?php endif; ?>
 
     </div>

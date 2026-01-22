@@ -6,7 +6,6 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
-
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);  
@@ -17,7 +16,7 @@ if (isset($_SESSION['username'])){
 $qIndikator = $conn->query("
     SELECT id, sub_kegiatan 
     FROM kegiatan 
-    WHERE bidang = 'Umum dan Kepegawaian'
+    WHERE bidang = 'Pemberdayaan Masyarakat'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY sub_kegiatan ASC
 ");
@@ -26,7 +25,7 @@ $qIndikator = $conn->query("
 $qTahun = $conn->query("
     SELECT DISTINCT tahun   
     FROM kegiatan 
-    WHERE bidang = 'Umum dan Kepegawaian'
+    WHERE bidang = 'Pemberdayaan Masyarakat'
     AND tahun >= YEAR(CURDATE()) - 4
     ORDER BY tahun DESC
 ");
@@ -155,7 +154,7 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DINSOS PM - Umum dan Kepegawaian</title>
+    <title>DINSOS PM - Pemberdayaan Masyarakat</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -443,7 +442,7 @@ body {
     padding-left: 30px;
 }
 /* Warna untuk bidang */
-.bidang-kepegawaian { background-color: #3498db; }
+.bidang-perencanaan { background-color: #3498db; }
 .bidang-umum { background-color: #2ecc71; }
 .bidang-rehabilitasi { background-color: #e74c3c; }
 .bidang-perlindungan { background-color: #9b59b6; }
@@ -465,7 +464,6 @@ body {
     text-align: center;
 }
 
-</style>
     </style>
 </head>
 <body>
@@ -477,7 +475,7 @@ body {
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
-            <h5 class="mb-0">Umum dan Kepegawaian</h5>
+            <h5 class="mb-0">Pemberdayaan Masyarakat</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
@@ -513,16 +511,15 @@ body {
             </h2>
         </div>
         <!-- Tombol Input -->
-                <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
+                <?php if ($_SESSION['role'] === 'Pemberdayaan Masyarakat'): ?>
                     <div class="text-start mb-1">
-                        <a class="btn btn-success" href="editKepegawaian.php">
+                        <a class="btn btn-success" href="editPM.php">
                             <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
                         </a>
                     </div>
-
                 <?php  else: ?>
                     <div class="text-start mb-1">
-                        <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Umum dan Kepegawaian</p>
+                        <p class=" text-muted"><i class="bi bi-info-circle-fill"></i> Hanya bisa di akses staff Pemberdayaan Masyarakat</p>
                     </div>
                 <?php endif; ?>
 
@@ -596,7 +593,7 @@ body {
                     <span>Tampilkan</span>
                 </button>
 
-                <a href="kepegawaian.php" class="btn btn-outline-success btn-filter">
+                <a href="pemberdayaanMasyarakat.php" class="btn btn-outline-success btn-filter">
                     <i class="bi bi-arrow-clockwise"></i>
                     <span>Reset</span>
                 </a>
@@ -654,7 +651,7 @@ body {
                     </li>
                     <li class="list-group-item">
                         <strong>Pagu Anggaran Tahunan:</strong> <br>Rp : 
-                        <?= number_format($data['pagu_anggaran'], 0, ',', '.'); ?>
+                        <?= number_format($data['pagu_anggaran'], 2, ',', '.'); ?>
                     </li>
                     <li class="list-group-item">
                         <strong>Tahun:</strong> <br> 
@@ -693,7 +690,7 @@ body {
                                 <li>
                                     Realisasi Anggaran:
                                     <strong>
-                                        Rp <?= number_format($tw[$i]['realisasi'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($tw[$i]['realisasi'], 2, ',', '.'); ?>
                                     </strong>
                                 </li>
                                 <li>
@@ -703,7 +700,7 @@ body {
                                 <li>
                                     Sisa Anggaran:
                                     <strong>
-                                        Rp <?= number_format($tw[$i]['sisa'], 0, ',', '.'); ?>
+                                        Rp <?= number_format($tw[$i]['sisa'], 2, ',', '.'); ?>
                                     </strong>
                                 </li>
                             </ul>
@@ -751,9 +748,9 @@ body {
                 <div class="row g-3" id="modalBulanContent"></div>
             </div>
 
-            <?php if ($_SESSION['role'] === 'Umum dan Kepegawaian'): ?>
+            <?php if ($_SESSION['role'] === 'Pemberdayaan Masyarakat'): ?>
                     <div class="modal-footer">
-                        <a href="editKepegawaian.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
+                        <a href="editPM.php?indikator_id=<?= $id; ?>&tahun=<?= $tahun; ?>" class="btn btn-success px-4">
                             <i class="bi bi-pencil-square"></i> Edit
                         </a>
                     </div>
@@ -762,8 +759,6 @@ body {
         </div>
     </div>
 </div>
-
-
 
 
 <!-- JavaScript Libraries -->
@@ -792,77 +787,7 @@ function updateDateTime() {
 setInterval(updateDateTime, 60*1000);
 updateDateTime(); // Panggil sekali saat pertama kali load
 
-// Fungsi untuk konfirmasi hapus
-function confirmDelete(id) {
-    if (confirm('Apakah Anda yakin ingin menghapus data realisasi ini?')) {
-        window.location.href = 'kepegawaian.php?delete=' + id;
-    }
-}
 
-// Validasi pagu tidak melebihi sisa pagu
-function validatePagu(inputId, sisaPagu) {
-    const input = document.getElementById(inputId);
-    if (input) {
-        input.addEventListener('change', function() {
-            const inputValue = parseFloat(this.value) || 0;
-            if (inputValue > sisaPagu) {
-                alert(`Pagu anggaran tidak boleh melebihi sisa pagu yang tersedia (Rp ${sisaPagu.toLocaleString('id-ID')})`);
-                this.value = sisaPagu;
-            }
-        });
-    }
-}
-
-// Validasi realisasi anggaran tidak melebihi pagu anggaran
-function validateRealisasiAnggaran(realisasiId, paguId) {
-    const realisasiInput = document.getElementById(realisasiId);
-    const paguInput = document.getElementById(paguId);
-    
-    if (realisasiInput && paguInput) {
-        realisasiInput.addEventListener('change', function() {
-            const paguAnggaran = parseFloat(paguInput.value) || 0;
-            const realisasiAnggaran = parseFloat(this.value) || 0;
-            
-            if (realisasiAnggaran > paguAnggaran) {
-                alert(`Realisasi anggaran tidak boleh melebihi pagu anggaran (Rp ${paguAnggaran.toLocaleString('id-ID')})`);
-                this.value = paguAnggaran;
-            }
-        });
-    }
-}
-
-// Format angka untuk input uang
-function formatCurrency(input) {
-    input.addEventListener('blur', function() {
-        if (this.value && !isNaN(this.value)) {
-            this.value = parseFloat(this.value).toLocaleString('id-ID', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            });
-        }
-    });
-    
-    input.addEventListener('focus', function() {
-        this.value = this.value.replace(/[^\d]/g, '');
-    });
-}
-
-// Dropdown account hover effect
-const accountDropdown = document.querySelector('.account-dropdown');
-if (accountDropdown) {
-    accountDropdown.addEventListener('mouseenter', function() {
-        this.querySelector('.dropdown-content').style.display = 'block';
-    });
-    
-    accountDropdown.addEventListener('mouseleave', function() {
-        this.querySelector('.dropdown-content').style.display = 'none';
-    });
-}
-
-// Auto-focus ke field pertama saat modal dibuka
-document.getElementById('addModal')?.addEventListener('shown.bs.modal', function () {
-    document.getElementById('modal_triwulan')?.focus();
-});
 
 //detail triwulan
 const dataBulan = <?= json_encode($bulan); ?>;
@@ -902,8 +827,6 @@ function openDetailTW(tw) {
                     <h6 class="text-center fw-bold mb-3 fs-4 text-success">
                         ${namaBulan[bln]}
                     </h6>
-
-
                     <ul class="list-unstyled small mb-0">
                         <li><span class='fs-6 text-primary'><strong>Realisasi Kinerja:</strong>
                             ${b.realisasi_target ?? '-'} ${b.realisasi_target ? satuan : ''}</span>

@@ -31,7 +31,7 @@ function upload_file(){
     // rename file agar aman
     $namaFileBaru = $namaFile . '.' . $ekstensi;
 
-    move_uploaded_file($tmpFile, "img/" . $namaFileBaru);
+    move_uploaded_file($tmpFile, "file bukti/" . $namaFile);
 
     return $namaFile;
 }

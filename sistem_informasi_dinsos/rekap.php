@@ -5,7 +5,7 @@ session_start();
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 //DATA TABEL
@@ -302,7 +302,7 @@ $qTahun = $conn->query("
       right: 0;
       background-color: white;
       min-width: 200px;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      box-shadow-sm: 0px 8px 16px rgba(0,0,0,0.2);
       padding: 10px;
       border-radius: 10px;
       z-index: 10;
@@ -386,7 +386,7 @@ $qTahun = $conn->query("
 
   <!-- FILTER -->
   <div class="container mt-3">
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm  ">
       <div class="card-body">
         <form class="row g-3" action="export.php" method="get">
 
@@ -399,6 +399,7 @@ $qTahun = $conn->query("
               <option>Rehabilitasi Sosial</option>
               <option>Perlindungan dan Jaminan Sosial</option>
               <option>Pemberdayaan Sosial</option>
+              <option>Pemberdayaan Masyarakat</option>
             </select>
           </div>
 
@@ -418,8 +419,11 @@ $qTahun = $conn->query("
             <label class="form-label">Realisasi Kinerja Minimal</label>
             <select class="form-select" name="realisasi_min">
               <option value="">Semua</option>
+              <option value="0">≥ belum berjalan(0%)</option>
               <option value="30">≥ 30%</option>
               <option value="50">≥ 50%</option>
+              <option value="90">≥ 90%</option>
+              <option value="100">100%</option>
             </select>
           </div>
 
@@ -439,7 +443,7 @@ $qTahun = $conn->query("
     <div class="row g-3">
 
       <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
+        <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Total Kegiatan</small>
             <h4 class="text-primary"><?= $total_data; ?></h4>
@@ -456,7 +460,7 @@ $qTahun = $conn->query("
       </div>
 
       <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
+        <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <div class="d-flex justify-content-between">
               <small>Total Kegiatan Terealisasi 30%</small>
@@ -483,7 +487,7 @@ $qTahun = $conn->query("
       </div>
 
       <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
+        <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Total Anggaran</small>
             <h4 class="text-warning"><?= number_format($total_pagu_anggaran, 0, ',', '.'); ?></h4>
@@ -501,7 +505,7 @@ $qTahun = $conn->query("
       </div>
 
       <div class="col-md-3">
-        <div class="card card-summary shadow-sm border-0">
+        <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Sisa Anggaran</small>
             <h4 class="text-danger"><?= number_format($row_anggaran_left['sisa_anggaran'], 0, ',', '.'); ?></h4>
@@ -522,7 +526,7 @@ $qTahun = $conn->query("
 
   <!-- TABEL REKAP -->
   <div class="container mt-3 mb-4">
-    <div class="card shadow-sm border-0">
+    <div class="card shadow  ">
       <div class="card-header bg-white">
         <h6 class="mb-0">Tabel Rekapitulasi Kegiatan Tahunan</h6>
       </div>

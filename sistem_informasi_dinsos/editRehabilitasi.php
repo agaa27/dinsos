@@ -1,14 +1,12 @@
 <?php
 require 'config/database.php';
+require 'fungsi.php';
 session_start();
 
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(E_ALL);
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 
@@ -103,6 +101,8 @@ if ($data) {
 
 $realisasi = '';
 $realisasi_anggaran = '';
+$bulan_ke = $_GET['bulan'];
+$bukti = "bukti$bulan_ke";
 
 if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['bulan'])) {
 
@@ -134,23 +134,39 @@ if (isset($_POST['submit_realisasi'])) {
     $id = intval($_POST['indikator_id']);
     $tahun        = intval($_POST['tahun']);
     $bulan_ke        = intval($_POST['bulan']);
-    $fisik        = intval($_POST['realisasi_fisik']);
-    $anggaran     = intval($_POST['realisasi_anggaran']);
+    $fisik        = floatval($_POST['realisasi_fisik']);
+    $anggaran     = floatval($_POST['realisasi_anggaran']);
+    $bukti     = upload_file();
 
-        // UPDATE
-        $update = $conn->prepare("
+    if ($bukti === false) {
+        exit; // upload error
+    }
+
+    if ($bukti === null) {
+        // tidak upload → jangan update kolom bukti
+        $sql = "
             UPDATE kegiatan
-            SET realisasi_bulan$bulan_ke = ?, realisasi_anggaran_bulan$bulan_ke = ?
-            WHERE id = ? AND tahun = ? 
-        ");
-        $update->bind_param(
-            "iiii",
-            $fisik,
-            $anggaran,
-            $id,
-            $tahun
-        );
-        $update->execute();
+            SET realisasi_bulan$bulan_ke = ?,
+                realisasi_anggaran_bulan$bulan_ke = ?
+            WHERE id = ? AND tahun = ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ddii", $fisik, $anggaran, $id, $tahun);
+    } else {
+        // upload ada → update bukti
+        $sql = "
+            UPDATE kegiatan
+            SET realisasi_bulan$bulan_ke = ?,
+                realisasi_anggaran_bulan$bulan_ke = ?,
+                bukti$bulan_ke = ?
+            WHERE id = ? AND tahun = ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ddsis", $fisik, $anggaran, $bukti, $id, $tahun);
+    }
+
+    $stmt->execute();
+
 
     $_SESSION['notif'] = [
         'type' => 'success',
@@ -617,24 +633,29 @@ body {
                 <i class="bi bi-pencil-square me-1"></i>Input Realisasi
             </h6>
 
-            <form method="POST" class="row g-3">
+            <form method="POST"
+                class="row g-4 align-items-end"
+                enctype="multipart/form-data">
+
 
                 <input type="hidden" name="indikator_id" value="<?= $_GET['indikator_id']; ?>">
                 <input type="hidden" name="tahun" value="<?= $_GET['tahun']; ?>">
                 <input type="hidden" name="bulan" value="<?= $_GET['bulan']; ?>"> 
 
-                <?php if (isset($_GET['bulan'])):  ?>
-                    <div class="col-md-5">
-                        <label class="form-label">Realisasi Target</label>
+                <?php if (isset($_GET['bulan'])): ?>
+
+                    <div class="col-md-3 mb-auto">
+                        <label class="form-label fw-semibold">Realisasi Target</label>
                         <input type="number"
                             name="realisasi_fisik"
                             class="form-control"
-                            value="<?= number_format($realisasi, 0, '.', ','); ?>"
+                            step="0.01"
+                            value="<?= number_format($realisasi, 2, '.', ''); ?>"
                             required>
                     </div>
 
-                    <div class="col-md-5">
-                        <label class="form-label">Realisasi Anggaran</label>
+                    <div class="col-md-3 mb-auto">
+                        <label class="form-label fw-semibold">Realisasi Anggaran</label>
                         <input type="number"
                             name="realisasi_anggaran"
                             class="form-control"
@@ -642,22 +663,45 @@ body {
                             required>
                     </div>
 
-                    <div class="col-md-2 d-grid align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Bukti Dukung/Evidence (PDF)</label>
+                        <input type="file"
+                            name="gambar"
+                            class="form-control"
+                            accept="application/pdf">
+
+                        <?php
+                            $bulan = (int) $_GET['bulan'];
+                            $namaBukti = $data["bukti{$bulan}"] ?? null;
+                        ?>
+
+                        <?php if ($namaBukti): ?>
+                            <small class="text-muted d-block mt-1">
+                                Bukti saat ini:
+                                <a href="file bukti/<?= htmlspecialchars($namaBukti); ?>" target="_blank">
+                                    <?= htmlspecialchars($namaBukti); ?>
+                                </a>
+                            </small>
+                        <?php else: ?>
+                            <small class="text-muted d-block" style="font-size:12px;">
+                                Maksimal ukuran file: 40 MB
+                            </small>
+                        <?php endif; ?>                        
+                    </div>
+
+                    <div class="col-md-2 d-grid my-auto">
                         <button type="submit" name="submit_realisasi" class="btn btn-success">
                             <i class="bi bi-save me-1"></i>Simpan
                         </button>
                     </div>
-                
 
-                <?php else : ?>
-                    <div class="text-muted text-center py-4">
+                <?php else: ?>
+
+                    <div class="col-12 text-center text-muted py-4">
                         Pilih bulan yang mau diisi terlebih dahulu
                     </div>
 
-                <?php  endif;  ?>
-
-
-                
+                <?php endif; ?>
 
             </form>
         <?php endif; ?>

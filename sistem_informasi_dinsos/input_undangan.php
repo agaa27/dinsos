@@ -4,7 +4,7 @@ session_start();
 
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);
+    $jabatan = explode(" ", $username);
 }
 
 if (isset($_POST['submit'])) {
@@ -34,15 +34,21 @@ if (isset($_POST['submit'])) {
             ('$judul_kegiatan', '$tanggal', '$waktu', '$tempat', '$pihak_mengundang', '$bidang_terkait', NOW(), NOW())";
 
     if (mysqli_query($conn, $sql)) {
-        echo "<script>
-                alert('Data undangan berhasil disimpan');
-                window.location.href = 'input_undangan.php';
-              </script>";
+        $_SESSION['notif'] = [
+            'type' => 'success',
+            'message' => 'Data berhasil ditambah!'
+        ];
+
+        header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
+        exit;
     } else {
-        echo "<script>
-                alert('Gagal menyimpan data: " . mysqli_error($conn) . "');
-                history.back();
-              </script>";
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal ditambah!'
+        ];
+
+        header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
+        exit;
     }
 }
 
@@ -57,8 +63,18 @@ if (isset($_POST['update'])) {
     $waktu            = $_POST['waktu'];
     $tempat           = mysqli_real_escape_string($conn, $_POST['tempat']);
     $pihak_mengundang = mysqli_real_escape_string($conn, $_POST['pihak_mengundang']);
+    $status           = $_POST['status_kegiatan'];
 
-    // Validasi checkbox
+    // Validasi status
+    if ($status === '') {
+        echo "<script>
+                alert('Status kegiatan wajib dipilih');
+                history.back();
+              </script>";
+        exit;
+    }
+
+    // Validasi checkbox bidang
     if (empty($_POST['bidang_terkait'])) {
         echo "<script>
                 alert('Minimal pilih satu bidang terkait');
@@ -70,34 +86,52 @@ if (isset($_POST['update'])) {
     $bidang_terkait = implode(', ', $_POST['bidang_terkait']);
 
     $sql = "UPDATE undangan SET
-              judul_kegiatan   = '$judul_kegiatan',
-              tanggal          = '$tanggal',
-              waktu            = '$waktu',
-              tempat           = '$tempat',
-              pihak_mengundang = '$pihak_mengundang',
-              bidang_terkait   = '$bidang_terkait',
-              updated_at       = NOW()
+                judul_kegiatan   = '$judul_kegiatan',
+                tanggal          = '$tanggal',
+                waktu            = '$waktu',
+                tempat           = '$tempat',
+                pihak_mengundang = '$pihak_mengundang',
+                bidang_terkait   = '$bidang_terkait',
+                status_kegiatan  = '$status',
+                updated_at       = NOW()
             WHERE id = $id";
 
     if (mysqli_query($conn, $sql)) {
-        echo "<script>
-                alert('Data undangan berhasil diperbarui');
-                window.location.href = 'input_undangan.php';
-              </script>";
+        $_SESSION['notif'] = [
+            'type' => 'success',
+            'message' => 'Data berhasil diubah!'
+        ];
+
+        header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
+        exit;
     } else {
-        echo "<script>
-                alert('Gagal update data: " . mysqli_error($conn) . "');
-                history.back();
-              </script>";
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal diubah!'
+        ];
+
+        header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
+        exit;
     }
 }
+
 /* ======================
    PROSES HAPUS DATA
 ====================== */
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
-    mysqli_query($conn, "DELETE FROM undangan WHERE id='$id'");
-    header("Location: input_kegiatan.php");
+    if (mysqli_query($conn, "DELETE FROM undangan WHERE id='$id'")) {
+        $_SESSION['notif'] = [
+            'type' => 'warning',
+            'message' => 'Data berhasil dihapus!'
+        ];
+    } else {
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal dihapus!'
+        ];
+    }
+    header("Location: input_undangan.php");
     exit;
 }
 
@@ -191,10 +225,41 @@ while ($row = mysqli_fetch_assoc($query)) {
             border: none;
             font-size: 1.5rem;
         }
+        /* notif */
+.notif-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    width: auto;
+    max-width: 90%;
+}
+
+.notif-wrapper .alert {
+    min-width: 300px;
+    text-align: center;
+}
     </style>
 </head>
 
 <body>
+
+
+    <!-- notif  -->
+
+    <?php if (isset($_SESSION['notif'])): ?>
+        <div class="notif-wrapper">
+            <div class="alert alert-<?= $_SESSION['notif']['type']; ?> alert-dismissible fade show auto-close shadow"
+                role="alert">
+                <?= $_SESSION['notif']['message']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        <?php
+        unset($_SESSION['notif']);
+        endif;
+        ?>
 
     <?php include "includes/sidebar.php"; ?>
 
@@ -267,6 +332,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                 <th>Tempat</th>
                                 <th>Pihak Yang Mengundang</th>
                                 <th>Bidang Yang Terkait</th>
+                                <th>menghadiri</th>
+                                <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -285,6 +352,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                     <td><?= htmlspecialchars($u['tempat']); ?></td>
                                     <td><?= htmlspecialchars($u['pihak_mengundang']); ?></td>
                                     <td><?= htmlspecialchars($u['bidang_terkait']); ?></td>
+                                    <td><?= htmlspecialchars($u['menghadiri']); ?></td>
+                                    <td><?= htmlspecialchars($u['status_kegiatan']); ?></td>
 
                                     <td class="text-center">
                                         <div class="d-flex align-items-center gap-1">
@@ -334,6 +403,27 @@ while ($row = mysqli_fetch_assoc($query)) {
                                             <label class="form-label">Tempat</label>
                                             <input type="text" name="tempat" class="form-control" value="<?= htmlspecialchars($u['tempat']); ?>" required>
                                             </div>
+
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Status</label>
+                                                <select name="status_kegiatan" class="form-select" required>
+                                                    <option value="">-- Pilih Status Kegiatan --</option>
+
+                                                    <option value="Belum Terlaksana"
+                                                        <?= ($u['status_kegiatan'] === 'Belum Terlaksana') ? 'selected' : ''; ?>>
+                                                        Belum Terlaksana
+                                                    </option>
+
+                                                    <option value="Terlaksana"
+                                                        <?= ($u['status_kegiatan'] === 'Terlaksana') ? 'selected' : ''; ?>>
+                                                        Terlaksana
+                                                    </option>
+                                                </select>
+                                            </div>
+
+
+                                            
+
                                         </div>
 
                                         <div class="mb-3">
@@ -421,6 +511,15 @@ while ($row = mysqli_fetch_assoc($query)) {
                                                 <input type="text" name="tempat" class="form-control" placeholder="Ruang / Lokasi kegiatan" required>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Status Kegiatan</label>
+                                                <select name="status" class="form-select">
+                                                    <option value="Belum Terlaksana">Belum Terlaksana</option>
+                                                    <option value="Terlaksana">Terlaksana</option>
+                                                </select>
+                                            </div>
+                                      </div>
                                         <div class="mb-3">
                                             <label class="form-label">Pihak Yang Mengundang</label>
                                             <input type="text" name="pihak_mengundang" class="form-control" required>
@@ -481,7 +580,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <div class="form-check">
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
-                                            value="Pemberdayaan Sosial"
+                                            value="Kepala Sub Bagian"
                                             id="bidang5">
                                           <label class="form-check-label" for="bidang5">
                                             Kepala Sub Bagian
@@ -491,7 +590,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <div class="form-check">
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
-                                            value="Pemberdayaan Sosial"
+                                            value="Kepala Dinas"
                                             id="bidang5">
                                           <label class="form-check-label" for="bidang5">
                                             Kepala Dinas
@@ -501,14 +600,14 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <div class="form-check">
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
-                                            value="Pemberdayaan Sosial"
+                                            value="Kepala Bidang"
                                             id="bidang5">
                                           <label class="form-check-label" for="bidang5">
                                             Kepala Bidang
                                           </label>
                                         </div>
 
-                                      </div>
+                                      </div>                                      
 
                                     </div>
                                     <div class="modal-footer">
@@ -551,6 +650,17 @@ while ($row = mysqli_fetch_assoc($query)) {
         }
         updateDateTime();
         setInterval(updateDateTime, 60 * 1000);
+
+        // notif 
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        let alert = document.querySelector('.auto-close');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 2000); // durasi 3 detik
+});
     </script>
 
 </body>

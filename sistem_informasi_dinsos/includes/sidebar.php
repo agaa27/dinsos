@@ -89,7 +89,7 @@ $bidangOpen = in_array($currentPage, [
      role="button"
      aria-expanded="<?= $bidangOpen ? 'true' : 'false' ?>"
      aria-controls="bidangDropdown">
-    <span><i class="bi bi-diagram-3-fill"></i> Bidang / Seksi</span>
+    <span><i class="bi bi-diagram-3-fill"></i> Bidang Sosial</span>
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 
@@ -109,4 +109,10 @@ $bidangOpen = in_array($currentPage, [
         Pemberdayaan Sosial
     </a>
   </div>
+
+  <a href="pemberdayaanMasyarakat.php"
+     class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-primary' : '' ?>">
+    <i class="bi bi-person-rolodex"></i> Bidang PM
+  </a>
+
 </div>

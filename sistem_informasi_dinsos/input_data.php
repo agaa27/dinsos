@@ -4,7 +4,7 @@ session_start();
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 if (isset($_POST['submit'])) {
@@ -39,7 +39,17 @@ if (isset($_POST['submit'])) {
         $bidang
     );
 
-    $stmt->execute();
+    if ($stmt->execute()) {
+        $_SESSION['notif'] = [
+            'type' => 'success',
+            'message' => 'Data berhasil ditambah!'
+        ];
+    } else {
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal ditambah!'
+        ];
+    }
     header("Location: input_data.php");
     exit;
 }
@@ -90,7 +100,18 @@ if (isset($_POST['update'])) {
         $id
     );
 
-    $stmt->execute();
+    
+    if ($stmt->execute()) {
+        $_SESSION['notif'] = [
+            'type' => 'success',
+            'message' => 'Data berhasil diubah!'
+        ];
+    } else {
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal diubah!'
+        ];
+    }
     header("Location: input_data.php");
     exit;
 }
@@ -100,7 +121,18 @@ if (isset($_POST['update'])) {
 ====================== */
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
-    mysqli_query($conn, "DELETE FROM kegiatan WHERE id='$id'");
+    
+    if (mysqli_query($conn, "DELETE FROM kegiatan WHERE id='$id'")) {
+        $_SESSION['notif'] = [
+            'type' => 'warning',
+            'message' => 'Data berhasil dihapus!'
+        ];
+    } else {
+        $_SESSION['notif'] = [
+            'type' => 'danger',
+            'message' => 'Data gagal dihapus!'
+        ];
+    }
     header("Location: input_data.php");
     exit;
 }
@@ -185,6 +217,21 @@ while ($row = mysqli_fetch_assoc($query)) {
       border: none;
       font-size: 1.5rem;
     }
+        /* notif */
+.notif-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    width: auto;
+    max-width: 90%;
+}
+
+.notif-wrapper .alert {
+    min-width: 300px;
+    text-align: center;
+}
   </style>
 </head>
 
@@ -194,6 +241,21 @@ while ($row = mysqli_fetch_assoc($query)) {
 <?php include "includes/sidebar.php"; ?>
 
 <div class="main-content">
+
+<!-- notif  -->
+
+    <?php if (isset($_SESSION['notif'])): ?>
+        <div class="notif-wrapper">
+            <div class="alert alert-<?= $_SESSION['notif']['type']; ?> alert-dismissible fade show auto-close shadow"
+                role="alert">
+                <?= $_SESSION['notif']['message']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        <?php
+        unset($_SESSION['notif']);
+        endif;
+        ?>
 
 
   <!-- Navbar -->
@@ -379,6 +441,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                             <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
                             <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
                             <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+                            <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
                           </select>
                         </div>
                       </div>
@@ -474,6 +537,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                             <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
                             <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
                             <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+                            <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
                           </select>
                         </div>
                       </div>
@@ -574,6 +638,7 @@ while ($row = mysqli_fetch_assoc($query)) {
               <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
               <option value="Perlindungan dan Jaminan Sosial">Perlindungan dan Jaminan Sosial</option>
               <option value="Pemberdayaan Sosial">Pemberdayaan Sosial</option>
+              <option value="Pemberdayaan Masyarakat">Pemberdayaan Masyarakat</option>
             </select>
           </div>
 
@@ -617,6 +682,17 @@ while ($row = mysqli_fetch_assoc($query)) {
   }
   updateDateTime();
   setInterval(updateDateTime, 60*1000);
+
+        // notif 
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        let alert = document.querySelector('.auto-close');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 2000); // durasi 3 detik
+});
 </script>
 
 </body>

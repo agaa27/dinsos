@@ -4,8 +4,44 @@ session_start();
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
+
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
+$role = $_SESSION['role'];
+
+if (isset($_POST['status'])){
+  $id_undangan = $_POST['id_undangan'];
+
+  $sql = "UPDATE undangan 
+          SET menghadiri = '$role', status_kegiatan = 'Terlaksana'
+          WHERE id = '$id_undangan'";
+
+  if (mysqli_query($conn, $sql)) {
+      header("Location: dashboard.php");
+      exit;
+  } else {
+      echo "Gagal memperbarui data";
+  }
+}
+
+
+$query = mysqli_query($conn, "
+    SELECT *
+    FROM undangan
+    WHERE bidang_terkait LIKE '%$role%'
+    ORDER BY status_kegiatan ASC, tanggal ASC, waktu ASC
+");
+
+function formatTanggal($tanggal) {
+    return date('d F Y', strtotime($tanggal));
+}
+
+
 
 
 ?>
@@ -67,6 +103,46 @@ if (isset($_SESSION['username'])){
       border: none;
       font-size: 1.5rem;
     }
+    /* ===== Dashboard Cards ===== */
+.info-card h6 {
+  font-weight: 600;
+}
+.info-card h3 {
+  font-weight: 700;
+}
+
+/* ===== Undangan Card ===== */
+.undangan-card {
+  background-color: #ffffff;
+  color: #111;
+  border: 2px solid #000;     /* border hitam agak tebal */
+  border-radius: 18px;        /* radius lebih halus */
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 200;
+
+}
+
+
+.undangan-text p {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.badge-status {
+  margin-bottom: auto;
+  background-color: #0d6efd;
+  color:  #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
   </style>
 </head>
 
@@ -120,7 +196,7 @@ if (isset($_SESSION['username'])){
     <div class="row g-3">
 
       <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm mb-2">
           <div class="card-body">
             <h6>
               <i class="bi bi-cash-stack fs-4 mx-2"></i>
@@ -135,7 +211,7 @@ if (isset($_SESSION['username'])){
       </div>
 
       <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm">
           <div class="card-body">
             <h6>
               <i class="bi bi-people fs-4 mx-2"></i>
@@ -148,7 +224,7 @@ if (isset($_SESSION['username'])){
       </div>
 
       <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm">
           <div class="card-body">
             <h6>
               <i class="bi bi-calendar-event fs-4 mx-2"></i>
@@ -163,85 +239,57 @@ if (isset($_SESSION['username'])){
     </div> <!-- end row -->
   </div> <!-- end container -->
 
-  <!-- ===== GRAFIK ===== -->
-  <div class="container mt-2">
-    <div class="row g-3">
-
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">Isi Text</div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card shadow-sm bg-dark">
-          <div class="card-header text-white">Isi Text</div>
-          <div class="card-body">
-            <div class="text-center p-5 border rounded text-light">
-              Grafik Dummy
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div> <!-- end row -->
-  </div> <!-- end container -->
-
-  <!-- ===== TABLE ===== -->
-  <div class="container mt-2">
-    <div class="card shadow-sm border-0">
-      <div class="card-header bg-white">
-        <h6 class="mb-0">Isi Text</h6>
-      </div>
+  <div class="container mt-3">
+    <div class="card shadow rounded-3">
       <div class="card-body">
-        <table class="table table-hover table-borderless">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Customer</th>
-              <th>Program</th>
-              <th>Total</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Ahmad</td>
-              <td>Bantuan Sembako</td>
-              <td>Rp 500.000</td>
-              <td>2025-01-02</td>
-              <td>Selesai</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Siti</td>
-              <td>BLT Tahap II</td>
-              <td>Rp 1.000.000</td>
-              <td>2025-01-02</td>
-              <td>Proses</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Budi</td>
-              <td>Bantuan Pendidikan</td>
-              <td>Rp 750.000</td>
-              <td>2025-01-01</td>
-              <td>Menunggu</td>
-            </tr>
-          </tbody>
-        </table>
+
+        <h5 class="mb-3 ">Undangan</h5><hr class="border border-1 border-dark opacity-100">
+
+        <?php if (mysqli_num_rows($query) > 0): ?>
+          <?php while ($row = mysqli_fetch_assoc($query)): ?>
+
+            <div class="undangan-card">
+              <div class="undangan-text">
+                <h6><strong>Kegiatan :</strong> <?= htmlspecialchars($row['judul_kegiatan']); ?></h6>
+                <h6>
+                  <strong>Waktu :</strong>
+                  <?= formatTanggal($row['tanggal']); ?>,
+                  <?= date('H:i', strtotime($row['waktu'])); ?> WIB
+                </h6>
+                <h6><strong>Lokasi :</strong> <?= htmlspecialchars($row['tempat']); ?></h6>
+                <h6><strong>Mengundang :</strong> <?= htmlspecialchars($row['pihak_mengundang']); ?></h6>
+                <h6>
+                  <strong>Menghadiri :</strong>
+                  <?= !empty($row['menghadiri']) ? htmlspecialchars($row['menghadiri']) : '-' ?>
+                </h6>
+
+              </div>
+
+              <form method="post"  class="d-inline mb-auto">
+                <input type="hidden" name="id_undangan" value="<?= $row['id']; ?>">
+                <button
+                  type="submit" 
+                  name="status"
+                  class="btn rounded-4 btn-sm <?= $row['status_kegiatan'] == 'Terlaksana' ? 'btn-success' : 'btn-primary'; ?>"
+                  <?= $row['status_kegiatan'] == 'Terlaksana' ? 'disabled' : ''; ?>
+                >
+                  <?= $row['status_kegiatan'] == 'Terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'; ?>
+                </button>
+              </form>
+
+            </div>
+
+          <?php endwhile; ?>
+        <?php else: ?>
+          <div class="alert alert-secondary">
+            Tidak ada undangan untuk bidang Anda.
+          </div>
+        <?php endif; ?>
+
       </div>
     </div>
   </div>
 
-</div> <!-- end main-content -->
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

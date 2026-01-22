@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 
@@ -122,6 +122,7 @@ for ($i = 1; $i <= 12; $i++) {
     $bulan[$i] = [
         'realisasi_target'   => $realisasi_target ?: null,
         'realisasi_anggaran' => $realisasi_anggaran ?: null,
+        'bukti' => $data["bukti{$i}"] ?? null,
 
         'sisa_target'   => $target - $total_realisasi_target,
         'sisa_anggaran' => $pagu_tahunan - $total_realisasi_anggaran,
@@ -922,6 +923,14 @@ function openDetailTW(tw) {
                         </li>
                         <li><strong>Sisa Anggaran:</strong>
                             Rp ${Number(b.sisa_anggaran).toLocaleString('id-ID')}
+                        </li>
+                        <hr>
+                        <li><strong>Bukti Pendukung:</strong>
+                            ${
+                                b.bukti
+                                ? `<a href="file bukti/${b.bukti}" target="_blank">${b.bukti}</a>`
+                                : `<span class="text-muted">-</span>`
+                            }
                         </li>
                     </ul>
                 </div>

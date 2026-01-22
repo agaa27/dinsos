@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
-    $jabatan = explode("_", $username);  
+    $jabatan = explode(" ", $username);  
 }
 
 
@@ -681,7 +681,7 @@ body {
                         <?php if ($namaBukti): ?>
                             <small class="text-muted d-block mt-1">
                                 Bukti saat ini:
-                                <a href="img/<?= htmlspecialchars($namaBukti); ?>" target="_blank">
+                                <a href="file bukti/<?= htmlspecialchars($namaBukti); ?>" target="_blank">
                                     <?= htmlspecialchars($namaBukti); ?>
                                 </a>
                             </small>
