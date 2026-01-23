@@ -17,17 +17,23 @@ $role = $_SESSION['role'];
 $isAdmin = ($role === 'Admin');
 
 
+
 $limit = 5; // jumlah card per halaman
 $page  = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page  = max($page, 1);
 $start = ($page - 1) * $limit;
 
-$search = $_GET['search'] ?? '';
+$search = trim($_GET['search'] ?? '');
+
 
 $role = mysqli_real_escape_string($conn, $role);
 $safe = mysqli_real_escape_string($conn, $search);
+$statusFilter = trim($_GET['status'] ?? 'Belum Terlaksana');
+$statusFilter = mysqli_real_escape_string($conn, $statusFilter);
 
-$where = "WHERE bidang_terkait LIKE '%$role%'";
+$where = "WHERE bidang_terkait LIKE '%$role%'
+          AND status_kegiatan = '$statusFilter'";
+
 
 if (!empty($search)) {
   $where .= " AND (
@@ -45,19 +51,22 @@ $totalPage  = ceil($totalData / $limit);
 
 if ($isAdmin) {
     // ADMIN → tampilkan semua undangan
-    $sql_tampil = "SELECT * FROM undangan ORDER BY status_kegiatan ASC, tanggal ASC, waktu ASC";
+    $sql_tampil = "SELECT * FROM undangan ORDER BY  tanggal ASC, waktu ASC";
 } else {
     // USER → tampilkan berdasarkan role
     $sql_tampil = " SELECT *
                     FROM undangan
                     $where
-                    ORDER BY status_kegiatan ASC, tanggal ASC, waktu ASC
+                    ORDER BY tanggal DESC, waktu DESC
                     LIMIT $start, $limit";
 }
 
 $query = mysqli_query($conn, $sql_tampil);
 
-
+$queryString = http_build_query([
+  'search' => $search ?: null,
+  'status' => $statusFilter
+]);
 
 if (isset($_POST['status'])){
   $id_undangan = $_POST['id_undangan'];
@@ -441,39 +450,64 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
     <div class="card shadow rounded-3">
       <div class="card-body">
 
-        <div class="d-flex justify-content-between my-1">
-          <h4 class=" ">Undangan</h4>
-          <div class="d-flex">
-            
-            <form method="get" class="">
-            <div class="input-group">
-              
-              <input type="hidden" name="role" value="<?= $role; ?>">
-
-              <input
-                type="text"
-                name="search"
-                class="form-control form-control-md"
-                placeholder="Cari kegiatan, lokasi, atau pengundang..."
-                value="<?= htmlspecialchars($search); ?>"
-              >
-              <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i>
-              </button>
-              <button type="submit" formaction="export_undangan.php" class="btn btn-success ms-1">
-                  <i class="bi bi-download"></i> Export
-              </button>
-            </div>
-          </form>
-          <a href="dashboard.php" class="btn btn-success ms-1"><i class="bi bi-arrow-clockwise"></i></a>
-          </div>
-        </div>
-        <hr class="border border-1 border-dark opacity-100">
+        
 
         
 
         
           <?php if (!$isAdmin): ?>
+            <div class="d-flex justify-content-between my-1">
+              <h4>
+                <span class="px-2 pb-1 rounded-2 <?= $statusFilter === 'Terlaksana' ? 'bg-success text-white' : 'bg-primary text-white'; ?>">
+                Undangan <?= $statusFilter; ?>
+                </span>
+              </h4>
+
+              <form method="get" class="d-flex align-items-center me-2">
+                <input type="hidden" name="search" value="<?= htmlspecialchars($search); ?>">
+
+                <div class="form-check form-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="status"
+                    value="Terlaksana"
+                    id="switchStatus"
+                    <?= $statusFilter === 'Terlaksana' ? 'checked' : ''; ?>
+                    onchange="this.form.submit()"
+                  >
+                  <label class="form-check-label fw-semibold">
+                    <?= $statusFilter; ?>
+                  </label>
+                </div>
+              </form>
+
+              <div class="d-flex">
+
+
+                
+
+                <form method="get" class="">
+                  <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter); ?>">
+
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      name="search"
+                      class="form-control form-control-md"
+                      placeholder="Cari kegiatan, lokasi, atau pengundang..."
+                      value="<?= htmlspecialchars($search); ?>"
+                    >
+                    <button class="btn btn-primary" type="submit">
+                      <i class="bi bi-search"></i>
+                    </button>
+                  </div>
+                </form>
+
+              <a href="dashboard.php" class="btn btn-success ms-1"><i class="bi bi-arrow-clockwise"></i></a>
+              </div>
+            </div>
+        <hr class="border border-1 border-dark opacity-100">
             <?php if (mysqli_num_rows($query) > 0): ?>
             <?php while ($row = mysqli_fetch_assoc($query)): ?>            
                 <div class="undangan-card">
@@ -549,7 +583,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                   <!-- Prev -->
                   <li class="page-item <?= $page <= 1 ? 'disabled' : '' ?>">
                     <a class="page-link"
-                      href="?page=<?= $page - 1 ?>&search=<?= urlencode($search); ?>">
+                      href="?page=<?= $page - 1 ?>&<?= $queryString ?>">
                       Prev
                     </a>
                   </li>
@@ -557,7 +591,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                   <?php for ($i = 1; $i <= $totalPage; $i++): ?>
                     <li class="page-item <?= $i == $page ? 'active' : '' ?>">
                       <a class="page-link"
-                        href="?page=<?= $i ?>&search=<?= urlencode($search); ?>">
+                        href="?page=<?= $i ?>&<?= $queryString ?>">
                         <?= $i ?>
                       </a>
                     </li>
@@ -566,7 +600,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                   <!-- Next -->
                   <li class="page-item <?= $page >= $totalPage ? 'disabled' : '' ?>">
                     <a class="page-link"
-                      href="?page=<?= $page + 1 ?>&search=<?= urlencode($search); ?>">
+                      href="?page=<?= $page + 1 ?>&<?= $queryString ?>">
                       Next
                     </a>
                   </li>
