@@ -99,6 +99,113 @@ function formatTanggal($tanggal) {
     return date('d F Y', strtotime($tanggal));
 }
 
+// kegiatan dengan realisasi tertinggi 
+$query_data_total = "SELECT 
+    bidang,
+    SUM(
+        COALESCE(realisasi_bulan1,0) +
+        COALESCE(realisasi_bulan2,0) +
+        COALESCE(realisasi_bulan3,0) +
+        COALESCE(realisasi_bulan4,0) +
+        COALESCE(realisasi_bulan5,0) +
+        COALESCE(realisasi_bulan6,0) +
+        COALESCE(realisasi_bulan7,0) +
+        COALESCE(realisasi_bulan8,0) +
+        COALESCE(realisasi_bulan9,0) +
+        COALESCE(realisasi_bulan10,0) +
+        COALESCE(realisasi_bulan11,0) +
+        COALESCE(realisasi_bulan12,0)
+    ) AS total_realisasi,
+    SUM(target) AS total_target,
+    ROUND(
+        (SUM(
+            COALESCE(realisasi_bulan1,0) +
+            COALESCE(realisasi_bulan2,0) +
+            COALESCE(realisasi_bulan3,0) +
+            COALESCE(realisasi_bulan4,0) +
+            COALESCE(realisasi_bulan5,0) +
+            COALESCE(realisasi_bulan6,0) +
+            COALESCE(realisasi_bulan7,0) +
+            COALESCE(realisasi_bulan8,0) +
+            COALESCE(realisasi_bulan9,0) +
+            COALESCE(realisasi_bulan10,0) +
+            COALESCE(realisasi_bulan11,0) +
+            COALESCE(realisasi_bulan12,0)
+        ) / SUM(target)) * 100, 2
+    ) AS persentase_realisasi
+FROM kegiatan
+WHERE tahun = YEAR(CURDATE())
+GROUP BY bidang
+ORDER BY persentase_realisasi DESC
+LIMIT 1;
+";
+$result_data_total = mysqli_query($conn, $query_data_total);
+$row_data_total = mysqli_fetch_assoc($result_data_total);
+
+
+
+// sub kegiatan dengan 0 persen realisasi
+$query_anggaran_left = "SELECT
+  bidang,
+    COUNT(*) AS jumlah_sub_kegiatan_0_persen
+FROM kegiatan
+WHERE 
+    COALESCE(realisasi_bulan1,0) +
+    COALESCE(realisasi_bulan2,0) +
+    COALESCE(realisasi_bulan3,0) +
+    COALESCE(realisasi_bulan4,0) +
+    COALESCE(realisasi_bulan5,0) +
+    COALESCE(realisasi_bulan6,0) +
+    COALESCE(realisasi_bulan7,0) +
+    COALESCE(realisasi_bulan8,0) +
+    COALESCE(realisasi_bulan9,0) +
+    COALESCE(realisasi_bulan10,0) +
+    COALESCE(realisasi_bulan11,0) +
+    COALESCE(realisasi_bulan12,0) = 0
+    AND tahun = YEAR(CURDATE());
+
+";
+$result_anggaran_left = mysqli_query($conn, $query_anggaran_left);
+$row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);
+
+
+// bidang paling banyak 0 nya
+$query_anggaran_used = "SELECT 
+    bidang,
+    COUNT(*) AS jumlah_sub_kegiatan_0_persen
+FROM kegiatan
+WHERE 
+    COALESCE(realisasi_bulan1,0) +
+    COALESCE(realisasi_bulan2,0) +
+    COALESCE(realisasi_bulan3,0) +
+    COALESCE(realisasi_bulan4,0) +
+    COALESCE(realisasi_bulan5,0) +
+    COALESCE(realisasi_bulan6,0) +
+    COALESCE(realisasi_bulan7,0) +
+    COALESCE(realisasi_bulan8,0) +
+    COALESCE(realisasi_bulan9,0) +
+    COALESCE(realisasi_bulan10,0) +
+    COALESCE(realisasi_bulan11,0) +
+    COALESCE(realisasi_bulan12,0) = 0
+    AND tahun = YEAR(CURDATE())
+GROUP BY bidang
+ORDER BY jumlah_sub_kegiatan_0_persen DESC
+LIMIT 1;
+
+";
+$result_anggaran_used = mysqli_query($conn, $query_anggaran_used);
+$row_anggaran_used = mysqli_fetch_assoc($result_anggaran_used);
+
+// total undangan bulan ini
+$query_total_undangan = "SELECT 
+    COUNT(*) AS total_undangan_bulan_ini
+FROM undangan
+";
+$result_total_undangan = mysqli_query($conn, $query_total_undangan);
+$row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -282,42 +389,50 @@ function formatTanggal($tanggal) {
         <div class="card shadow-sm mb-2">
           <div class="card-body">
             <h6>
-              <i class="bi bi-cash-stack fs-4 mx-2"></i>
-              Total Anggaran Terserap
+              <i class="bi bi-graph-up-arrow fs-5 mx-2"></i>
+              Persetase realisasi kinerja tertinggi
             </h6>
-            <h3 class="d-flex justify-content-end text-primary">
-              Rp. 120.000.000
-            </h3>
-            <small class="text-muted">Data dummy</small>
+            <h5 class="d-flex justify-content-end text-primary">
+              <?= $row_data_total['bidang']; ?>
+            </h5>
+            <small class="text-muted" style="font-size: small;">Dengan <?= $row_data_total['persentase_realisasi']; ?>% dari total target</small>
           </div>
         </div>
       </div>
 
       <div class="col-md-4">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mb-2">
           <div class="card-body">
             <h6>
-              <i class="bi bi-people fs-4 mx-2"></i>
-              Jumlah Penerima Manfaat
+              <i class="bi bi-graph-down-arrow fs-5 mx-2"></i>
+              Jumlah Sub Kegiatan 0% realisasi
             </h6>
-            <h3 class="d-flex justify-content-end">248</h3>
-            <small class="text-muted">Data dummy</small>
+            <h5 class="d-flex justify-content-end text-primary">
+              <?= $row_anggaran_left['jumlah_sub_kegiatan_0_persen']; ?>
+            </h5>
+            <small class="text-muted" style="font-size: small;">
+                <?= $row_anggaran_used['jumlah_sub_kegiatan_0_persen'] ?> di bidang <?= $row_anggaran_used['bidang']; ?>
+            </small>
           </div>
         </div>
       </div>
 
       <div class="col-md-4">
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mb-2">
           <div class="card-body">
             <h6>
-              <i class="bi bi-calendar-event fs-4 mx-2"></i>
-              Kegiatan Berjalan
+              <i class="bi bi-table fs-5 mx-2"></i>
+              Total undangan
             </h6>
-            <h3 class="d-flex justify-content-end">17</h3>
-            <small class="text-muted">+17 today</small>
+            <h5 class="d-flex justify-content-end text-primary">
+              <?= $row_total_undangan['total_undangan_bulan_ini'] ?>
+            </h5>
+            <small class="text-muted" style="font-size: small;">-</small>
           </div>
         </div>
       </div>
+
+
 
     </div> <!-- end row -->
   </div> <!-- end container -->
@@ -327,9 +442,14 @@ function formatTanggal($tanggal) {
       <div class="card-body">
 
         <div class="d-flex justify-content-between my-1">
-          <h5 class=" ">Undangan</h5>
-          <form method="get" class="">
+          <h4 class=" ">Undangan</h4>
+          <div class="d-flex">
+            
+            <form method="get" class="">
             <div class="input-group">
+              
+              <input type="hidden" name="role" value="<?= $role; ?>">
+
               <input
                 type="text"
                 name="search"
@@ -340,8 +460,13 @@ function formatTanggal($tanggal) {
               <button class="btn btn-primary" type="submit">
                 <i class="bi bi-search"></i>
               </button>
+              <button type="submit" formaction="export_undangan.php" class="btn btn-success ms-1">
+                  <i class="bi bi-download"></i> Export
+              </button>
             </div>
           </form>
+          <a href="dashboard.php" class="btn btn-success ms-1"><i class="bi bi-arrow-clockwise"></i></a>
+          </div>
         </div>
         <hr class="border border-1 border-dark opacity-100">
 

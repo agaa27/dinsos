@@ -2,6 +2,11 @@
 require 'config/database.php';
 session_start();
 
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);  
@@ -294,7 +299,7 @@ while ($row = mysqli_fetch_assoc($query)) {
     </div>
   </nav>  
   
-  <?php if ($_SESSION['role'] == 'Admin' || 1 == "1"):?>
+  <?php if ($_SESSION['role'] == 'Admin'):?>
 
     <!-- Table Preview -->
     <div class="container mt-4">          
@@ -657,7 +662,7 @@ while ($row = mysqli_fetch_assoc($query)) {
   </div>
 </div>
     <?php else : ?>
-      <div class="text-mute d-flex justify-content-center align-items-center vh-100  fs-4"><i class="bi bi-info-circle-fill"></i> Anda tidak punya akses di halaman ini!.</div>
+      <div class="text-mute d-flex justify-content-center align-items-center vh-100  fs-4"><i class="bi bi-info-circle-fill me-2"></i> Anda tidak punya akses di halaman ini!.</div>
     <?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>

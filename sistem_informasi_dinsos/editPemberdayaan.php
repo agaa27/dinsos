@@ -3,6 +3,11 @@ require 'config/database.php';
 require 'fungsi.php';
 session_start();
 
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);

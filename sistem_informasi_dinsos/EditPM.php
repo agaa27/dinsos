@@ -7,6 +7,11 @@ ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);  

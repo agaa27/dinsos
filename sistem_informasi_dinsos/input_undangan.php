@@ -2,6 +2,11 @@
 require 'config/database.php';
 session_start();
 
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_SESSION['username'])) {
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);
@@ -36,7 +41,7 @@ if (isset($_POST['submit'])) {
     if (mysqli_query($conn, $sql)) {
         $_SESSION['notif'] = [
             'type' => 'success',
-            'message' => 'Data berhasil ditambah!'
+            'message' => 'Undangan telah dibuat!'
         ];
 
         header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
@@ -44,7 +49,7 @@ if (isset($_POST['submit'])) {
     } else {
         $_SESSION['notif'] = [
             'type' => 'danger',
-            'message' => 'Data gagal ditambah!'
+            'message' => 'Undangan gagal dibuat!'
         ];
 
         header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
@@ -99,7 +104,7 @@ if (isset($_POST['update'])) {
     if (mysqli_query($conn, $sql)) {
         $_SESSION['notif'] = [
             'type' => 'success',
-            'message' => 'Data berhasil diubah!'
+            'message' => 'Undangan telah diubah!'
         ];
 
         header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
@@ -107,7 +112,7 @@ if (isset($_POST['update'])) {
     } else {
         $_SESSION['notif'] = [
             'type' => 'danger',
-            'message' => 'Data gagal diubah!'
+            'message' => 'Undangan gagal diubah!'
         ];
 
         header("Location: input_undangan.php?indikator_id=$id&tahun=$tahun");
@@ -299,7 +304,7 @@ while ($row = mysqli_fetch_assoc($query)) {
             </div>
         </nav>
 
-        <?php if ($_SESSION['role'] == 'Admin' || 1 == "1") : ?>
+        <?php if ($_SESSION['role'] == 'Admin') : ?>
 
             <div class="container mt-4">
 
@@ -442,6 +447,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                             'Rehabilitasi Sosial',
                                             'Perlindungan dan Jaminan Sosial',
                                             'Pemberdayaan Sosial',
+                                            'Pemberdayaan Masyarakat',
                                             'Kepala Sub Bagian',
                                             'Kepala Bidang',
                                             'Kepala Dinas'
@@ -580,9 +586,19 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <div class="form-check">
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
-                                            value="Kepala Sub Bagian"
+                                            value="Pemberdayaan Masyarakat"
                                             id="bidang6">
                                           <label class="form-check-label" for="bidang6">
+                                            Pemberdayaan Masyarakat
+                                          </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                          <input class="form-check-input" type="checkbox"
+                                            name="bidang_terkait[]"
+                                            value="Kepala Sub Bagian"
+                                            id="bidang7">
+                                          <label class="form-check-label" for="bidang7">
                                             Kepala Sub Bagian
                                           </label>
                                         </div>
@@ -591,8 +607,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
                                             value="Kepala Dinas"
-                                            id="bidang7">
-                                          <label class="form-check-label" for="bidang7">
+                                            id="bidang8">
+                                          <label class="form-check-label" for="bidang8">
                                             Kepala Dinas
                                           </label>
                                         </div>
@@ -601,8 +617,8 @@ while ($row = mysqli_fetch_assoc($query)) {
                                           <input class="form-check-input" type="checkbox"
                                             name="bidang_terkait[]"
                                             value="Kepala Bidang"
-                                            id="bidang8">
-                                          <label class="form-check-label" for="bidang8">
+                                            id="bidang9">
+                                          <label class="form-check-label" for="bidang9">
                                             Kepala Bidang
                                           </label>
                                         </div>

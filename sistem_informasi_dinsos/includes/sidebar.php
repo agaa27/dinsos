@@ -32,7 +32,7 @@ $bidangOpen = in_array($currentPage, [
 
   <a href="rekap.php"
      class="<?= $currentPage === 'rekap.php' ? 'active fw-bold text-primary' : '' ?>">
-    <i class="bi bi-pie-chart-fill"></i> Rekapitulasi
+    <i class="bi bi-folder-check"></i> Rekapitulasi
   </a>
   
   <!-- DROPDOWN INPUT DATA -->
@@ -42,7 +42,7 @@ $bidangOpen = in_array($currentPage, [
     role="button"
     aria-expanded="<?= $inputOpen ? 'true' : 'false' ?>"
     aria-controls="inputDropdown">
-    <span><i class="bi bi-clipboard-data"></i> Input Data</span>
+    <span><i class="bi bi-file-earmark-plus"></i> Input Data</span>
     <i class="bi bi-caret-down-fill small"></i>
   </a>
 

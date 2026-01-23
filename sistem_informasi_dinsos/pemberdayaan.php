@@ -11,6 +11,11 @@ if (isset($_SESSION['username'])){
     $jabatan = explode(" ", $username);  
 }
 
+if (!isset($_SESSION['role'])) {
+    header("Location: index.php");
+    exit;
+}
+
 
 
 $qIndikator = $conn->query("
