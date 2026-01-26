@@ -65,12 +65,20 @@ if (isset($_POST['submit'])) {
         
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+
+            /* Background gambar + overlay gelap */
+            background:
+                linear-gradient(
+                    rgba(0, 0, 0, 0.3),
+                    rgba(0, 0, 0, 0.3)
+                ),
+                url('assets/image/bg-gedung.png') center/cover no-repeat fixed;
         }
+
         
         .login-container {
             display: flex;
@@ -252,7 +260,6 @@ if (isset($_POST['submit'])) {
                 <li><i class="fas fa-check"></i> Manajemen Laporan Terpusat</li>
                 <li><i class="fas fa-check"></i> Monitoring Kegiatan Real-time</li>
                 <li><i class="fas fa-check"></i> Rekapitulasi Data Otomatis</li>
-                <li><i class="fas fa-check"></i> Keamanan Data Terjamin</li>
                 <li><i class="fas fa-check"></i> Akses Multi-User</li>
             </ul>
         </div>

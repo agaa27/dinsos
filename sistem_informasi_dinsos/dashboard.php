@@ -246,7 +246,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       margin: 4px 8px;
     }
     .sidebar a:hover, .sidebar a.active {
-      background-color: #1151d3;
+      background-color: #0d6efd;
       color: #fff;
     }
     .submenu a { padding-left: 40px; font-size: 14px; }
@@ -354,7 +354,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 <div class="main-content">
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light">
+  <nav class="navbar navbar-expand-lg navbar-light text-white bg-primary">
     <div class="container-fluid">
       <h5 class="mb-0">Dashboard</h5>
 
@@ -364,10 +364,9 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       </span>
 
       <div class="d-flex align-items-center">
-        <i class="bi bi-bell me-3 fs-5"></i>
 
         <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
+                <button class="btn account-btn d-flex align-items-center text-white">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
@@ -375,7 +374,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong><?= $jabatan[0]; ?></strong>
+                            <strong class="text-black"><?= $jabatan[0]; ?></strong>
                             <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
@@ -458,7 +457,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
           <?php if (!$isAdmin): ?>
             <div class="d-flex justify-content-between my-1">
               <h4>
-                <span class="px-2 pb-1 rounded-2 <?= $statusFilter === 'Terlaksana' ? 'bg-success text-white' : 'bg-primary text-white'; ?>">
+                <span class="px-2 pb-1 rounded-2 <?= $statusFilter === 'Terlaksana' ? 'bg-primary text-white' : 'bg-primary text-white'; ?>">
                 Undangan <?= $statusFilter; ?>
                 </span>
               </h4>
@@ -503,7 +502,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                       <i class="bi bi-search"></i>
                     </button>
                     
-                    <button type="submit" formaction="export_undangan.php" class="btn btn-success ms-1 rounded-5">
+                    <button type="submit" formaction="export_undangan.php" class="btn btn-primary ms-1 rounded-5">
                       <i class="bi bi-download"></i> export
                   </button>
                   </div>
@@ -511,7 +510,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 
                 
 
-              <a href="dashboard.php" class="btn btn-success ms-1"><i class="bi bi-arrow-clockwise"></i></a>
+              <a href="dashboard.php" class="btn btn-primary ms-1"><i class="bi bi-arrow-clockwise"></i></a>
               </div>
             </div>
         <hr class="border border-1 border-dark opacity-100">
@@ -634,7 +633,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                     <h4>Undangan</h4>
 
                     <form class="ms-auto" action="export_undangan.php" method="get">
-                      <button type="submit" class="btn btn-success rounded-5">
+                      <button type="submit" class="btn btn-primary rounded-5">
                         <i class="bi bi-download"></i> export
                       </button>
                     </form>

@@ -7,14 +7,27 @@ if (!isset($_SESSION['role'])) {
     exit;
 }
 
+$role = $_SESSION['role'];
 
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);  
 }
 
-//DATA TABEL
-include 'config/database.php';
+$bidangFilter = $_GET['bidang'] ?? '';
+$whereBidang = '';
+
+if ($bidangFilter === 'Sekretariat') {
+    $whereBidang = "WHERE bidang IN ('Perencanaan dan Keuangan', 'Umum dan Kepegawaian')";
+} 
+elseif ($bidangFilter === 'Bidang Sosial') {
+    $whereBidang = "WHERE bidang IN ('Rehabilitasi Sosial', 'Perlindungan dan Jaminan Sosial', 'Pemberdayaan Sosial')";
+} 
+elseif ($bidangFilter === 'Bidang PM') {
+    $whereBidang = "WHERE bidang = 'Pemberdayaan Masyarakat'";
+} 
+// jika "Semua" atau kosong → tidak pakai WHERE (tampilkan semua)
+
 
 $data_tabel = "
 SELECT *,
@@ -34,7 +47,9 @@ SELECT *,
   COALESCE(realisasi_anggaran_bulan11,0)+COALESCE(realisasi_anggaran_bulan12,0)
 ) AS total_realisasi_anggaran
 FROM kegiatan
+$whereBidang
 ";
+
 
 $data = mysqli_query($conn, $data_tabel);
 
@@ -275,7 +290,7 @@ $qTahun = $conn->query("
       margin: 4px 8px;
     }
     .sidebar a:hover, .sidebar a.active {
-      background-color: #1151d3;
+      background-color: #0d6efd;
       color: #fff;
     }
     .submenu a { padding-left: 40px; font-size: 14px; }
@@ -302,55 +317,7 @@ $qTahun = $conn->query("
       border: none;
       font-size: 1.5rem;
     }
-    /* ===== Dashboard Cards ===== */
-.info-card h6 {
-  font-weight: 600;
-}
-.info-card h3 {
-  font-weight: 700;
-}
-
-/* ===== Undangan Card ===== */
-.undangan-card {
-  background-color: #ffffff;
-  color: #111;
-  border: 2px solid #000;     /* border hitam agak tebal */
-  border-radius: 18px;        /* radius lebih halus */
-  padding: 20px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 200;
-
-}
-
-
-.undangan-text p {
-  margin-bottom: 6px;
-  font-size: 15px;
-}
-
-.badge-status {
-  margin-bottom: auto;
-  background-color: #0d6efd;
-  color:  #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-}/* notif */
-.notif-wrapper {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1055;
-    width: auto;
-    max-width: 90%;
-}
-
+   
 .notif-wrapper .alert {
     min-width: 300px;
     text-align: center;
@@ -367,7 +334,7 @@ $qTahun = $conn->query("
 <div class="main-content">
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light d-flex mt-0">
+  <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white d-flex mt-0">
     <div class="container-fluid">
       <h5 class="mb-0">Rekapitulasi</h5>
       <span class="date">
@@ -375,12 +342,11 @@ $qTahun = $conn->query("
       </span>
 
       <div class="d-flex align-items-center">
-        <i class="bi bi-bell me-3 fs-5"></i>
 
         <!-- Account Dropdown -->
         
               <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
+                <button class="btn account-btn d-flex align-items-center text-white">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
@@ -388,7 +354,7 @@ $qTahun = $conn->query("
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong><?= $jabatan[0]; ?></strong>
+                            <strong class="text-black"><?= $jabatan[0]; ?></strong>
                             <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
@@ -446,7 +412,7 @@ $qTahun = $conn->query("
           </div>
 
           <div class="col-md-12 d-flex justify-content-end gap-2">
-            <button class="btn btn-success">
+            <button class="btn btn-primary">
               <i class="bi bi-file-earmark-excel"></i> Export Excel
             </button>
           </div>
@@ -483,15 +449,15 @@ $qTahun = $conn->query("
             <div class="d-flex justify-content-between">
               <small>Total Kegiatan Terealisasi 30%</small>
               <span
-                class="btn bg-warning btn-sm"
+                class="btn bg-primary btn-sm"
                 data-bs-toggle="modal"
                 data-bs-target="#modalRealisasiRendah"
                 style="font-size: 14px; padding: 0 3px;"
               >
-                <i class="bi bi-info-circle"></i>
+                <i class="bi bi-info-circle text-white"></i>
               </span>
             </div>
-            <h4 class="text-success"><?= $row_data_up_30['jumlah']; ?></h4>
+            <h4 class="text-primary"><?= $row_data_up_30['jumlah']; ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
                   <?= $persentase_data_up_30; ?>% kegiatan sudah terealisasi 
@@ -508,7 +474,7 @@ $qTahun = $conn->query("
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Total Anggaran</small>
-            <h4 class="text-warning"><?= number_format($total_pagu_anggaran, 0, ',', '.'); ?></h4>
+            <h4 class="text-primary"><?= number_format($total_pagu_anggaran, 0, ',', '.'); ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
                   total anggaran digunakan <?= number_format($row_anggaran_used['total_realisasi'], 0, ',', '.'); ?>
@@ -526,7 +492,7 @@ $qTahun = $conn->query("
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Sisa Anggaran</small>
-            <h4 class="text-danger"><?= number_format($row_anggaran_left['sisa_anggaran'], 0, ',', '.'); ?></h4>
+            <h4 class="text-primary"><?= number_format($row_anggaran_left['sisa_anggaran'], 0, ',', '.'); ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
                   <?= $row_anggaran_left['persentase_sisa']; ?>% anggaran tersisa
@@ -549,6 +515,19 @@ $qTahun = $conn->query("
         <h6 class="mb-0">Tabel Rekapitulasi Kegiatan Tahunan</h6>
       </div>
 
+      <div id="toolbar">
+        <form action="" method="get" class="d-flex">          
+            <select class="form-select" name="bidang">
+              <option value="">-- filter bidang --</option>
+              <option value="">Semua</option>
+              <option value="Sekretariat" <?= ($bidangFilter=='Sekretariat')?'selected':''; ?>>Sekretariat</option>
+              <option value="Bidang PM" <?= ($bidangFilter=='Bidang PM')?'selected':''; ?>>Bidang PM</option>
+              <option value="Bidang Sosial" <?= ($bidangFilter=='Bidang Sosial')?'selected':''; ?>>Bidang Sosial</option>
+            </select>
+            <button class="btn btn-primary ms-2" type="submit" name="filterBidang">Terapkan</button>
+        </form>
+          </div>
+
       <div class="card-body table-responsive">
         <table
           class="table table-bordered table-striped small"
@@ -560,7 +539,9 @@ $qTahun = $conn->query("
           data-show-toggle="true"
           data-show-refresh="true"
           data-resizable="true"
-          data-mobile-responsive="true">
+          data-mobile-responsive="true"
+          data-toolbar="#toolbar"
+          >
 
         <thead class="table-primary">
         <tr>
@@ -622,7 +603,7 @@ $qTahun = $conn->query("
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
 
-      <div class="modal-header bg-warning text-white">
+      <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">
           Daftar Kegiatan dengan Realisasi di Bawah 30%
         </h5>

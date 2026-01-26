@@ -1,4 +1,5 @@
 <?php
+$role = $_SESSION['role'];
 $currentPage = basename($_SERVER['PHP_SELF']);
 $category    = $_GET['category'] ?? '';
 
@@ -23,7 +24,10 @@ $bidangOpen = in_array($currentPage, [
 ?>
 
 <div class="sidebar">
-  <h4 class="text-center mb-4">Dinsos - PM</h4>
+  <div class="d-flex align-items-center ms-3 mb-3">
+    <img src="assets/image/dinsos_logo.png" width="50px" alt="">
+    <h4 class="ms-2 my-auto" >Dinsos - PM</h4>
+  </div>
 
   <a href="dashboard.php"
      class="<?= $currentPage === 'dashboard.php' ? 'active fw-bold text-white' : '' ?>">
@@ -36,7 +40,7 @@ $bidangOpen = in_array($currentPage, [
   </a>
   
   <!-- DROPDOWN INPUT DATA -->
-  <a class="d-flex justify-content-between align-items-center mt-2"
+  <a class="d-flex justify-content-between align-items-center"
     data-bs-toggle="collapse"
     href="#inputDropdown"
     role="button"
@@ -82,7 +86,8 @@ $bidangOpen = in_array($currentPage, [
     </a>
   </div>
 
-  <!-- DROPDOWN BIDANG /  -->
+  <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat'): ?>
+    <!-- DROPDOWN BIDANG /  -->
   <a class="d-flex justify-content-between align-items-center mt-2"
      data-bs-toggle="collapse"
      href="#bidangDropdown"
@@ -109,10 +114,15 @@ $bidangOpen = in_array($currentPage, [
         Pemberdayaan Sosial
     </a>
   </div>
+  <?php endif; ?>
 
+  <?php if($role != 'Kepala Bidang Sosial'):?>
+  
   <a href="pemberdayaanMasyarakat.php"
      class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-white' : '' ?>">
     <i class="bi bi-person-rolodex"></i> Bidang PM
   </a>
+
+  <?php  endif;?>
 
 </div>

@@ -199,7 +199,7 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Realisasi Triwulan - Dinsos Tarakan</title>
+    <title>DINSOS PM - Rehabilitasi Sosial</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -213,40 +213,29 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .sidebar {
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    background-color: #2c2f33;
-    color: white;
-    padding-top: 20px;
-    overflow-y: auto;
-}
-.sidebar a {
-    color: #ddd;
-    text-decoration: none;
-    display: block;
-    padding: 10px 20px;
-    border-radius: 8px;
-    margin: 4px 8px;
-    transition: all 0.3s;
-}
-.sidebar a:hover, .sidebar a.active {
-    background-color: #343a40;
-    color: #fff;
-}
-.submenu a {
-    padding-left: 40px;
-    font-size: 13px;
-}
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      background-color: #202f5b;
+      color: white;
+      padding-top: 20px;
+    }
+    .sidebar a {
+      color: #ddd;
+      text-decoration: none;
+      display: block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin: 4px 8px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1151d3;
+      color: #fff;
+    }
+    .submenu a { padding-left: 40px; font-size: 14px; }
 .main-content {
     margin-left: 250px;
     min-height: 100vh;
-}
-.navbar {
-    background-color: #fff;
-    border-bottom: 1px solid #dee2e6;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .account-dropdown {
     position: relative;
@@ -280,7 +269,6 @@ body {
     background-color: white;
 }
 .card-header {
-    background-color: #27ae60;
     color: white;
     border-radius: 10px 10px 0 0 !important;
     padding: 15px 20px;
@@ -291,7 +279,6 @@ body {
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
-    font-weight: 600;
     transition: all 0.3s;
 }
 .btn-success:hover {
@@ -303,23 +290,7 @@ body {
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
-    font-weight: 600;
     transition: all 0.3s;
-}
-.btn-primary:hover {
-    background-color: #2980b9;
-}
-.btn-warning {
-    background-color: #f39c12;
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
-}
-.btn-danger {
-    background-color: #e74c3c;
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
 }
 .btn-outline-success {
     color: #27ae60;
@@ -333,81 +304,10 @@ body {
     background-color: #27ae60;
     color: white;
 }
-.progress {
-    height: 25px;
-    border-radius: 10px;
-}
-.progress-bar {
-    border-radius: 10px;
-}
-.table th {
-    background-color: #2c3e50;
-    color: white;
-    border-color: #34495e;
-}
-.table td {
-    vertical-align: middle;
-}
 .alert {
     border-radius: 8px;
     border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.badge-tw {
-    font-size: 0.9em;
-    padding: 5px 10px;
-}
-.readonly-input {
-    background-color: #f8f9fa;
-    cursor: not-allowed;
-}
-.info-box {
-    background-color: #e8f5e8;
-    border-left: 4px solid #27ae60;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.empty-state i {
-    font-size: 3rem;
-    color: #ddd;
-    margin-bottom: 15px;
-}
-.empty-state h4 {
-    font-size: 1.25rem;
-    margin-bottom: 10px;
-}
-.empty-state p {
-    font-size: 0.95rem;
-    color: #6c757d;
-    margin-bottom: 20px;
-}
-#currentDateTime {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-.modal-header {
-    background-color: #27ae60;
-    color: white;
-    border-radius: 10px 10px 0 0;
-}
-.modal-header .btn-close {
-    filter: invert(1);
-    opacity: 0.8;
-}
-.modal-header .btn-close:hover {
-    opacity: 1;
-}
-.required::after {
-    content: " *";
-    color: #e74c3c;
 }
 .content-wrapper {
     padding: 20px;
@@ -415,18 +315,7 @@ body {
     min-height: calc(100vh - 70px);
 }
 .page-title {
-    color: #2c3e50;
-    font-weight: 600;
     margin-bottom: 20px;
-}
-.filter-required {
-    color: #e74c3c;
-    font-size: 0.9em;
-}
-.form-label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 5px;
 }
 .form-control, .form-select {
     border-radius: 8px;
@@ -434,64 +323,6 @@ body {
     padding: 10px 15px;
     transition: all 0.3s;
 }
-.form-control:focus, .form-select:focus {
-    border-color: #27ae60;
-    box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.25);
-}
-.dropdown-item {
-    padding: 8px 15px;
-    color: #333;
-    text-decoration: none;
-    display: block;
-    border-radius: 5px;
-    transition: all 0.3s;
-}
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-}
-.table-action-buttons {
-    display: flex;
-    gap: 5px;
-}
-.table-action-buttons .btn {
-    padding: 5px 10px;
-    font-size: 0.875rem;
-}
-.action-header {
-    text-align: center;
-}
-.btn-add-triwulan {
-    background-color: #f39c12;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-.btn-add-triwulan:hover {
-    background-color: #e67e22;
-    transform: translateY(-2px);
-}
-.bidang-badge {
-    font-size: 0.7em;
-    margin-left: 5px;
-    vertical-align: middle;
-}
-.option-group {
-    font-weight: 600;
-    color: #2c3e50;
-    background-color: #f8f9fa;
-    padding: 8px 15px;
-}
-.option-item {
-    padding-left: 30px;
-}
-/* Warna untuk bidang */
-.bidang-rehabilitasi { background-color: #3498db; }
-.bidang-umum { background-color: #2ecc71; }
-.bidang-rehabilitasi { background-color: #e74c3c; }
-.bidang-perlindungan { background-color: #9b59b6; }
-.bidang-pemberdayaan { background-color: #f39c12; }
 
 /* notif */
 .notif-wrapper {
@@ -519,15 +350,15 @@ body {
 
 <div class="main-content">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white">
         <div class="container-fluid">
             <h5 class="mb-0">Rehabilitasi Sosial</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
             </span>
-            <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
+            <div class="account-dropdown ">
+                <button class="btn account-btn d-flex align-items-center text-white">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
                     <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
@@ -535,7 +366,7 @@ body {
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong><?= $jabatan[0]; ?></strong>
+                            <strong class="text-black"><?= $jabatan[0]; ?></strong>
                             <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
@@ -553,13 +384,13 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-clipboard-data text-success me-2"></i>Input Realisasi Pagu dan Anggaran
+                <i class="bi bi-clipboard-data text-primary me-2"></i>Input Realisasi Pagu dan Anggaran
             </h2>
         </div>
         <!-- Tombol Input -->
                 <?php if ($_SESSION['role'] === 'Rehabilitasi Sosial'): ?>
                     <div class="text-start mb-1">
-                        <a class="btn btn-success" href="editrehabilitasi.php">
+                        <a class="btn btn-primary" href="editrehabilitasi.php">
                             <i class="bi bi-pencil-square"></i> Input / Edit Realisasi
                         </a>
                     </div>
@@ -587,7 +418,7 @@ body {
 
         <!-- Filter Form Card -->
 <div class="card shadow-sm mb-4 border-0">
-    <div class="card-header bg-secondary text-white">
+    <div class="card-header bg-primary text-white">
         <div class="d-flex align-items-center">
             <i class="bi bi-funnel me-2 fs-5"></i>
             <div>
@@ -656,7 +487,7 @@ body {
 
         <!-- Data Table Card -->
         <div class="card">
-            <div class="card-header bg-secondary">
+            <div class="card-header bg-primary">
                 <h5 class="mb-0">
                     <i class="bi bi-clipboard-data me-2"></i>Detail Realisasi Anggaran Tahunan
                 </h5>

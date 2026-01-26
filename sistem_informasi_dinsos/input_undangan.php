@@ -162,75 +162,53 @@ while ($row = mysqli_fetch_assoc($query)) {
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
 
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
+    body { background-color: #f8f9fa; }
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      background-color: #202f5b;
+      color: white;
+      padding-top: 20px;
+    }
+    .sidebar a {
+      color: #ddd;
+      text-decoration: none;
+      display: block;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin: 4px 8px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1151d3;
+      color: #fff;
+    }
+    .submenu a { padding-left: 40px; font-size: 14px; }
+    .main-content { margin-left: 250px; }
+    .navbar {
+      background-color: #fff;
+      border-bottom: 1px solid #dee2e6;
+    }
+    .account-dropdown { position: relative; display: inline-block; }
+    .account-dropdown .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,.2);
+      padding: 10px;
+      border-radius: 10px;
+      z-index: 10;
+    }
+    .account-dropdown:hover .dropdown-content { display: block; }
+    .account-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+    }
 
-        .sidebar {
-            width: 250px;
-            height: 100vh;
-            position: fixed;
-            background-color: #2c2f33;
-            color: white;
-            padding-top: 20px;
-        }
-
-        .sidebar a {
-            color: #ddd;
-            text-decoration: none;
-            display: block;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin: 4px 8px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #343a40;
-            color: #fff;
-        }
-
-        .submenu a {
-            padding-left: 40px;
-            font-size: 13px;
-        }
-
-        .main-content {
-            margin-left: 250px;
-        }
-
-        .navbar {
-            background-color: #fff;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .account-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .account-dropdown .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 10;
-        }
-
-        .account-dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .account-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-        }
-        /* notif */
+/* notif */
 .notif-wrapper {
     position: fixed;
     top: 20px;
@@ -245,6 +223,7 @@ while ($row = mysqli_fetch_assoc($query)) {
     min-width: 300px;
     text-align: center;
 }
+
     </style>
 </head>
 
@@ -270,7 +249,7 @@ while ($row = mysqli_fetch_assoc($query)) {
 
     <div class="main-content">
 
-        <nav class="navbar navbar-expand-lg navbar-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white">
             <div class="container-fluid">
                 <h5 class="mb-0">Input Data Surat Undangan</h5>
 
@@ -279,10 +258,9 @@ while ($row = mysqli_fetch_assoc($query)) {
                 </span>
 
                 <div class="d-flex align-items-center">
-                    <i class="bi bi-bell me-3 fs-5"></i>
 
                     <div class="account-dropdown">
-                        <button class="btn account-btn d-flex align-items-center">
+                        <button class="btn account-btn d-flex align-items-center text-white">
                             <i class="bi bi-person-circle fs-4 me-2"></i>
                             <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                         </button>
@@ -290,7 +268,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                             <div class="d-flex align-items-center p-2">
                                 <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                                 <div>
-                                    <strong><?= $jabatan[0]; ?></strong>
+                                    <strong class="text-black"><?= $jabatan[0]; ?></strong>
                                     <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                                 </div>
                             </div>
@@ -639,7 +617,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 </div>
 
             <?php else : ?>
-                <div class="text-mute d-flex justify-content-center align-items-center vh-100 fs-4">
+                <div class="text-mute d-flex justify-content-center align-items-center vh-100 text-secondary fs-4">
                     <i class="bi bi-info-circle-fill me-2"></i> Anda tidak punya akses di halaman ini!.
                 </div>
             <?php endif; ?>
