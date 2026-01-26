@@ -258,14 +258,11 @@ $qTahun = $conn->query("
   <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
   <style>
     body { background-color: #f8f9fa; }
-    .main-content { margin-left: 250px; }
-    .navbar { background-color: #fff; border-bottom: 1px solid #dee2e6; }
-    .card-summary h4 { font-weight: bold; }
     .sidebar {
       width: 250px;
       height: 100vh;
       position: fixed;
-      background-color: #2c2f33;
+      background-color: #202f5b;
       color: white;
       padding-top: 20px;
     }
@@ -278,70 +275,86 @@ $qTahun = $conn->query("
       margin: 4px 8px;
     }
     .sidebar a:hover, .sidebar a.active {
-      background-color: #343a40;
+      background-color: #1151d3;
       color: #fff;
     }
-    .submenu a {
-    padding-left: 40px;
-    font-size: 13px;
-}
-    .main-content {
-      margin-left: 250px;
-    }
+    .submenu a { padding-left: 40px; font-size: 14px; }
+    .main-content { margin-left: 250px; }
     .navbar {
       background-color: #fff;
       border-bottom: 1px solid #dee2e6;
     }
-    .navbar {
-      background-color: #fff;
-      border-bottom: 1px solid #dee2e6;
-    }      
-    .account-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
+    .account-dropdown { position: relative; display: inline-block; }
     .account-dropdown .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
       background-color: white;
       min-width: 200px;
-      box-shadow-sm: 0px 8px 16px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 16px rgba(0,0,0,.2);
       padding: 10px;
       border-radius: 10px;
       z-index: 10;
     }
-
-    .account-dropdown .dropdown-content p {
-      margin: 8px 0;
-      padding: 5px 10px;
-    }
-
-    .account-dropdown .dropdown-content a {
-      color: black;
-      text-decoration: none;
-    }
-
-    .account-dropdown .dropdown-content a:hover {
-      color: #007bff;
-    }
-
-    /* Saat ikon 👤 di-hover, tampilkan dropdown */
-    .account-dropdown:hover .dropdown-content {
-      display: block;
-    }
-
-    /* Styling tambahan opsional */
+    .account-dropdown:hover .dropdown-content { display: block; }
     .account-btn {
       background: none;
       border: none;
       font-size: 1.5rem;
     }
+    /* ===== Dashboard Cards ===== */
+.info-card h6 {
+  font-weight: 600;
+}
+.info-card h3 {
+  font-weight: 700;
+}
 
-    .account-btn:hover {
-      cursor: pointer;
-    }     
+/* ===== Undangan Card ===== */
+.undangan-card {
+  background-color: #ffffff;
+  color: #111;
+  border: 2px solid #000;     /* border hitam agak tebal */
+  border-radius: 18px;        /* radius lebih halus */
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 200;
+
+}
+
+
+.undangan-text p {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.badge-status {
+  margin-bottom: auto;
+  background-color: #0d6efd;
+  color:  #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}/* notif */
+.notif-wrapper {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1055;
+    width: auto;
+    max-width: 90%;
+}
+
+.notif-wrapper .alert {
+    min-width: 300px;
+    text-align: center;
+}
 
   </style>
 </head>
@@ -549,7 +562,7 @@ $qTahun = $conn->query("
           data-resizable="true"
           data-mobile-responsive="true">
 
-        <thead class="table-dark">
+        <thead class="table-primary">
         <tr>
           <th>No</th>
           <th data-sortable="true">Bidang</th>

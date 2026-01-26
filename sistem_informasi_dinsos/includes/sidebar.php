@@ -26,12 +26,12 @@ $bidangOpen = in_array($currentPage, [
   <h4 class="text-center mb-4">Dinsos - PM</h4>
 
   <a href="dashboard.php"
-     class="<?= $currentPage === 'dashboard.php' ? 'active fw-bold text-primary' : '' ?>">
+     class="<?= $currentPage === 'dashboard.php' ? 'active fw-bold text-white' : '' ?>">
     <i class="bi bi-speedometer2"></i> Dashboard
   </a>
 
   <a href="rekap.php"
-     class="<?= $currentPage === 'rekap.php' ? 'active fw-bold text-primary' : '' ?>">
+     class="<?= $currentPage === 'rekap.php' ? 'active fw-bold text-white' : '' ?>">
     <i class="bi bi-folder-check"></i> Rekapitulasi
   </a>
   
@@ -48,12 +48,12 @@ $bidangOpen = in_array($currentPage, [
 
   <div class="collapse submenu <?= $inputOpen ? 'show' : '' ?>" id="inputDropdown">
     <a href="input_data.php"
-      class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-primary' : '' ?>">
+      class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-white' : '' ?>">
       Input Kegiatan
     </a>
 
     <a href="input_undangan.php"
-      class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-primary' : '' ?>">
+      class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-white' : '' ?>">
       Input Undangan
     </a>
   </div>
@@ -72,12 +72,12 @@ $bidangOpen = in_array($currentPage, [
 
   <div class="collapse submenu <?= $menuOpen ? 'show' : '' ?>" id="menuDropdown">
     <a href="perencanaan.php"
-       class="<?= ($currentPage === 'perencanaan.php' && $category === '') ? 'active fw-bold text-primary' : '' ?>">
+       class="<?= ($currentPage === 'perencanaan.php' && $category === '') ? 'active fw-bold text-white' : '' ?>">
       Perencanaan dan Keuangan
     </a>
 
     <a href="kepegawaian.php"
-       class="<?= ($currentPage === 'kepegawaian.php') ? 'active fw-bold text-primary' : '' ?>">
+       class="<?= ($currentPage === 'kepegawaian.php') ? 'active fw-bold text-white' : '' ?>">
       Umum dan kepegawaian
     </a>
   </div>
@@ -95,23 +95,23 @@ $bidangOpen = in_array($currentPage, [
 
   <div class="collapse submenu <?= $bidangOpen ? 'show' : '' ?>" id="bidangDropdown">
     <a href="rehabilitasi.php"
-       class="<?= $currentPage === 'rehabilitasi.php' ? 'active fw-bold text-primary' : '' ?>">
+       class="<?= $currentPage === 'rehabilitasi.php' ? 'active fw-bold text-white' : '' ?>">
         Rehabilitasi Sosial
     </a>
 
     <a href="perlindungan.php"
-       class="<?= $currentPage === 'perlindungan.php' ? 'active fw-bold text-primary' : '' ?>">
+       class="<?= $currentPage === 'perlindungan.php' ? 'active fw-bold text-white' : '' ?>">
         Perlindungan & Jaminan Sosial
     </a>
 
     <a href="pemberdayaan.php"
-       class="<?= $currentPage === 'pemberdayaan.php' ? 'active fw-bold text-primary' : '' ?>">
+       class="<?= $currentPage === 'pemberdayaan.php' ? 'active fw-bold text-white' : '' ?>">
         Pemberdayaan Sosial
     </a>
   </div>
 
   <a href="pemberdayaanMasyarakat.php"
-     class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-primary' : '' ?>">
+     class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-white' : '' ?>">
     <i class="bi bi-person-rolodex"></i> Bidang PM
   </a>
 

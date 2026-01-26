@@ -233,7 +233,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       width: 250px;
       height: 100vh;
       position: fixed;
-      background-color: #2c2f33;
+      background-color: #202f5b;
       color: white;
       padding-top: 20px;
     }
@@ -246,7 +246,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       margin: 4px 8px;
     }
     .sidebar a:hover, .sidebar a.active {
-      background-color: #343a40;
+      background-color: #1151d3;
       color: #fff;
     }
     .submenu a { padding-left: 40px; font-size: 14px; }
@@ -397,14 +397,14 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       <div class="col-md-4">
         <div class="card shadow-sm mb-2">
           <div class="card-body">
-            <h6>
+            <h6 style="font-size: 15px;">
               <i class="bi bi-graph-up-arrow fs-5 mx-2"></i>
               Persetase realisasi kinerja tertinggi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
               <?= $row_data_total['bidang']; ?>
             </h5>
-            <small class="text-muted" style="font-size: small;">Dengan <?= $row_data_total['persentase_realisasi']; ?>% dari total target</small>
+            <small class="text-muted" style="font-size: 12px;">Dengan <?= $row_data_total['persentase_realisasi']; ?>% dari total target</small>
           </div>
         </div>
       </div>
@@ -412,14 +412,14 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       <div class="col-md-4">
         <div class="card shadow-sm mb-2">
           <div class="card-body">
-            <h6>
+            <h6 style="font-size: 15px;">
               <i class="bi bi-graph-down-arrow fs-5 mx-2"></i>
               Jumlah Sub Kegiatan 0% realisasi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
               <?= $row_anggaran_left['jumlah_sub_kegiatan_0_persen']; ?>
             </h5>
-            <small class="text-muted" style="font-size: small;">
+            <small class="text-muted" style="font-size: 12px;">
                 <?= $row_anggaran_used['jumlah_sub_kegiatan_0_persen'] ?> di bidang <?= $row_anggaran_used['bidang']; ?>
             </small>
           </div>
@@ -429,14 +429,14 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
       <div class="col-md-4">
         <div class="card shadow-sm mb-2">
           <div class="card-body">
-            <h6>
+            <h6 style="font-size: 15px;">
               <i class="bi bi-table fs-5 mx-2"></i>
               Total undangan
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
               <?= $row_total_undangan['total_undangan_bulan_ini'] ?>
             </h5>
-            <small class="text-muted" style="font-size: small;">-</small>
+            <small class="text-muted" style="font-size: 12px;">-</small>
           </div>
         </div>
       </div>
@@ -489,6 +489,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 
                 <form method="get" class="">
                   <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter); ?>">
+                  <input type="hidden" name="role" value="<?= htmlspecialchars($role); ?>">
 
                   <div class="input-group">
                     <input
@@ -501,8 +502,14 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                     <button class="btn btn-primary" type="submit">
                       <i class="bi bi-search"></i>
                     </button>
+                    
+                    <button type="submit" formaction="export_undangan.php" class="btn btn-success ms-1 rounded-5">
+                      <i class="bi bi-download"></i> export
+                  </button>
                   </div>
                 </form>
+
+                
 
               <a href="dashboard.php" class="btn btn-success ms-1"><i class="bi bi-arrow-clockwise"></i></a>
               </div>
@@ -609,7 +616,12 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
               </nav>
               <?php endif; ?>
 
-
+              <?php else: ?>
+                <div class="d-flex flex-column align-items-center justify-content-center text-center py-5 text-muted">
+                  <i class="bi bi-envelope-open fs-1 mb-3"></i>
+                  <h5 class="mb-1">Belum Ada Undangan Saat Ini</h5>
+                  <p class="mb-0 small">Undangan akan muncul jika sudah tersedia</p>
+                </div>
 
               <?php endif; ?>
           <?php endif; ?>
@@ -618,6 +630,17 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
         <?php if ($isAdmin): ?>
               <div class="mt-1">
                 <div class="table-responsive">
+                  <div id="toolbar" class="d-flex justify-content-between align-items-center" style="width: 570px;">
+                    <h4>Undangan</h4>
+
+                    <form class="ms-auto" action="export_undangan.php" method="get">
+                      <button type="submit" class="btn btn-success rounded-5">
+                        <i class="bi bi-download"></i> export
+                      </button>
+                    </form>
+                  </div>
+                  
+
                   <table id="table-undangan" 
                     class="table table-bordered table-striped small"
                     data-toggle="table"
