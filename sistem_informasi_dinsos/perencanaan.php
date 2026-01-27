@@ -192,7 +192,7 @@ body {
       background-color: #1151d3;
       color: #fff;
     }
-    .submenu a { padding-left: 40px; font-size: 14px; }
+    .submenu a { padding-left: 40px; font-size: 13px; }
 .main-content {
     margin-left: 250px;
     min-height: 100vh;
