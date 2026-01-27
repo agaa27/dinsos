@@ -76,7 +76,7 @@ if (isset($_POST['submit'])) {
                     rgba(0, 0, 0, 0.3),
                     rgba(0, 0, 0, 0.3)
                 ),
-                url('assets/image/bg-gedung.png') center/cover no-repeat fixed;
+                url('assets/image/final\ gambar\ bg.png') center/cover no-repeat fixed;
         }
 
         
@@ -84,11 +84,20 @@ if (isset($_POST['submit'])) {
             display: flex;
             width: 900px;
             height: 550px;
-            background: white;
+
+            /* transparan halus */
+            background: rgba(255, 255, 255, 0.4);
+
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+
+            /* efek kaca */
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
         }
+
         
         .login-left {
             flex: 1;
@@ -232,7 +241,7 @@ if (isset($_POST['submit'])) {
         .copyright {
             text-align: center;
             margin-top: 30px;
-            color: #777;
+            color: #464646;
             font-size: 12px;
         }
         

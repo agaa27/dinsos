@@ -398,7 +398,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
           <div class="card-body">
             <h6 style="font-size: 15px;">
               <i class="bi bi-graph-up-arrow fs-5 mx-2"></i>
-              Persetase realisasi kinerja tertinggi
+              Persentase realisasi kinerja tertinggi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
               <?= $row_data_total['bidang']; ?>
