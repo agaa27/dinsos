@@ -447,7 +447,7 @@ $qTahun = $conn->query("
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <div class="d-flex justify-content-between">
-              <small>Total Kegiatan Terealisasi 30%</small>
+              <small>Kegiatan Terealisasi 30%</small>
               <span
                 class="btn bg-primary btn-sm"
                 data-bs-toggle="modal"
@@ -477,11 +477,11 @@ $qTahun = $conn->query("
             <h4 class="text-primary"><?= number_format($total_pagu_anggaran, 0, ',', '.'); ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
-                  total anggaran digunakan <?= number_format($row_anggaran_used['total_realisasi'], 0, ',', '.'); ?>
+                   <?= $row_anggaran_used['persentase_realisasi']; ?>% | <?= number_format($row_anggaran_used['total_realisasi'], 0, ',','.'); ?> digunakan 
               </small>
-              <span class="text-muted" style="font-size: 11px;">
-                  <?= $row_anggaran_used['persentase_realisasi']; ?>%
-              </span>
+              <!-- <span class="text-muted" style="font-size: 11px;">
+                 
+              </span> -->
             </div>
 
           </div>

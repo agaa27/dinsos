@@ -39,28 +39,30 @@ $bidangOpen = in_array($currentPage, [
     <i class="bi bi-folder-check"></i> Rekapitulasi
   </a>
   
-  <!-- DROPDOWN INPUT DATA -->
-  <a class="d-flex justify-content-between align-items-center"
-    data-bs-toggle="collapse"
-    href="#inputDropdown"
-    role="button"
-    aria-expanded="<?= $inputOpen ? 'true' : 'false' ?>"
-    aria-controls="inputDropdown">
-    <span><i class="bi bi-file-earmark-plus"></i> Input Data</span>
-    <i class="bi bi-caret-down-fill small"></i>
-  </a>
+  <?php if ($role == 'Admin'): ?>
+    <!-- DROPDOWN INPUT DATA -->
+      <a class="d-flex justify-content-between align-items-center"
+        data-bs-toggle="collapse"
+        href="#inputDropdown"
+        role="button"
+        aria-expanded="<?= $inputOpen ? 'true' : 'false' ?>"
+        aria-controls="inputDropdown">
+        <span><i class="bi bi-file-earmark-plus"></i> Input Data</span>
+        <i class="bi bi-caret-down-fill small"></i>
+      </a>
 
-  <div class="collapse submenu <?= $inputOpen ? 'show' : '' ?>" id="inputDropdown">
-    <a href="input_data.php"
-      class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-white' : '' ?>">
-      Input Kegiatan
-    </a>
+      <div class="collapse submenu <?= $inputOpen ? 'show' : '' ?>" id="inputDropdown">
+        <a href="input_data.php"
+          class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-white' : '' ?>">
+          Input Kegiatan
+        </a>
 
-    <a href="input_undangan.php"
-      class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-white' : '' ?>">
-      Input Undangan
-    </a>
-  </div>
+        <a href="input_undangan.php"
+          class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-white' : '' ?>">
+          Input Undangan
+        </a>
+      </div>
+    <?php endif; ?>
 
 
   <!-- DROPDOWN SEKRETARIAT -->
@@ -86,7 +88,7 @@ $bidangOpen = in_array($currentPage, [
     </a>
   </div>
 
-  <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat'): ?>
+  <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat' && $role != 'Kepala Dinas'): ?>
     <!-- DROPDOWN BIDANG /  -->
   <a class="d-flex justify-content-between align-items-center mt-2"
      data-bs-toggle="collapse"
@@ -116,7 +118,7 @@ $bidangOpen = in_array($currentPage, [
   </div>
   <?php endif; ?>
 
-  <?php if($role != 'Kepala Bidang Sosial'):?>
+  <?php if($role != 'Kepala Bidang Sosial' && $role != 'Kepala Dinas'):?>
   
   <a href="pemberdayaanMasyarakat.php"
      class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-white' : '' ?>">

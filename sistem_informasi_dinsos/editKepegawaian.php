@@ -53,7 +53,7 @@ if (isset($_GET['indikator_id'])) {
     $data = $stmt->get_result()->fetch_assoc();
 }
 
-//TAMPILKAN DATA PER TRIWULAN
+//TAMPILKAN DATA PER Bulan
 if ($data) {
 
     $pagu_tahunan = (float) $data['pagu_anggaran'];
@@ -64,7 +64,7 @@ if ($data) {
     $total_realisasi_anggaran = 0;
     $total_realisasi_target   = 0;
 
-    // Mapping bulan per triwulan
+    // Mapping bulan per Bulan
     $mapping_tw = [
         1 => [1, 2, 3],
         2 => [4, 5, 6],
@@ -195,7 +195,7 @@ if (isset($_POST['submit_realisasi'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Realisasi Triwulan - Dinsos Tarakan</title>
+    <title>Input Realisasi Bulan - Dinsos Tarakan</title>
     
     <!-- CSS Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -206,16 +206,6 @@ if (isset($_POST['submit_realisasi'])) {
     <style>
 body {
     background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.main-content {
-    min-height: 100vh;
-}
-.navbar {
-    background-color: #fff;
-    border-bottom: 1px solid #dee2e6;
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .account-dropdown {
     position: relative;
@@ -249,134 +239,22 @@ body {
     background-color: white;
 }
 .card-header {
-    background-color: #27ae60;
     color: white;
     border-radius: 10px 10px 0 0 !important;
     padding: 15px 20px;
     font-weight: 600;
-}
-.btn-success {
-    background-color: #27ae60;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-.btn-success:hover {
-    background-color: #219653;
-    transform: translateY(-2px);
 }
 .btn-primary {
     background-color: #3498db;
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
-    font-weight: 600;
     transition: all 0.3s;
-}
-.btn-primary:hover {
-    background-color: #2980b9;
-}
-.btn-warning {
-    background-color: #f39c12;
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
-}
-.btn-danger {
-    background-color: #e74c3c;
-    border: none;
-    border-radius: 5px;
-    padding: 6px 12px;
-}
-.btn-outline-success {
-    color: #27ae60;
-    border-color: #27ae60;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-.btn-outline-success:hover {
-    background-color: #27ae60;
-    color: white;
-}
-.progress {
-    height: 25px;
-    border-radius: 10px;
-}
-.progress-bar {
-    border-radius: 10px;
-}
-.table th {
-    background-color: #2c3e50;
-    color: white;
-    border-color: #34495e;
-}
-.table td {
-    vertical-align: middle;
 }
 .alert {
     border-radius: 8px;
     border: none;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.badge-tw {
-    font-size: 0.9em;
-    padding: 5px 10px;
-}
-.readonly-input {
-    background-color: #f8f9fa;
-    cursor: not-allowed;
-}
-.info-box {
-    background-color: #e8f5e8;
-    border-left: 4px solid #27ae60;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.empty-state i {
-    font-size: 3rem;
-    color: #ddd;
-    margin-bottom: 15px;
-}
-.empty-state h4 {
-    font-size: 1.25rem;
-    margin-bottom: 10px;
-}
-.empty-state p {
-    font-size: 0.95rem;
-    color: #6c757d;
-    margin-bottom: 20px;
-}
-#currentDateTime {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-.modal-header {
-    background-color: #27ae60;
-    color: white;
-    border-radius: 10px 10px 0 0;
-}
-.modal-header .btn-close {
-    filter: invert(1);
-    opacity: 0.8;
-}
-.modal-header .btn-close:hover {
-    opacity: 1;
-}
-.required::after {
-    content: " *";
-    color: #e74c3c;
 }
 .content-wrapper {
     padding: 20px;
@@ -384,18 +262,7 @@ body {
     min-height: calc(100vh - 70px);
 }
 .page-title {
-    color: #2c3e50;
-    font-weight: 600;
     margin-bottom: 20px;
-}
-.filter-required {
-    color: #e74c3c;
-    font-size: 0.9em;
-}
-.form-label {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 5px;
 }
 .form-control, .form-select {
     border-radius: 8px;
@@ -403,65 +270,6 @@ body {
     padding: 10px 15px;
     transition: all 0.3s;
 }
-.form-control:focus, .form-select:focus {
-    border-color: #27ae60;
-    box-shadow: 0 0 0 0.25rem rgba(39, 174, 96, 0.25);
-}
-.dropdown-item {
-    padding: 8px 15px;
-    color: #333;
-    text-decoration: none;
-    display: block;
-    border-radius: 5px;
-    transition: all 0.3s;
-}
-.dropdown-item:hover {
-    background-color: #f8f9fa;
-}
-.table-action-buttons {
-    display: flex;
-    gap: 5px;
-}
-.table-action-buttons .btn {
-    padding: 5px 10px;
-    font-size: 0.875rem;
-}
-.action-header {
-    text-align: center;
-}
-.btn-add-triwulan {
-    background-color: #f39c12;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-.btn-add-triwulan:hover {
-    background-color: #e67e22;
-    transform: translateY(-2px);
-}
-.bidang-badge {
-    font-size: 0.7em;
-    margin-left: 5px;
-    vertical-align: middle;
-}
-.option-group {
-    font-weight: 600;
-    color: #2c3e50;
-    background-color: #f8f9fa;
-    padding: 8px 15px;
-}
-.option-item {
-    padding-left: 30px;
-}
-/* Warna untuk bidang */
-.bidang-kepegawaian { background-color: #3498db; }
-.bidang-umum { background-color: #2ecc71; }
-.bidang-rehabilitasi { background-color: #e74c3c; }
-.bidang-perlindungan { background-color: #9b59b6; }
-.bidang-pemberdayaan { background-color: #f39c12; }
-
 
 </style>
 </head>
@@ -469,30 +277,27 @@ body {
 
 <div class="main-content">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white">
         <div class="container-fluid">
+            <h5 class="mb-0">Umum dan Kepegawaian</h5>
             <span id="currentDateTime">
                 <i class="bi bi-clock"></i> 
                 <!-- Date & Time will be inserted here -->
             </span>
             <div class="account-dropdown">
-                <button class="btn account-btn d-flex align-items-center">
+                <button class="btn account-btn d-flex align-items-center text-white">
                     <i class="bi bi-person-circle fs-4 me-2"></i>
-                    <h6 class="mb-0">Hello, User Name</h6>
+                    <h6 class="mb-0">Hallo, <?= $_SESSION['username']; ?> </h6>
                 </button>
                 <div class="dropdown-content">
                     <div class="d-flex align-items-center p-2">
                         <i class="bi bi-person-circle fs-3 text-primary me-2"></i>
                         <div>
-                            <strong>User Name</strong>
-                            <p class="mb-0 text-muted small">Role</p>
-                            <p class="mb-0 text-muted small">Bidang</p>
+                            <strong class="text-black"><?= $jabatan[0]; ?></strong>
+                            <p class="mb-0 text-muted small"><?= $_SESSION['role']; ?></p>
                         </div>
                     </div>
                     <hr class="my-2">
-                    <a href="profile.php" class="dropdown-item">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </a>
                     <a href="logout.php" class="dropdown-item text-danger">
                         <i class="bi bi-box-arrow-right me-2"></i> Logout
                     </a>
@@ -509,12 +314,12 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-pencil-fill success me-3"></i>Edit Data per-Triwulan
+                <i class="bi bi-pencil-fill primary me-3"></i>Update Data per-Bulan
             </h2>
         </div>
         
-    <div class="text-start mb-1">
-        <a class="btn btn-success" href="kepegawaian.php">
+    <div class="text-start mb-2">
+        <a class="btn btn-primary" href="kepegawaian.php">
             <i class="bi bi-arrow-bar-left"></i> Kembali
         </a>
     </div>
@@ -523,11 +328,11 @@ body {
 <div class="card mb-4 shadow-sm">
 
     <!-- Header -->
-    <div class="card-header bg-secondary text-white">
+    <div class="card-header bg-primary text-white">
         <h5 class="mb-0">
             <i class="bi bi-funnel me-2"></i>Pilih Data & Detail
         </h5>
-        <small>Pilih indikator, tahun, dan triwulan</small>
+        <small>Pilih indikator, tahun, dan bulan</small>
     </div>
 
     <div class="card-body">
@@ -565,7 +370,7 @@ body {
                 </select>
             </div>
 
-            <!-- Dropdown Triwulan -->
+            <!-- Dropdown Bulan -->
             <div class="col-md-2">
                 <label class="form-label">Bulan</label>
                 <select name="bulan" class="form-select" required>
@@ -702,7 +507,8 @@ body {
                     </div>
 
                     <div class="col-md-2 d-grid my-auto">
-                        <button type="submit" name="submit_realisasi" class="btn btn-success">
+                        <label class="form-label fw-semibold text-white">.</label>
+                        <button type="submit" name="submit_realisasi" class="btn btn-primary">
                             <i class="bi bi-save me-1"></i>Simpan
                         </button>
                     </div>

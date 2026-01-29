@@ -301,16 +301,6 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 .undangan-text p {
   margin-bottom: 6px;
   font-size: 15px;
-}
-
-.badge-status {
-  margin-bottom: auto;
-  background-color: #0d6efd;
-  color:  #fff;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
 }/* notif */
 .notif-wrapper {
     position: fixed;
@@ -398,7 +388,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
           <div class="card-body">
             <h6 style="font-size: 15px;">
               <i class="bi bi-graph-up-arrow fs-5 mx-2"></i>
-              Persentase realisasi kinerja tertinggi
+              % realisasi kinerja tertinggi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
               <?= $row_data_total['bidang']; ?>
@@ -448,18 +438,17 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
   <div class="container mt-3">
     <div class="card shadow rounded-3">
       <div class="card-body">
-
-        
-
-        
-
         
           <?php if (!$isAdmin): ?>
             <div class="d-flex justify-content-between my-1">
               <h4>
-                <span class="px-2 pb-1 rounded-2 <?= $statusFilter === 'Terlaksana' ? 'bg-primary text-white' : 'bg-primary text-white'; ?>">
-                Undangan <?= $statusFilter; ?>
+                <span class="px-2 pb-1 border-bottom 
+                <?= $statusFilter === 'Terlaksana' 
+                    ? 'border-success text-success' 
+                    : 'border-primary text-primary'; ?>">
+                    Undangan <?= $statusFilter; ?>
                 </span>
+
               </h4>
 
               <form method="get" class="d-flex align-items-center me-2">
@@ -629,10 +618,9 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
         <?php if ($isAdmin): ?>
               <div class="mt-1">
                 <div class="table-responsive">
+                  <h4>Undangan</h4><hr class="border-3">
                   <div id="toolbar" class="d-flex justify-content-between align-items-center" style="width: 570px;">
-                    <h4>Undangan</h4>
-
-                    <form class="ms-auto" action="export_undangan.php" method="get">
+                    <form action="export_undangan.php" method="get">
                       <button type="submit" class="btn btn-primary rounded-5">
                         <i class="bi bi-download"></i> export
                       </button>

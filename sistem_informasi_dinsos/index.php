@@ -7,8 +7,6 @@ if (isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Proses login
-$error = '';
 if (isset($_POST['submit'])) {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -35,10 +33,16 @@ if (isset($_POST['submit'])) {
             header('Location: dashboard.php');
             exit();
         } else {
-            $error = 'Password salah!';
+            $_SESSION['notif'] = [
+                'type' => 'danger',
+                'message' => 'Password tidak sesuai!'
+            ];
         }
     } else {
-        $error = 'Username tidak ditemukan!';
+        $_SESSION['notif'] = [
+                'type' => 'warning',
+                'message' => 'Username tidak ditemukan!'
+            ];
     }
 }
 ?>
@@ -86,7 +90,7 @@ if (isset($_POST['submit'])) {
             height: 550px;
 
             /* transparan halus */
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.5);
 
             border-radius: 20px;
             overflow: hidden;
@@ -96,6 +100,11 @@ if (isset($_POST['submit'])) {
             -webkit-backdrop-filter: blur(2px);
 
             box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+        }
+
+        input{
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
         }
 
         
@@ -228,23 +237,29 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
         }
         
-        .error-message {
-            background: #ffeaea;
-            color: #d32f2f;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: <?php echo $error ? 'block' : 'none'; ?>;
-        }
-        
         .copyright {
             text-align: center;
             margin-top: 30px;
             color: #464646;
             font-size: 12px;
         }
-        
+
+        /* notif */
+        .notif-wrapper {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1055;
+            width: auto;
+            max-width: 90%;
+        }
+
+        .notif-wrapper .alert {
+            min-width: 300px;
+            text-align: center;
+        }
+                
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
@@ -259,6 +274,22 @@ if (isset($_POST['submit'])) {
     </style>
 </head>
 <body>
+
+<!-- notif  -->
+
+    <?php if (isset($_SESSION['notif'])): ?>
+        <div class="notif-wrapper">
+            <div class="alert alert-<?= $_SESSION['notif']['type']; ?> alert-dismissible fade show auto-close shadow"
+                role="alert">
+                <?= $_SESSION['notif']['message']; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+        <?php
+        unset($_SESSION['notif']);
+        endif;
+        ?>
+
     <div class="login-container">
         <!-- Bagian Kiri: Informasi Sistem -->
         <div class="login-left">
@@ -283,12 +314,6 @@ if (isset($_POST['submit'])) {
                 <h2>DINSOS & PM</h2>
                 <p>Kota Tarakan</p>
             </div>
-            
-            <?php if ($error): ?>
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i> <?php echo $error; ?>
-                </div>
-            <?php endif; ?>
             
             <form method="POST" action="">
                 <div class="form-group">
@@ -335,6 +360,20 @@ if (isset($_POST['submit'])) {
                 });
             });
         });
+
+        
+
+// notif 
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(function () {
+        let alert = document.querySelector('.auto-close');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 5000); // durasi 3 detik
+});
+
     </script>
 </body>
 </html>
