@@ -343,7 +343,7 @@ body {
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center">
             <h2 class="page-title">
-                <i class="bi bi-clipboard-data text-primary me-2"></i>Input Realisasi Pagu dan Anggaran
+                <i class="bi bi-clipboard-data text-primary me-2"></i>Input Realisasi Kinerja dan Anggaran
             </h2>
         </div>
         <!-- Tombol Input -->
@@ -609,22 +609,29 @@ body {
 // Update waktu secara real-time
 function updateDateTime() {
     const now = new Date();
-    const options = { 
+
+    const dateOptions = { 
         weekday: 'long', 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric' 
     };
-    const dateString = now.toLocaleDateString('id-ID', options);
-    const timeString = now.toLocaleTimeString('id-ID');
-    
+
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const dateString = now.toLocaleDateString('id-ID', dateOptions);
+    const timeString = now.toLocaleTimeString('id-ID', timeOptions);
+
     document.getElementById('currentDateTime').innerHTML = 
         `<i class="bi bi-clock"></i> ${dateString} | ${timeString}`;
 }
 
-// Update waktu setiap detik
-setInterval(updateDateTime, 60*1000);
-updateDateTime(); // Panggil sekali saat pertama kali load
+// Update tiap menit (sudah benar)
+setInterval(updateDateTime, 60 * 1000);
+updateDateTime();
 
 // Fungsi untuk konfirmasi hapus
 function confirmDelete(id) {

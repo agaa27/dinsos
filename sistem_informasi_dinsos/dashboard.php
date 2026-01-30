@@ -690,19 +690,31 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 <script>
   function updateDateTime() {
     const now = new Date();
-    const options = {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+
+    const dateOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     };
-    document.getElementById('currentDateTime').innerHTML =
-      `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 60*1000);
+
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const dateString = now.toLocaleDateString('id-ID', dateOptions);
+    const timeString = now.toLocaleTimeString('id-ID', timeOptions);
+
+    document.getElementById('currentDateTime').innerHTML = 
+        `<i class="bi bi-clock"></i> ${dateString} | ${timeString}`;
+}
+
+// Update tiap menit (sudah benar)
+setInterval(updateDateTime, 60 * 1000);
+updateDateTime();
+ 
+
 
   
 // notif 

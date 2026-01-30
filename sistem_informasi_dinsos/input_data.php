@@ -256,7 +256,7 @@ while ($row = mysqli_fetch_assoc($query)) {
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white">
     <div class="container-fluid">
-      <h5 class="mb-0">Kelola Data Kegiatan per-Bidang</h5>
+      <h5 class="mb-0">Kelola Data Kegiatan</h5>
 
       <!-- Realtime Clock -->
       <span class="date" id="currentDateTime">
@@ -660,22 +660,32 @@ while ($row = mysqli_fetch_assoc($query)) {
 
 <!-- Realtime Clock Script -->
 <script>
-  function updateDateTime() {
+function updateDateTime() {
     const now = new Date();
-    const options = {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      // second: '2-digit'
+
+    const dateOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     };
-    document.getElementById('currentDateTime').innerHTML =
-      `<i class="bi bi-clock"></i> ${now.toLocaleString('id-ID', options)}`;
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 60*1000);
+
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const dateString = now.toLocaleDateString('id-ID', dateOptions);
+    const timeString = now.toLocaleTimeString('id-ID', timeOptions);
+
+    document.getElementById('currentDateTime').innerHTML = 
+        `<i class="bi bi-clock"></i> ${dateString} | ${timeString}`;
+}
+
+// Update tiap menit (sudah benar)
+setInterval(updateDateTime, 60 * 1000);
+updateDateTime();
+
 
         // notif 
 document.addEventListener("DOMContentLoaded", function () {

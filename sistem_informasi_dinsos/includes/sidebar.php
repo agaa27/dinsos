@@ -47,25 +47,26 @@ $bidangOpen = in_array($currentPage, [
         role="button"
         aria-expanded="<?= $inputOpen ? 'true' : 'false' ?>"
         aria-controls="inputDropdown">
-        <span><i class="bi bi-file-earmark-plus"></i> Input Data</span>
+        <span><i class="bi bi-file-earmark-plus"></i> Kelola Data</span>
         <i class="bi bi-caret-down-fill small"></i>
       </a>
 
       <div class="collapse submenu <?= $inputOpen ? 'show' : '' ?>" id="inputDropdown">
         <a href="input_data.php"
           class="<?= $currentPage === 'input_data.php' ? 'active fw-bold text-white' : '' ?>">
-          Input Kegiatan
+          Kegiatan
         </a>
 
         <a href="input_undangan.php"
           class="<?= $currentPage === 'input_undangan.php' ? 'active fw-bold text-white' : '' ?>">
-          Input Undangan
+          Undangan
         </a>
       </div>
     <?php endif; ?>
 
 
-  <!-- DROPDOWN SEKRETARIAT -->
+  <?php if ($role != 'Kepala Dinas'): ?>
+    <!-- DROPDOWN SEKRETARIAT -->
   <a class="d-flex justify-content-between align-items-center"
      data-bs-toggle="collapse"
      href="#menuDropdown"
@@ -87,6 +88,8 @@ $bidangOpen = in_array($currentPage, [
       Umum dan kepegawaian
     </a>
   </div>
+
+    <?php endif; ?>
 
   <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat' && $role != 'Kepala Dinas'): ?>
     <!-- DROPDOWN BIDANG /  -->

@@ -297,21 +297,22 @@ if (isset($_POST['submit'])) {
             <p>Sistem terintegrasi untuk pengelolaan laporan dan kegiatan Dinas Sosial & Pemberdayaan Masyarakat Kota Tarakan</p>
             
             <ul class="features">
-                <li><i class="fas fa-check"></i> Manajemen Laporan Terpusat</li>
+                <li><i class="fas fa-check"></i> Manajemen Laporan</li>
                 <li><i class="fas fa-check"></i> Monitoring Kegiatan Real-time</li>
-                <li><i class="fas fa-check"></i> Rekapitulasi Data Otomatis</li>
+                <li><i class="fas fa-check"></i> Rekapitulasi Data</li>
                 <li><i class="fas fa-check"></i> Akses Multi-User</li>
+                <li><i class="fas fa-check"></i> Kemudahan Pengelolaan Data</li>
             </ul>
         </div>
         
         <!-- Bagian Kanan: Form Login -->
         <div class="login-right">
-            <div class="login-logo ">
+            <div class="login-logo">
                 <!-- Ganti dengan logo asli Kota Tarakan -->
                 <div style=" width: 70px; height: 70px; border-radius: 10px; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
                     <img src="assets/image/dinsos_logo.png" alt="">
                 </div>
-                <h2>DINSOS & PM</h2>
+                <h2>DINSOS - PM</h2>
                 <p>Kota Tarakan</p>
             </div>
             
@@ -339,7 +340,7 @@ if (isset($_POST['submit'])) {
             
             <div class="copyright">
                 <p>&copy; <?php echo date('Y'); ?> Dinas Sosial & Pemberdayaan Masyarakat Kota Tarakan</p>
-                <p>Versi 1.0.0</p>
+                
             </div>
         </div>
     </div>

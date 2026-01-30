@@ -337,8 +337,8 @@ $qTahun = $conn->query("
   <nav class="navbar navbar-expand-lg navbar-light bg-primary text-white d-flex mt-0">
     <div class="container-fluid">
       <h5 class="mb-0">Rekapitulasi</h5>
-      <span class="date">
-        <i class="bi bi-clock"></i> Mon, 01 Jan 2025, 08.30 AM
+      <span class="date" id="currentDateTime">
+        <i class="bi bi-clock"></i> --
       </span>
 
       <div class="d-flex align-items-center">
@@ -673,5 +673,34 @@ $qTahun = $conn->query("
 <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+
+    <script>
+      function updateDateTime() {
+    const now = new Date();
+
+    const dateOptions = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+
+    const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+
+    const dateString = now.toLocaleDateString('id-ID', dateOptions);
+    const timeString = now.toLocaleTimeString('id-ID', timeOptions);
+
+    document.getElementById('currentDateTime').innerHTML = 
+        `<i class="bi bi-clock"></i> ${dateString} | ${timeString}`;
+}
+
+// Update tiap menit (sudah benar)
+setInterval(updateDateTime, 60 * 1000);
+updateDateTime();
+
+    </script>
 </body>
 </html>
