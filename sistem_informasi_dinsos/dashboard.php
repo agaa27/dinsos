@@ -17,28 +17,23 @@ if (!isset($_SESSION['role'])) {
     header("Location: index.php");
     exit;
 }
-// var_dump($_SESSION);die;
+
 $role = $_SESSION['role'];
 $isAdmin = ($role === 'Admin');
 
-
-
-$limit = 5; // jumlah card per halaman
+$limit = 5;
 $page  = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $page  = max($page, 1);
 $start = ($page - 1) * $limit;
 
 $search = trim($_GET['search'] ?? '');
 
-
 $role = mysqli_real_escape_string($conn, $role);
 $safe = mysqli_real_escape_string($conn, $search);
 $statusFilter = trim($_GET['status'] ?? 'Belum Terlaksana');
 $statusFilter = mysqli_real_escape_string($conn, $statusFilter);
 
-$where = "WHERE bidang_terkait LIKE '%$role%'
-          AND status_kegiatan = '$statusFilter'";
-
+$where = "WHERE status_kegiatan = '$statusFilter'";
 
 if (!empty($search)) {
   $where .= " AND (
@@ -48,17 +43,13 @@ if (!empty($search)) {
   )";
 }
 
-
-// total data
 $totalQuery = mysqli_query($conn, "SELECT COUNT(*) total FROM undangan $where");
 $totalData  = mysqli_fetch_assoc($totalQuery)['total'];
 $totalPage  = ceil($totalData / $limit);
 
 if ($isAdmin) {
-    // ADMIN → tampilkan semua undangan
-    $sql_tampil = "SELECT * FROM undangan ORDER BY  tanggal DESC, waktu DESC";
+    $sql_tampil = "SELECT * FROM undangan ORDER BY tanggal DESC, waktu DESC";
 } else {
-    // USER → tampilkan berdasarkan role
     $sql_tampil = " SELECT *
                     FROM undangan
                     $where
@@ -73,24 +64,39 @@ $queryString = http_build_query([
   'status' => $statusFilter
 ]);
 
+/* =======================
+   UPDATE STATUS TERLAKSANA
+======================= */
+
 if (isset($_POST['status'])){
+
   $id_undangan = $_POST['id_undangan'];
-  $bukti     = upload_undangan();
+
+  // 🔥 tambahan keterangan delegasi
+  $delegasi = mysqli_real_escape_string($conn, $_POST['keterangan'] ?? '');
+
+
+  $bukti = upload_undangan();
 
     if ($bukti === false) {
-        exit; // upload error
+        exit;
     }
 
     if ($bukti === null) {
-        // tidak upload → jangan update kolom bukti
+
         $sql = "UPDATE undangan 
-          SET menghadiri = '$role', status_kegiatan = 'Terlaksana'
+          SET menghadiri = '$role',
+              status_kegiatan = 'Terlaksana',
+              delegasi = '$delegasi'
           WHERE id = '$id_undangan'";
         
     } else {
-        // upload ada → update bukti
+
         $sql = "UPDATE undangan 
-          SET menghadiri = '$role', status_kegiatan = 'Terlaksana', bukti = '$bukti'
+          SET menghadiri = '$role',
+              status_kegiatan = 'Terlaksana',
+              bukti = '$bukti',
+              delegasi = '$delegasi'
           WHERE id = '$id_undangan'";
     }
 
@@ -525,53 +531,83 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                     <h6><strong>Lokasi :</strong> <?= htmlspecialchars($row['tempat']); ?></h6>
                     <h6><strong>Mengundang :</strong> <?= htmlspecialchars($row['pihak_mengundang']); ?></h6>
                     <h6>
+                        <strong>Bidang Terkait :</strong>
+                        <?= htmlspecialchars($row['bidang_terkait']); ?>
+                    </h6>
+                    <h6>
                       <strong>Menghadiri :</strong>
                       <?= !empty($row['menghadiri']) ? htmlspecialchars($row['menghadiri']) : '-' ?>
                     </h6>
+                    <?php if ($row['status_kegiatan'] == 'Terlaksana'): ?>
+<h6>
+  <strong>Delegasi :</strong>
+  <?= !empty($row['delegasi']) ? htmlspecialchars($row['delegasi']) : '-' ?>
+</h6>
+<?php endif; ?>
+
 
                   </div>
 
 
                   <form method="post" class="d-inline mt-auto" enctype="multipart/form-data">
 
-                  <?php if (!empty($row['bukti']) || $row['status_kegiatan'] != 'Belum Terlaksana'): ?>
+<?php if (!empty($row['bukti']) || $row['status_kegiatan'] != 'Belum Terlaksana'): ?>
 
-                    <!-- Bukti sudah ada & kegiatan terlaksana -->
-                    <a 
-                      href="<?= !empty($row['bukti']) ? 'uploads/' . htmlspecialchars($row['bukti']) : '#' ?>" 
-                      target="_blank"
-                      class="btn btn-info btn-sm rounded-4 <?= empty($row['bukti']) ? 'disabled' : '' ?>"
-                    >
-                      <i class="bi bi-file-earmark-text"></i>
-                      Lihat Bukti: <?= !empty($row['bukti']) ? htmlspecialchars($row['bukti']) : 'Tidak ada bukti'; ?>
-                    </a>
+<a 
+  href="<?= !empty($row['bukti']) ? 'uploads/' . htmlspecialchars($row['bukti']) : '#' ?>" 
+  target="_blank"
+  class="btn btn-info btn-sm rounded-4 <?= empty($row['bukti']) ? 'disabled' : '' ?>"
+>
+  <i class="bi bi-file-earmark-text"></i>
+  Lihat Bukti: <?= !empty($row['bukti']) ? htmlspecialchars($row['bukti']) : 'Tidak ada bukti'; ?>
+</a>
 
+<?php else: ?>
 
-                  <?php else: ?>
+<div class="mb-2">
+  <input 
+    type="file" 
+    name="gambar" 
+    class="form-control form-control-sm w-75"
+    <?= $row['status_kegiatan'] === 'Terlaksana' ? 'disabled' : ''; ?>
+  >
+</div>
 
-                    <!-- Bukti belum ada -->
-                    <div class="mb-2">
-                      <input 
-                        type="file" 
-                        name="gambar" 
-                        class="form-control form-control-sm w-75"
-                        <?= $row['status_kegiatan'] === 'Terlaksana' ? 'disabled' : ''; ?>
-                      >
-                    </div>
+<!-- 🔥 CHECKBOX DELEGASI -->
+<div class="form-check mb-2">
+  <input 
+    class="form-check-input toggle-delegasi"
+    type="checkbox"
+    data-target="ket<?= $row['id']; ?>"
+  >
+  <label class="form-check-label">
+    Hadir sebagai delegasi
+  </label>
+</div>
 
-                  <?php endif; ?>
+<!-- 🔥 FIELD KETERANGAN (HIDDEN DEFAULT) -->
+<div class="mb-2 d-none" id="ket<?= $row['id']; ?>">
+  <textarea 
+    name="keterangan"
+    class="form-control form-control-sm"
+    placeholder="Isi keterangan delegasi..."
+  ></textarea>
+</div>
 
+<?php endif; ?>
 
-                      <input type="hidden" name="id_undangan" value="<?= $row['id']; ?>">
+<input type="hidden" name="id_undangan" value="<?= $row['id']; ?>">
 
-                      <button
-                        type="submit" 
-                        name="status"
-                        class="btn rounded-4 btn-sm <?= $row['status_kegiatan'] == 'Terlaksana' ? 'btn-success' : 'btn-primary'; ?>"
-                        <?= $row['status_kegiatan'] == 'Terlaksana' ? 'disabled' : ''; ?>
-                      >
-                        <?= $row['status_kegiatan'] == 'Terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'; ?>
-                      </button>
+<button
+  type="submit" 
+  name="status"
+  class="btn rounded-4 btn-sm <?= $row['status_kegiatan'] == 'Terlaksana' ? 'btn-success' : 'btn-primary'; ?>"
+  <?= $row['status_kegiatan'] == 'Terlaksana' ? 'disabled' : ''; ?>
+>
+  <?= $row['status_kegiatan'] == 'Terlaksana' ? 'Terlaksana' : 'Belum Terlaksana'; ?>
+</button>
+
+</form>
 
                     </form>
 
@@ -718,6 +754,23 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
     document.getElementById('currentDateTime').innerHTML = 
         `<i class="bi bi-clock"></i> ${dateString} | ${timeString}`;
 }
+
+document.querySelectorAll('.toggle-delegasi').forEach(function(el){
+
+  el.addEventListener('change', function(){
+
+    let target = document.getElementById(this.dataset.target);
+
+    if(this.checked){
+        target.classList.remove('d-none');
+    }else{
+        target.classList.add('d-none');
+    }
+
+  });
+
+});
+
 
 // Update tiap menit (sudah benar)
 setInterval(updateDateTime, 60 * 1000);
