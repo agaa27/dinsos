@@ -128,6 +128,7 @@ for ($i = 1; $i <= 12; $i++) {
         'realisasi_target'   => $realisasi_target ?: null,
         'realisasi_anggaran' => $realisasi_anggaran ?: null,
         'bukti' => $data["bukti{$i}"] ?? null,
+        'keterangan'         => $data["keterangan{$i}"] ?? '-',
 
         'sisa_target'   => $target - $total_realisasi_target,
         'sisa_anggaran' => $pagu_tahunan - $total_realisasi_anggaran,
@@ -724,6 +725,12 @@ function openDetailTW(tw) {
                                 ? `<a href="file bukti/${b.bukti}" target="_blank">${b.bukti}</a>`
                                 : `<span class="text-muted">-</span>`
                             }
+                        </li>
+                        <li>
+                            <strong>Keterangan:</strong><br>
+                            <span class="text-muted small">
+                                ${b.keterangan}
+                            </span>
                         </li>
                     </ul>
                 </div>
