@@ -427,7 +427,7 @@ while ($row = mysqli_fetch_assoc($query)) {
 
                                         <!-- BIDANG TERKAIT (CHECKBOX) -->
                                         <div class="mb-3">
-                                            <label class="form-label">Bidang Yang Terkait</label>
+                                            <label class="form-label">Pihak Yang Terkait/diundang</label>
 
                                             <?php
                                             $daftarBidang = [

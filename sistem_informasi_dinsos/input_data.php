@@ -323,7 +323,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                 <th>Pagu</th>
                 <th>Kegiatan</th>
                 <th>Sub Kegiatan</th>
-                <th>Bidang</th>
+                <th>Urusan</th>
                 <th>Aksi</th>                  
               </tr>
             </thead>
@@ -428,7 +428,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                         </div>
 
                         <div class="mb-3">
-                          <label class="form-label">Bidang</label>
+                          <label class="form-label">Urusan</label>
                           <select name="bidang" class="form-select">
                             <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
                             <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
@@ -524,7 +524,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                         </div>
 
                         <div class="mb-3">
-                          <label class="form-label">Bidang</label>
+                          <label class="form-label">Urusan</label>
                           <select name="bidang" class="form-select">
                             <option value="<?= $n['bidang']; ?>"><?= $n['bidang']; ?></option>
                             <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
