@@ -500,7 +500,7 @@ body {
                     <div class="border rounded p-3 mb-3 position-relative">
                         <h6 class="mb-2">Triwulan <?= $i; ?></h6>
 
-                        <?php if ($tw[$i]['realisasi'] === null): ?>
+                        <?php if ($tw[$i]['realisasi'] === null && $tw[$i]['realisasiT'] === null): ?>
                             <ul class="mb-0">                                
                                 <li class="text-muted">
                                     Belum ada realisasi

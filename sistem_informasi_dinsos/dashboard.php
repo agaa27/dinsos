@@ -160,33 +160,24 @@ $row_data_total = mysqli_fetch_assoc($result_data_total);
 
 // sub kegiatan dengan 0 persen realisasi
 $query_anggaran_left = "
-SELECT 
-    bidang,
-    COALESCE(
-        SUM(
-            CASE 
-                WHEN (
-                    COALESCE(realisasi_bulan1,0) +
-                    COALESCE(realisasi_bulan2,0) +
-                    COALESCE(realisasi_bulan3,0) +
-                    COALESCE(realisasi_bulan4,0) +
-                    COALESCE(realisasi_bulan5,0) +
-                    COALESCE(realisasi_bulan6,0) +
-                    COALESCE(realisasi_bulan7,0) +
-                    COALESCE(realisasi_bulan8,0) +
-                    COALESCE(realisasi_bulan9,0) +
-                    COALESCE(realisasi_bulan10,0) +
-                    COALESCE(realisasi_bulan11,0) +
-                    COALESCE(realisasi_bulan12,0)
-                ) = 0
-                THEN 1 ELSE 0
-            END
-        ),0
-    ) AS jumlah_sub_kegiatan_0_persen
+SELECT
+  bidang,
+    COUNT(*) AS jumlah_sub_kegiatan_0_persen
 FROM kegiatan
-WHERE tahun = YEAR(CURDATE())
-GROUP BY bidang
-ORDER BY bidang
+WHERE 
+    COALESCE(realisasi_bulan1,0) +
+    COALESCE(realisasi_bulan2,0) +
+    COALESCE(realisasi_bulan3,0) +
+    COALESCE(realisasi_bulan4,0) +
+    COALESCE(realisasi_bulan5,0) +
+    COALESCE(realisasi_bulan6,0) +
+    COALESCE(realisasi_bulan7,0) +
+    COALESCE(realisasi_bulan8,0) +
+    COALESCE(realisasi_bulan9,0) +
+    COALESCE(realisasi_bulan10,0) +
+    COALESCE(realisasi_bulan11,0) +
+    COALESCE(realisasi_bulan12,0) = 0
+    AND tahun = YEAR(CURDATE());
 ";
 $result_anggaran_left = mysqli_query($conn, $query_anggaran_left);
 $row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);

@@ -139,38 +139,48 @@ if (!empty($_GET['indikator_id']) && !empty($_GET['tahun']) && !empty($_GET['bul
 // UPDATE HANDLER 
 if (isset($_POST['submit_realisasi'])) {
 
-    $id = intval($_POST['indikator_id']);
-    $tahun        = intval($_POST['tahun']);
-    $bulan_ke        = intval($_POST['bulan']);
-    $fisik        = floatval($_POST['realisasi_fisik']);
-    $anggaran     = floatval($_POST['realisasi_anggaran']);
-    $bukti     = upload_file();
+    $id     = intval($_POST['indikator_id']);
+    $tahun  = intval($_POST['tahun']);
+    $bulan_ke = intval($_POST['bulan']);
+
+    $fisik    = floatval($_POST['realisasi_fisik']);
+    $anggaran = floatval($_POST['realisasi_anggaran']);
+    $keterangan = $_POST['keterangan'] ?? '';
+
+    $bukti = upload_file();
 
     if ($bukti === false) {
         exit; // upload error
     }
 
     if ($bukti === null) {
-        // tidak upload → jangan update kolom bukti
-        $sql = "
-            UPDATE kegiatan
-            SET realisasi_bulan$bulan_ke = ?,
-                realisasi_anggaran_bulan$bulan_ke = ?
-            WHERE id = ? AND tahun = ?
-        ";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ddii", $fisik, $anggaran, $id, $tahun);
-    } else {
-        // upload ada → update bukti
+
+        // TANPA upload file
         $sql = "
             UPDATE kegiatan
             SET realisasi_bulan$bulan_ke = ?,
                 realisasi_anggaran_bulan$bulan_ke = ?,
-                bukti$bulan_ke = ?
+                keterangan$bulan_ke = ?
             WHERE id = ? AND tahun = ?
         ";
+
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ddsis", $fisik, $anggaran, $bukti, $id, $tahun);
+        $stmt->bind_param("ddsii", $fisik, $anggaran, $keterangan, $id, $tahun);
+
+    } else {
+
+        // ADA upload file
+        $sql = "
+            UPDATE kegiatan
+            SET realisasi_bulan$bulan_ke = ?,
+                realisasi_anggaran_bulan$bulan_ke = ?,
+                bukti$bulan_ke = ?,
+                keterangan$bulan_ke = ?
+            WHERE id = ? AND tahun = ?
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ddssii", $fisik, $anggaran, $bukti, $keterangan, $id, $tahun);
     }
 
     $stmt->execute();
@@ -406,7 +416,7 @@ body {
         <!-- DETAIL DATA -->
         <?php if (!$data): ?>
             <div class="text-muted text-center py-4">
-                Indikator tidak ada
+                Pilih sub kegiatan dan tahun terlebih dahulu
             </div>
         <?php else: ?>
 
@@ -507,12 +517,22 @@ body {
                         <?php endif; ?>                        
                     </div>
 
-                    <div class="col-md-2 d-grid my-auto">
-                        <label class="form-label fw-semibold text-white">.</label>
+                    <div class="col-md-10">
+                        <label class="form-label fw-semibold">Keterangan</label>
+                        <textarea
+                            name="keterangan"
+                            class="form-control"
+                            rows="3"
+                        ><?= htmlspecialchars($data["keterangan{$bulan}"] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+                        <!-- <label class="form-label fw-semibold text-white">.</label> -->
                         <button type="submit" name="submit_realisasi" class="btn btn-primary">
                             <i class="bi bi-save me-1"></i>Simpan
                         </button>
                     </div>
+
 
                 <?php else: ?>
 

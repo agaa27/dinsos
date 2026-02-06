@@ -145,7 +145,7 @@ if (isset($_GET['hapus'])) {
 /* ======================
    AMBIL DATA
 ====================== */
-$query = mysqli_query($conn, "SELECT * FROM kegiatan ORDER BY created_at DESC");
+$query = mysqli_query($conn, "SELECT * FROM kegiatan ORDER BY bidang DESC, created_at DESC");
 $data = [];
 while ($row = mysqli_fetch_assoc($query)) {
     $data[] = $row;
