@@ -625,9 +625,9 @@ while ($row = mysqli_fetch_assoc($query)) {
 
           <!-- Bidang -->
           <div class="mb-3">
-            <label class="form-label">Bidang</label>
+            <label class="form-label">Urusan</label>
             <select name="bidang" class="form-select" required>
-              <option value="">-- Pilih Bidang --</option>
+              <option value="">-- Pilih Urusan --</option>
               <option value="Perencanaan dan Keuangan">Perencanaan dan Keuangan</option>
               <option value="Umum dan Kepegawaian">Umum dan Kepegawaian</option>
               <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>

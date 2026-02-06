@@ -325,7 +325,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                 <th>Waktu</th>
                                 <th>Tempat</th>
                                 <th>Pihak Yang Mengundang</th>
-                                <th>Bidang Yang Terkait</th>
+                                <th>Pihak Yang Terkait/diundang</th>
                                 <th>menghadiri</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
@@ -523,7 +523,7 @@ while ($row = mysqli_fetch_assoc($query)) {
                                             <input type="text" name="pihak_mengundang" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                        <label class="form-label">Bidang Yang Terkait</label>
+                                        <label class="form-label">Pihak Yang Terkait/diundang</label>
 
                                         <div class="checkbox-columns">
                                             <div class="form-check">
