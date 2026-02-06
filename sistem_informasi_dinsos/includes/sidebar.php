@@ -65,7 +65,7 @@ $bidangOpen = in_array($currentPage, [
     <?php endif; ?>
 
 
-  <?php if ($role != 'Kepala Dinas'): ?>
+  <?php if ($role != 'Kepala Dinas' && $role != 'Kepala Bidang Sosial' && $role != 'Kepala Bidang Pemberdayaan Masyarakat' && $role != 'Admin' ): ?>
     <!-- DROPDOWN SEKRETARIAT -->
   <a class="d-flex justify-content-between align-items-center"
      data-bs-toggle="collapse"
@@ -91,7 +91,7 @@ $bidangOpen = in_array($currentPage, [
 
     <?php endif; ?>
 
-  <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat' && $role != 'Kepala Dinas'): ?>
+  <?php if($role!='Kepala Bidang Pemberdayaan Masyarakat' && $role != 'Kepala Dinas' && $role != 'Admin'): ?>
     <!-- DROPDOWN BIDANG /  -->
   <a class="d-flex justify-content-between align-items-center mt-2"
      data-bs-toggle="collapse"
@@ -121,7 +121,7 @@ $bidangOpen = in_array($currentPage, [
   </div>
   <?php endif; ?>
 
-  <?php if($role != 'Kepala Bidang Sosial' && $role != 'Kepala Dinas'):?>
+  <?php if($role != 'Kepala Bidang Sosial' && $role != 'Kepala Dinas' && $role != 'Admin'):?>
   
   <a href="pemberdayaanMasyarakat.php"
      class="<?= $currentPage === 'pemberdayaanMasyarakat.php' ? 'active fw-bold text-white' : '' ?>">

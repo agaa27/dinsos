@@ -2,6 +2,12 @@
 require 'config/database.php';
 session_start();
 
+// ini_set('display_errors', 0);
+// ini_set('display_startup_errors', 0);
+// error_reporting(E_ALL);
+
+
+
 if (!isset($_SESSION['role'])) {
     header("Location: index.php");
     exit;
@@ -69,36 +75,37 @@ FROM (
         sub_kegiatan,
         bidang,
         pagu_anggaran,
+        target,
         (
-            IFNULL(realisasi_anggaran_bulan1,0) +
-            IFNULL(realisasi_anggaran_bulan2,0) +
-            IFNULL(realisasi_anggaran_bulan3,0) +
-            IFNULL(realisasi_anggaran_bulan4,0) +
-            IFNULL(realisasi_anggaran_bulan5,0) +
-            IFNULL(realisasi_anggaran_bulan6,0) +
-            IFNULL(realisasi_anggaran_bulan7,0) +
-            IFNULL(realisasi_anggaran_bulan8,0) +
-            IFNULL(realisasi_anggaran_bulan9,0) +
-            IFNULL(realisasi_anggaran_bulan10,0) +
-            IFNULL(realisasi_anggaran_bulan11,0) +
-            IFNULL(realisasi_anggaran_bulan12,0)
+            IFNULL(realisasi_bulan1,0) +
+            IFNULL(realisasi_bulan2,0) +
+            IFNULL(realisasi_bulan3,0) +
+            IFNULL(realisasi_bulan4,0) +
+            IFNULL(realisasi_bulan5,0) +
+            IFNULL(realisasi_bulan6,0) +
+            IFNULL(realisasi_bulan7,0) +
+            IFNULL(realisasi_bulan8,0) +
+            IFNULL(realisasi_bulan9,0) +
+            IFNULL(realisasi_bulan10,0) +
+            IFNULL(realisasi_bulan11,0) +
+            IFNULL(realisasi_bulan12,0)
         ) AS total_realisasi,
         ROUND(
             (
                 (
-                    IFNULL(realisasi_anggaran_bulan1,0) +
-                    IFNULL(realisasi_anggaran_bulan2,0) +
-                    IFNULL(realisasi_anggaran_bulan3,0) +
-                    IFNULL(realisasi_anggaran_bulan4,0) +
-                    IFNULL(realisasi_anggaran_bulan5,0) +
-                    IFNULL(realisasi_anggaran_bulan6,0) +
-                    IFNULL(realisasi_anggaran_bulan7,0) +
-                    IFNULL(realisasi_anggaran_bulan8,0) +
-                    IFNULL(realisasi_anggaran_bulan9,0) +
-                    IFNULL(realisasi_anggaran_bulan10,0) +
-                    IFNULL(realisasi_anggaran_bulan11,0) +
-                    IFNULL(realisasi_anggaran_bulan12,0)
-                ) / pagu_anggaran
+                    IFNULL(realisasi_bulan1,0) +
+                    IFNULL(realisasi_bulan2,0) +
+                    IFNULL(realisasi_bulan3,0) +
+                    IFNULL(realisasi_bulan4,0) +
+                    IFNULL(realisasi_bulan5,0) +
+                    IFNULL(realisasi_bulan6,0) +
+                    IFNULL(realisasi_bulan7,0) +
+                    IFNULL(realisasi_bulan8,0) +
+                    IFNULL(realisasi_bulan9,0) +
+                    IFNULL(realisasi_bulan10,0) +
+                    IFNULL(realisasi_bulan11,0) +
+                    IFNULL(realisasi_bulan12,0)
+                ) / target
             ) * 100, 2
         ) AS persentase_realisasi
     FROM kegiatan
@@ -109,8 +116,14 @@ WHERE persentase_realisasi >= 30;
 ";
 $result_data_up_30 = mysqli_query($conn, $query_data_up_30);
 $row_data_up_30 = mysqli_fetch_assoc($result_data_up_30);
-// PERSENTASE KEGIATAN YANG TEREALISASI DIATAS 30%
-$persentase_data_up_30 = round(($row_data_up_30['jumlah'] / $total_data) * 100, 2);
+
+// jika tidak ada data
+$jumlah_up_30 = $row_data_up_30['jumlah'] ?? 0;
+
+// hindari pembagian nol
+$persentase_data_up_30 = ($total_data > 0)
+    ? round(($jumlah_up_30 / $total_data) * 100, 2)
+    : 0;
 
 // TOTAL KEGIATAN YANG KURANG 30%
 $sql = "
@@ -264,13 +277,13 @@ $qTahun = $conn->query("
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
   <title>DINSOS-PM | Rekapitulasi</title>
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
+
   <style>
     body { background-color: #f8f9fa; }
     .sidebar {
@@ -372,6 +385,12 @@ $qTahun = $conn->query("
   <div class="container mt-3">
     <div class="card shadow-sm  ">
       <div class="card-body">
+        <div>
+          <h5>
+            <i class="bi bi-funnel"></i> Filter Laporan Kegiatan
+          </h5>          
+        </div>
+        <hr>
         <form class="row g-3" action="export.php" method="get">
 
           <div class="col-md-4">
@@ -403,7 +422,6 @@ $qTahun = $conn->query("
             <label class="form-label">Realisasi Kinerja Minimal</label>
             <select class="form-select" name="realisasi_min">
               <option value="">Semua</option>
-              <option value="0">≥ belum berjalan(0%)</option>
               <option value="30">≥ 30%</option>
               <option value="50">≥ 50%</option>
               <option value="90">≥ 90%</option>
@@ -430,7 +448,7 @@ $qTahun = $conn->query("
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <small>Total Kegiatan</small>
-            <h4 class="text-primary"><?= $total_data; ?></h4>
+            <h4 class="text-primary"><?= $total_data ?? '-'; ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
                   -
@@ -447,7 +465,7 @@ $qTahun = $conn->query("
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
             <div class="d-flex justify-content-between">
-              <small>Kegiatan Terealisasi 30%</small>
+              <small>Kegiatan Terealisasi >30%</small>
               <span
                 class="btn bg-primary btn-sm"
                 data-bs-toggle="modal"
@@ -457,10 +475,10 @@ $qTahun = $conn->query("
                 <i class="bi bi-info-circle text-white"></i>
               </span>
             </div>
-            <h4 class="text-primary"><?= $row_data_up_30['jumlah']; ?></h4>
+            <h4 class="text-primary"><?= $row_data_up_30['jumlah'] ?? '-'; ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
-                  <?= $persentase_data_up_30; ?>% kegiatan sudah terealisasi 
+                  <?= $persentase_data_up_30 ?? '-'; ?>% kegiatan sudah terealisasi 
               </small>
               <span class="text-muted" style="font-size: 11px;">
                   
@@ -473,11 +491,11 @@ $qTahun = $conn->query("
       <div class="col-md-3">
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
-            <small>Total Anggaran</small>
-            <h4 class="text-primary"><?= number_format($total_pagu_anggaran, 0, ',', '.'); ?></h4>
+            <small>Total Pagu Anggaran</small>
+            <h4 class="text-primary"><?= number_format($total_pagu_anggaran, 0, ',', '.') ?? '0'; ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
-                   <?= $row_anggaran_used['persentase_realisasi']; ?>% | <?= number_format($row_anggaran_used['total_realisasi'], 0, ',','.'); ?> digunakan 
+                   <?= $row_anggaran_used['persentase_realisasi'] ?? '-'; ?>% | <?= number_format($row_anggaran_used['total_realisasi'], 0, ',','.') ?? '-'; ?> digunakan 
               </small>
               <!-- <span class="text-muted" style="font-size: 11px;">
                  
@@ -491,11 +509,11 @@ $qTahun = $conn->query("
       <div class="col-md-3">
         <div class="card card-summary shadow-sm  ">
           <div class="card-body">
-            <small>Sisa Anggaran</small>
-            <h4 class="text-primary"><?= number_format($row_anggaran_left['sisa_anggaran'], 0, ',', '.'); ?></h4>
+            <small>Sisa Pagu Anggaran</small>
+            <h4 class="text-primary"><?= number_format($row_anggaran_left['sisa_anggaran'], 0, ',', '.') ?? '-'; ?></h4>
             <div style="display: flex; justify-content: space-between;">
               <small class="text-muted" style="font-size: 11px;">
-                  <?= $row_anggaran_left['persentase_sisa']; ?>% anggaran tersisa
+                  <?= $row_anggaran_left['persentase_sisa'] ?? '-'; ?>% anggaran tersisa
               </small>
               <span class="text-muted" style="font-size: 11px;">
 
@@ -512,7 +530,7 @@ $qTahun = $conn->query("
   <div class="container mt-3 mb-4">
     <div class="card shadow  ">
       <div class="card-header bg-white">
-        <h6 class="mb-0">Tabel Rekapitulasi Kegiatan Tahunan</h6>
+        <h5 class="mb-0">Tabel Rekapitulasi Kegiatan Tahunan</h5>
       </div>
 
       <div id="toolbar">
@@ -670,10 +688,10 @@ $qTahun = $conn->query("
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
 
+<script src="assets/jquery-4.0.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/bootstrap-table/dist/bootstrap-table.min.js"></script>
     <script>
       function updateDateTime() {
     const now = new Date();

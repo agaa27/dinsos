@@ -51,14 +51,12 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistem Informasi Dinsos Kota Tarakan</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
+  <title>Login - Sistem Informasi Dinsos Kota Tarakan</title>
+    
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
 
     <style>
         * {
@@ -297,11 +295,11 @@ if (isset($_POST['submit'])) {
             <p>Sistem terintegrasi untuk pengelolaan laporan dan kegiatan Dinas Sosial & Pemberdayaan Masyarakat Kota Tarakan</p>
             
             <ul class="features">
-                <li><i class="fas fa-check"></i> Manajemen Laporan</li>
-                <li><i class="fas fa-check"></i> Monitoring Kegiatan Real-time</li>
-                <li><i class="fas fa-check"></i> Rekapitulasi Data</li>
-                <li><i class="fas fa-check"></i> Akses Multi-User</li>
-                <li><i class="fas fa-check"></i> Kemudahan Pengelolaan Data</li>
+                <li><i class="bi bi-check fs-2"></i> Manajemen Laporan</li>
+                <li><i class="bi bi-check fs-2"></i> Monitoring Kegiatan Real-time</li>
+                <li><i class="bi bi-check fs-2"></i> Rekapitulasi Data</li>
+                <li><i class="bi bi-check fs-2"></i> Akses Multi-User</li>
+                <li><i class="bi bi-check fs-2"></i> Kemudahan Pengelolaan Data</li>
             </ul>
         </div>
         
@@ -320,7 +318,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-group">
                     <label for="username">Username</label>
                     <div class="input-with-icon">
-                        <i class="fas fa-user"></i>
+                        <i class="bi bi-person-fill fs-5"></i>
                         <input type="text" id="username" name="username" placeholder="Masukkan username" required>
                     </div>
                 </div>
@@ -328,7 +326,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-with-icon">
-                        <i class="fas fa-lock"></i>
+                        <i class="bi bi-lock-fill fs-5"></i>
                         <input type="password" id="password" name="password" placeholder="Masukkan password" required>
                     </div>
                 </div>

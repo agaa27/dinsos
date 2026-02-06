@@ -3,6 +3,11 @@ require 'config/database.php';
 require 'fungsi.php';
 session_start();
 
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
+
 if (isset($_SESSION['username'])){
     $username = $_SESSION['username'];
     $jabatan = explode(" ", $username);  
@@ -51,7 +56,7 @@ $totalPage  = ceil($totalData / $limit);
 
 if ($isAdmin) {
     // ADMIN → tampilkan semua undangan
-    $sql_tampil = "SELECT * FROM undangan ORDER BY  tanggal ASC, waktu ASC";
+    $sql_tampil = "SELECT * FROM undangan ORDER BY  tanggal DESC, waktu DESC";
 } else {
     // USER → tampilkan berdasarkan role
     $sql_tampil = " SELECT *
@@ -154,28 +159,39 @@ $row_data_total = mysqli_fetch_assoc($result_data_total);
 
 
 // sub kegiatan dengan 0 persen realisasi
-$query_anggaran_left = "SELECT
-  bidang,
-    COUNT(*) AS jumlah_sub_kegiatan_0_persen
+$query_anggaran_left = "
+SELECT 
+    bidang,
+    COALESCE(
+        SUM(
+            CASE 
+                WHEN (
+                    COALESCE(realisasi_bulan1,0) +
+                    COALESCE(realisasi_bulan2,0) +
+                    COALESCE(realisasi_bulan3,0) +
+                    COALESCE(realisasi_bulan4,0) +
+                    COALESCE(realisasi_bulan5,0) +
+                    COALESCE(realisasi_bulan6,0) +
+                    COALESCE(realisasi_bulan7,0) +
+                    COALESCE(realisasi_bulan8,0) +
+                    COALESCE(realisasi_bulan9,0) +
+                    COALESCE(realisasi_bulan10,0) +
+                    COALESCE(realisasi_bulan11,0) +
+                    COALESCE(realisasi_bulan12,0)
+                ) = 0
+                THEN 1 ELSE 0
+            END
+        ),0
+    ) AS jumlah_sub_kegiatan_0_persen
 FROM kegiatan
-WHERE 
-    COALESCE(realisasi_bulan1,0) +
-    COALESCE(realisasi_bulan2,0) +
-    COALESCE(realisasi_bulan3,0) +
-    COALESCE(realisasi_bulan4,0) +
-    COALESCE(realisasi_bulan5,0) +
-    COALESCE(realisasi_bulan6,0) +
-    COALESCE(realisasi_bulan7,0) +
-    COALESCE(realisasi_bulan8,0) +
-    COALESCE(realisasi_bulan9,0) +
-    COALESCE(realisasi_bulan10,0) +
-    COALESCE(realisasi_bulan11,0) +
-    COALESCE(realisasi_bulan12,0) = 0
-    AND tahun = YEAR(CURDATE());
-
+WHERE tahun = YEAR(CURDATE())
+GROUP BY bidang
+ORDER BY bidang
 ";
 $result_anggaran_left = mysqli_query($conn, $query_anggaran_left);
 $row_anggaran_left = mysqli_fetch_assoc($result_anggaran_left);
+
+
 
 
 // bidang paling banyak 0 nya
@@ -221,11 +237,12 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
   <title>DINSOS-PM | Dashboard</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+    
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
 
   <style>
     body { background-color: #f8f9fa; }
@@ -391,9 +408,9 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
               % realisasi kinerja tertinggi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
-              <?= $row_data_total['bidang']; ?>
+              <?= $row_data_total['bidang'] ?? '-'; ?>
             </h5>
-            <small class="text-muted" style="font-size: 12px;">Dengan <?= $row_data_total['persentase_realisasi']; ?>% dari total target</small>
+            <small class="text-muted" style="font-size: 12px;">Dengan <?= number_format($row_data_total['persentase_realisasi'], 2, ',', '.') ?? '-'; ?>% dari total target</small>
           </div>
         </div>
       </div>
@@ -406,10 +423,11 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
               Jumlah Sub Kegiatan 0% realisasi
             </h6>
             <h5 class="d-flex justify-content-end text-primary">
-              <?= $row_anggaran_left['jumlah_sub_kegiatan_0_persen']; ?>
+              <?= $row_anggaran_left['jumlah_sub_kegiatan_0_persen']??'-'; ?>
             </h5>
             <small class="text-muted" style="font-size: 12px;">
-                <?= $row_anggaran_used['jumlah_sub_kegiatan_0_persen'] ?> di bidang <?= $row_anggaran_used['bidang']; ?>
+                <?= $row_anggaran_used['jumlah_sub_kegiatan_0_persen'] ?? '-' ?>
+            di bidang <?= $row_anggaran_used['bidang'] ?? '-' ?>
             </small>
           </div>
         </div>
@@ -683,9 +701,9 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
   </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+<script src="assets/jquery-4.0.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <!-- Realtime Clock Script -->
 <script>
   function updateDateTime() {

@@ -79,13 +79,13 @@ echo "
 <th colspan='6'>Triwulan 4</th>
 
 <th rowspan='3'>Target Tahunan</th>
-<th rowspan='3'>Realisasi</th>
-<th rowspan='3'>Sisa</th>
-<th rowspan='3'>%</th>
+<th rowspan='3'>Realisasi Kinerja</th>
+<th rowspan='3'>Sisa Target</th>
+<th rowspan='3'>% Kinerja</th>
 <th rowspan='3'>Pagu Tahunan</th>
-<th rowspan='3'>Realisasi Pagu</th>
+<th rowspan='3'>Realisasi Anggaran</th>
 <th rowspan='3'>Sisa Pagu</th>
-<th rowspan='3'>% Pagu</th>
+<th rowspan='3'>% Anggaran</th>
 </tr>";
 
 echo "<tr>";
@@ -123,19 +123,33 @@ while ($r = mysqli_fetch_assoc($result)) {
   <td>{$r['sub_kegiatan']}</td>
   ";
 
-  for ($i=1; $i<=12; $i++) {
+
+
+  for ($i = 1; $i <= 12; $i++) {
+
     echo "<td>{$r["realisasi_bulan$i"]}</td>";
-    echo "<td>{$r["realisasi_anggaran_bulan$i"]}</td>";
+
+    if (!empty($r["realisasi_anggaran_bulan$i"])) {
+        echo "<td>" . number_format($r["realisasi_anggaran_bulan$i"], 0, ',', '.') . "</td>";
+    } else {
+        echo "<td></td>";
+    }
   }
+
+
+
+  $pagu_anggaran = number_format($r['pagu_anggaran'], 0, ',', '.');
+  $total_realisasi_anggaran = number_format($r['total_realisasi_anggaran'], 0, ',', '.');
+  $sisaA = number_format($sisa_pagu, 0, ',', '.');
 
   echo "
   <td>{$r['target']}</td>
   <td>{$r['total_realisasi']}</td>
   <td>$sisa</td>
   <td>".round($persen,2)."</td>
-  <td>{$r['pagu_anggaran']}</td>
-  <td>{$r['total_realisasi_anggaran']}</td>
-  <td>$sisa_pagu</td>
+  <td>{$pagu_anggaran}</td>
+  <td>{$total_realisasi_anggaran}</td>
+  <td>$sisaA</td>
   <td>".round($persen_pagu,2)."</td>
   </tr>";
   $n++;

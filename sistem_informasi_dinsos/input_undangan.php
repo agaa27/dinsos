@@ -2,6 +2,11 @@
 require 'config/database.php';
 session_start();
 
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL);
+
+
 if (!isset($_SESSION['role'])) {
     header("Location: index.php");
     exit;
@@ -155,12 +160,13 @@ while ($row = mysqli_fetch_assoc($query)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DINSOS-PM | Input Data</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
+  <title>DINSOS-PM | Input Data</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
-
+   
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
     <style>
     body { background-color: #f8f9fa; }
     .sidebar {
@@ -223,6 +229,11 @@ while ($row = mysqli_fetch_assoc($query)) {
     min-width: 300px;
     text-align: center;
 }
+
+.checkbox-columns {
+  column-count: 2;
+}
+
 
     </style>
 </head>
@@ -420,15 +431,18 @@ while ($row = mysqli_fetch_assoc($query)) {
 
                                             <?php
                                             $daftarBidang = [
+                                            'Kepala Dinas',                                            
+                                            'Kepala Bidang Sosial',  
+                                            'Kepala Bidang Pemberdayaan Masyarakat', 
+                                            'Kepala Sub Bagian Perencanaan',                                           
+                                            'Kepala Sub Bagian Kepegawaian', 
+                                            'Sekretaris',                                          
                                             'Perencanaan dan Keuangan',
                                             'Umum dan Kepegawaian',
                                             'Rehabilitasi Sosial',
                                             'Perlindungan dan Jaminan Sosial',
                                             'Pemberdayaan Sosial',
-                                            'Pemberdayaan Masyarakat',
-                                            'Kepala Sub Bagian',
-                                            'Kepala Bidang',
-                                            'Kepala Dinas'
+                                            'Pemberdayaan Masyarakat'                                            
                                             ];
 
                                             foreach ($daftarBidang as $i => $bidang) :
@@ -511,96 +525,127 @@ while ($row = mysqli_fetch_assoc($query)) {
                                         <div class="mb-3">
                                         <label class="form-label">Bidang Yang Terkait</label>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Perencanaan dan Keuangan"
-                                            id="bidang1">
-                                          <label class="form-check-label" for="bidang1">
-                                            Perencanaan dan Keuangan
-                                          </label>
-                                        </div>
+                                        <div class="checkbox-columns">
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Kepala Dinas"
+                                                id="bidang8">
+                                            <label class="form-check-label" for="bidang8">
+                                                Kepala Dinas
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Umum dan Kepegawaian"
-                                            id="bidang2">
-                                          <label class="form-check-label" for="bidang2">
-                                            Umum dan Kepegawaian
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Kepala Bidang Pemberdayaan Masyarakat"
+                                                id="bidang9">
+                                            <label class="form-check-label" for="bidang9">
+                                                Kepala Bidang Pemberdayaan Masyarakat
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Rehabilitasi Sosial"
-                                            id="bidang3">
-                                          <label class="form-check-label" for="bidang3">
-                                            Rehabilitasi Sosial
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Kepala Bidang Sosial"
+                                                id="bidang10">
+                                            <label class="form-check-label" for="bidang10">
+                                                Kepala Bidang Sosial
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Perlindungan dan Jaminan Sosial"
-                                            id="bidang4">
-                                          <label class="form-check-label" for="bidang4">
-                                            Perlindungan dan Jaminan Sosial
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Kepala Sub Bagian Perencanaan"
+                                                id="bidang11">
+                                            <label class="form-check-label" for="bidang11">
+                                                Kepala Sub Bagian Perencanaan
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Pemberdayaan Sosial"
-                                            id="bidang5">
-                                          <label class="form-check-label" for="bidang5">
-                                            Pemberdayaan Sosial
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Kepala Sub Bagian Kepegawaian"
+                                                id="bidang7">
+                                            <label class="form-check-label" for="bidang7">
+                                                Kepala Sub Bagian Kepegawaian
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Pemberdayaan Masyarakat"
-                                            id="bidang6">
-                                          <label class="form-check-label" for="bidang6">
-                                            Pemberdayaan Masyarakat
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Sekretaris"
+                                                id="bidang12">
+                                            <label class="form-check-label" for="bidang12">
+                                                Sekretaris
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Kepala Sub Bagian"
-                                            id="bidang7">
-                                          <label class="form-check-label" for="bidang7">
-                                            Kepala Sub Bagian
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Perencanaan dan Keuangan"
+                                                id="bidang1">
+                                            <label class="form-check-label" for="bidang1">
+                                                Perencanaan dan Keuangan
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Kepala Dinas"
-                                            id="bidang8">
-                                          <label class="form-check-label" for="bidang8">
-                                            Kepala Dinas
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Umum dan Kepegawaian"
+                                                id="bidang2">
+                                            <label class="form-check-label" for="bidang2">
+                                                Umum dan Kepegawaian
+                                            </label>
+                                            </div>
 
-                                        <div class="form-check">
-                                          <input class="form-check-input" type="checkbox"
-                                            name="bidang_terkait[]"
-                                            value="Kepala Bidang"
-                                            id="bidang9">
-                                          <label class="form-check-label" for="bidang9">
-                                            Kepala Bidang
-                                          </label>
-                                        </div>
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Rehabilitasi Sosial"
+                                                id="bidang3">
+                                            <label class="form-check-label" for="bidang3">
+                                                Rehabilitasi Sosial
+                                            </label>
+                                            </div>
 
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Perlindungan dan Jaminan Sosial"
+                                                id="bidang4">
+                                            <label class="form-check-label" for="bidang4">
+                                                Perlindungan dan Jaminan Sosial
+                                            </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Pemberdayaan Sosial"
+                                                id="bidang5">
+                                            <label class="form-check-label" for="bidang5">
+                                                Pemberdayaan Sosial
+                                            </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="bidang_terkait[]"
+                                                value="Pemberdayaan Masyarakat"
+                                                id="bidang6">
+                                            <label class="form-check-label" for="bidang6">
+                                                Pemberdayaan Masyarakat
+                                            </label>
+                                            </div>
+                                        </div>
                                       </div>                                      
 
                                     </div>
@@ -624,10 +669,9 @@ while ($row = mysqli_fetch_assoc($query)) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
-
+<script src="assets/jquery-4.0.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/bootstrap-table/dist/bootstrap-table.min.js"></script>
     <script>
         function updateDateTime() {
     const now = new Date();

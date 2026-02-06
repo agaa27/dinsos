@@ -1,11 +1,11 @@
 <?php
 
-$host = "127.0.0.1";
+$host = "localhost";
 $username = "root";
 $password = "";
 $database = "dinsos_tarakan";
 
-$conn = new mysqli("127.0.0.1", "root", "", "dinsos_tarakan");
+$conn = new mysqli($host, $username, $password, $database);
 
 
 if (!$conn) {

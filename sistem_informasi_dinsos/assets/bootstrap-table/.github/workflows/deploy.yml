@@ -1,0 +1,51 @@
+name: Deploy Site
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'yarn'
+
+      - name: Build page with Astro
+        run: |
+          cd ${{ github.workspace }}/site
+          yarn install --frozen-lockfile
+          yarn build
+          # Disable Jekyll, otherwise _astro folder will be ignored
+          touch dist/.nojekyll
+
+      - name: Upload to Algolia
+        run: |
+          cd ${{ github.workspace }}/site
+          yarn install --frozen-lockfile
+          ALGOLIA_APP_ID="${{ secrets.ALGOLIA_APP_ID || 'FXDJ517Z8G' }}" \
+          ALGOLIA_API_KEY="${{ secrets.ALGOLIA_API_KEY }}" \
+          ALGOLIA_INDEX_NAME="${{ secrets.ALGOLIA_INDEX_NAME || 'bootstrap-table' }}" \
+          yarn algolia
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: 'gh-pages'
+          path: './gh-pages'
+
+      - name: Move versions to target folder
+        run: |
+          mv gh-pages/versions site/dist
+          rm -rf gh-pages
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: site/dist

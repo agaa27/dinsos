@@ -157,12 +157,13 @@ while ($row = mysqli_fetch_assoc($query)) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
   <title>DINSOS-PM | Input Data</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
-
+ 
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
 
   <style>
     body { background-color: #f8f9fa; }
@@ -654,10 +655,10 @@ while ($row = mysqli_fetch_assoc($query)) {
       <div class="text-mute d-flex justify-content-center align-items-center vh-100 text-secondary fs-4"><i class="bi bi-info-circle-fill me-2"></i> Anda tidak punya akses di halaman ini!.</div>
     <?php endif; ?>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
 
+<script src="assets/jquery-4.0.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <!-- Realtime Clock Script -->
 <script>
 function updateDateTime() {

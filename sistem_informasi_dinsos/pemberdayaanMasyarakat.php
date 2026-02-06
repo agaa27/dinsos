@@ -159,13 +159,13 @@ $mapping_tw = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DINSOS PM - Pemberdayaan Masyarakat</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
+  <title>DINSOS PM - Pemberdayaan Masyarakat</title>
     
-    <!-- CSS Libraries -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css" rel="stylesheet">
-    
+  
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/bootstrap-table/dist/bootstrap-table.min.css">
     <!-- Custom CSS -->
     <style>
 body {
@@ -597,10 +597,10 @@ body {
 </div>
 
 
-<!-- JavaScript Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
 
+<script src="assets/jquery-4.0.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/bootstrap-table/dist/bootstrap-table.min.js"></script>
 <!-- Custom JavaScript -->
 <script>
 function updateDateTime() {
@@ -698,9 +698,11 @@ function openDetailTW(tw) {
                         <li><strong>Persentase Target:</strong>
                             ${b.persentase_target ?? '-'}%
                         </li>
-                        <li><strong>Sisa Target:</strong>
-                            ${b.sisa_target} ${satuan}
-                        </li>
+                        <li>
+  <strong>Sisa Target:</strong>
+  ${Number(b.sisa_target).toFixed(2)} ${satuan}
+</li>
+
                         <hr>
                         <li><span class='fs-6 text-primary'><strong>Realisasi Anggaran:</strong>
                             ${b.realisasi_anggaran
