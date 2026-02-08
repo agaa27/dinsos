@@ -26,7 +26,10 @@ $bidangOpen = in_array($currentPage, [
 <div class="sidebar">
   <div class="d-flex align-items-center ms-3 mb-3">
     <img src="assets/image/dinsos_logo.png" width="50px" alt="">
-    <h4 class="ms-2 my-auto" >Dinsos - PM</h4>
+    <div>
+      <h4 class="ms-2 my-auto border-bottom" >SIPEKA</h4>
+      <h5 class="ms-2 my-auto" >Dinsos - PM</h5>
+    </div>
   </div>
 
   <a href="dashboard.php"

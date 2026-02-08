@@ -131,7 +131,9 @@ SELECT
     sub_kegiatan,
     bidang,
     pagu_anggaran,    
+    satuan,    
     target,
+
     (
         IFNULL(realisasi_bulan1,0) +
         IFNULL(realisasi_bulan2,0) +
@@ -146,6 +148,7 @@ SELECT
         IFNULL(realisasi_bulan11,0) +
         IFNULL(realisasi_bulan12,0)
     ) AS total_realisasi,
+
     ROUND(
         (
             (
@@ -163,10 +166,43 @@ SELECT
                 IFNULL(realisasi_bulan12,0)
             ) / target
         ) * 100, 2
-    ) AS persentase_realisasi
+    ) AS persentase_realisasi,
+
+    -- KETERANGAN TERAKHIR
+    COALESCE(
+        NULLIF(keterangan12,''),
+        NULLIF(keterangan11,''),
+        NULLIF(keterangan10,''),
+        NULLIF(keterangan9,''),
+        NULLIF(keterangan8,''),
+        NULLIF(keterangan7,''),
+        NULLIF(keterangan6,''),
+        NULLIF(keterangan5,''),
+        NULLIF(keterangan4,''),
+        NULLIF(keterangan3,''),
+        NULLIF(keterangan2,''),
+        NULLIF(keterangan1,'')
+    ) AS keterangan_terakhir,
+
+    -- BULAN TERAKHIR
+    CASE
+        WHEN keterangan12 IS NOT NULL AND keterangan12 <> '' THEN 12
+        WHEN keterangan11 IS NOT NULL AND keterangan11 <> '' THEN 11
+        WHEN keterangan10 IS NOT NULL AND keterangan10 <> '' THEN 10
+        WHEN keterangan9  IS NOT NULL AND keterangan9  <> '' THEN 9
+        WHEN keterangan8  IS NOT NULL AND keterangan8  <> '' THEN 8
+        WHEN keterangan7  IS NOT NULL AND keterangan7  <> '' THEN 7
+        WHEN keterangan6  IS NOT NULL AND keterangan6  <> '' THEN 6
+        WHEN keterangan5  IS NOT NULL AND keterangan5  <> '' THEN 5
+        WHEN keterangan4  IS NOT NULL AND keterangan4  <> '' THEN 4
+        WHEN keterangan3  IS NOT NULL AND keterangan3  <> '' THEN 3
+        WHEN keterangan2  IS NOT NULL AND keterangan2  <> '' THEN 2
+        WHEN keterangan1  IS NOT NULL AND keterangan1  <> '' THEN 1
+    END AS bulan_keterangan
+
 FROM kegiatan
 WHERE tahun = YEAR(CURDATE())
-HAVING persentase_realisasi < 30
+HAVING persentase_realisasi < 30;
 ";
 $result = mysqli_query($conn, $sql);
 
@@ -378,6 +414,10 @@ $qTahun = $conn->query("
     font-size: 12.5px;
     line-height: 1.35;
 }
+.td-nowrap{
+    white-space: nowrap;
+}
+
 
 
   </style>
@@ -592,7 +632,7 @@ $qTahun = $conn->query("
 
       <div class="card-body table-responsive">
         <table
-          class="table table-bordered table-striped small"
+          class="table table-bordered table-responsive table-striped small"
           data-toggle="table"
           data-search="true"
           data-pagination="true"
@@ -631,6 +671,7 @@ $qTahun = $conn->query("
 
           $target        = (float) $row['target'];
           $realisasi     = (float) $row['total_realisasi'];
+          $satuan     =  $row['satuan'];
           $sisa_target   = $target - $realisasi;
           $persen_kinerja = $target > 0 ? ($realisasi / $target) * 100 : 0;
 
@@ -653,13 +694,13 @@ $qTahun = $conn->query("
                   <i class="bi bi-info-circle text-white"></i>
               </button>
           </td>
-          <td><?= number_format($target,2) ?></td>
-          <td><?= number_format($realisasi,2) ?></td>
-          <td><?= number_format($sisa_target,2) ?></td>
+          <td class="td-nowrap"><?= number_format($target,2,',','.') . " " . $satuan ?></td>
+          <td class="td-nowrap"><?= number_format($realisasi,2,',','.') . " " . $satuan ?></td>
+          <td class="td-nowrap"><?= number_format($sisa_target,2,',','.') . " " . $satuan ?></td>
           <td><?= number_format($persen_kinerja,2) ?>%</td>
-          <td><?= number_format($pagu,2) ?></td>
-          <td><?= number_format($realisasi_ang,2) ?></td>
-          <td><?= number_format($sisa_pagu,2) ?></td>
+          <td><?= number_format($pagu) ?></td>
+          <td><?= number_format($realisasi_ang) ?></td>
+          <td><?= number_format($sisa_pagu) ?></td>
           <td><?= number_format($persen_ang,2) ?>%</td>
         </tr>
         <?php } ?>
@@ -678,7 +719,7 @@ $qTahun = $conn->query("
 
       <div class="modal-header bg-primary text-white">
         <h5 class="modal-title">
-          Daftar Kegiatan dengan Realisasi di Bawah 30%
+          Daftar Sub Kegiatan dengan Realisasi  kinerja di Bawah 30%
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -694,9 +735,10 @@ $qTahun = $conn->query("
                 <th>No</th>
                 <th>Sub Kegiatan</th>
                 <th>Urusan</th>
-                <th>Pagu Anggaran</th>
+                <th>Target  </th>
                 <th>Total Realisasi</th>
                 <th>Persentase</th>
+                <th>Keterangan</th>
               </tr>
             </thead>
             <tbody>
@@ -708,15 +750,27 @@ $qTahun = $conn->query("
                     <td><?= htmlspecialchars($row['sub_kegiatan']) ?></td>
                     <td><?= htmlspecialchars($row['bidang']) ?></td>
                     <td class="text-end">
-                      <?= number_format($row['target'], 0, ',', '.') ?>
+                      <?= number_format($row['target'], 2, ',', '.') . " " . $row['satuan'] ?>
                     </td>
                     <td class="text-end">
-                      <?= number_format($row['total_realisasi'], 0, ',', '.') ?>
+                      <?= number_format($row['total_realisasi'], 2, ',', '.') . " " . $row['satuan'] ?>
                     </td>
                     <td class="text-center">
                       <span class="badge bg-warning text-dark">
                         <?= $row['persentase_realisasi'] ?>%
                       </span>
+                    </td>
+                    <td class="text-start">
+                      <?php if( isset($row['bulan_keterangan'])): ?>
+                        <span class="fw-blod">
+                        bulan ke - <?= $row['bulan_keterangan'] ?> :
+                      </span><br>
+                      <small>
+                        <?= $row['keterangan_terakhir'] ?>
+                      </small>
+                        <?php else: ?>
+                          <span class="text-muted">Tidak ada keterangan</span>
+                        <?php endif; ?>
                     </td>
                   </tr>
                 <?php endwhile; ?>
@@ -814,75 +868,86 @@ async function openDetailKegiatan(id,tahun)
     const d = await res.json();
 
     document.getElementById("judulSubKegiatan").innerText =
-        "Sub Kegiatan : " + d.sub_kegiatan;
+      "Bidang : " + d.bidang + " | Sub Kegiatan : " + d.sub_kegiatan + " | Target : " + d.target + " " + d.satuan + " | Pagu : Rp. " + Number(d.pagu_anggaran).toLocaleString('id-ID');
 
     let html = '';
     let totalTarget = 0;
     let totalAnggaran = 0;
 
     for(let tw=1; tw<=4; tw++)
-    {
-        let ringkasan = '';
-        let bulanHTML = '';
+{
+    let ringkasan = '';
+    let bulanHTML = '';
 
-        mappingTW[tw].forEach(bln=>{
+    // TOTAL KHUSUS TRIWULAN
+    let twTarget = 0;
+    let twAnggaran = 0;
 
-            let real = parseFloat(d[`realisasi_bulan${bln}`])||0;
-            let ang  = parseFloat(d[`realisasi_anggaran_bulan${bln}`])||0;
-            let bukti = d[`bukti${bln}`] ?? '-';
-            let ket = d[`keterangan${bln}`] ?? '-';
+    // ================= HITUNG DULU =================
+    mappingTW[tw].forEach(bln=>{
+        twTarget += parseFloat(d[`realisasi_bulan${bln}`])||0;
+        twAnggaran += parseFloat(d[`realisasi_anggaran_bulan${bln}`])||0;
+    });
 
-            totalTarget += real;
-            totalAnggaran += ang;
+    totalTarget += twTarget;
+    totalAnggaran += twAnggaran;
 
-            let persen = d.target>0 ? ((totalTarget/d.target)*100).toFixed(2):'-';
-            let sisa   = (d.target-totalTarget).toFixed(2);
-            let persenA = d.pagu_anggaran>0 ? ((totalAnggaran/d.pagu_anggaran)*100).toFixed(2):'-';
-            let sisaA   = (d.pagu_anggaran-totalAnggaran).toFixed(2);
+    let persen = d.target>0 ? ((totalTarget/d.target)*100).toFixed(2):'-';
+    let sisa   = (d.target-totalTarget).toFixed(2);
+    let persenA = d.pagu_anggaran>0 ? ((totalAnggaran/d.pagu_anggaran)*100).toFixed(2):'-';
+    let sisaA   = (d.pagu_anggaran-totalAnggaran).toFixed(2);
 
-            if(bln===mappingTW[tw][0]){ // ringkasan kiri
-                ringkasan=`
-                <div class="bg-success text-white pt-3 ps-3 pb-3 pe-2 ">
-                    <div class="px-2 pb-1 border-bottom border-white fw-bold">Triwulan ${tw}</div>
-                    <ul>
-                        <li><strong>Realisasi Kinerja:</strong> ${real}</li>
-                        <li><strong>Persentase Kinerja:</strong> ${persen}%</li>
-                        <li><strong>Sisa Target:</strong> ${sisa}</li>
-                    </ul>
-                    <div class="border-bottom border-white mb-1"></div>
-                    <ul>
-                        <li><strong>Realisasi Anggaran:</strong> ${ang ? Number(ang).toLocaleString('id-ID') : '-'}</li>
-                        <li><strong>Persentase Anggaran:</strong> ${persenA}%</li>
-                        <li><strong>Sisa Anggaran:</strong> ${sisaA ? Number(sisaA).toLocaleString('id-ID') : '-'}</li>
-                    </ul>
-                </div>`;
-            }
+    // ================= RINGKASAN =================
+    ringkasan=`
+    <div class="bg-success text-white pt-3 ps-3 pb-3 pe-2 ">
+        <div class="px-2 pb-1 border-bottom border-white fw-bold">Triwulan ${tw}</div>
+        <ul>
+            <li><strong>Realisasi Kinerja:</strong> ${twTarget}</li>
+            <li><strong>Persentase Kinerja:</strong> ${persen}%</li>
+            <li><strong>Sisa Target:</strong> ${sisa}</li>
+        </ul>
+        <div class="border-bottom border-white mb-1"></div>
+        <ul>
+            <li><strong>Realisasi Anggaran:</strong> ${twAnggaran ? Number(twAnggaran).toLocaleString('id-ID') : '-'}</li>
+            <li><strong>Persentase Anggaran:</strong> ${persenA}%</li>
+            <li><strong>Sisa Anggaran:</strong> ${sisaA ? Number(sisaA).toLocaleString('id-ID') : '-'}</li>
+        </ul>
+    </div>`;
 
-            bulanHTML += `
-            <div class="tw-bulan pt-3 pe-3 pb-3">
-                <h6>${namaBulan[bln]}</h6>
-                <div class="tw-divider"></div>
-                <ul>
-                    <li><strong>Realisasi Kinerja:</strong> ${real||'-'}</li>
-                    <li><strong>Realisasi Anggaran:</strong> ${ang?ang.toLocaleString('id-ID'):'-'}</li>
-                    <li><strong>Bukti Dukung:</strong> ${
-                                bukti
-                                ? `<a href="file bukti/${bukti}" target="_blank">${bukti}</a>`
-                                : `<span class="text-muted">-</span>`
-                            }</li>
-                    <li><strong>Ket:</strong> ${ket||'-'}</li>
-                </ul>
-            </div>`;
-        });
+    // ================= DETAIL BULAN =================
+    mappingTW[tw].forEach(bln=>{
 
-        html += `
-        <div class="tw-box">
-            <div class="tw-grid">
-                ${ringkasan}
-                ${bulanHTML}
-            </div>
+        let real = parseFloat(d[`realisasi_bulan${bln}`])||0;
+        let ang  = parseFloat(d[`realisasi_anggaran_bulan${bln}`])||0;
+        let bukti = d[`bukti${bln}`] ?? '-';
+        let ket = d[`keterangan${bln}`] ?? '-';
+
+        bulanHTML += `
+        <div class="tw-bulan pt-3 pe-3 pb-3">
+            <h6>${namaBulan[bln]}</h6>
+            <div class="tw-divider"></div>
+            <ul>
+                <li><strong>Realisasi Kinerja:</strong> ${real||'-'}</li>
+                <li><strong>Realisasi Anggaran:</strong> ${ang?ang.toLocaleString('id-ID'):'-'}</li>
+                <li><strong>Bukti Dukung:</strong> ${
+                            bukti
+                            ? `<a href="file bukti/${bukti}" target="_blank">${bukti}</a>`
+                            : `<span class="text-muted">-</span>`
+                        }</li>
+                <li><strong>Ket:</strong> ${ket||'-'}</li>
+            </ul>
         </div>`;
-    }
+    });
+
+    html += `
+    <div class="tw-box">
+        <div class="tw-grid">
+            ${ringkasan}
+            ${bulanHTML}
+        </div>
+    </div>`;
+}
+
 
     document.getElementById("isiDetailKegiatan").innerHTML = html;
     new bootstrap.Modal(document.getElementById('modalDetailKegiatan')).show();

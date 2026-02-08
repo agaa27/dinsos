@@ -520,6 +520,7 @@ body {
                             name="keterangan"
                             class="form-control"
                             rows="3"
+                            placeholder="jika tidak ada keterangan tertentu atau kendala, kosongkan saja!"
                         ><?= htmlspecialchars($data["keterangan{$bulan}"] ?? '') ?></textarea>
                     </div>
 

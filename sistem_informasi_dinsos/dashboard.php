@@ -312,6 +312,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
 }
 
 
+
 .undangan-text p {
   margin-bottom: 6px;
   font-size: 15px;
@@ -424,7 +425,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
             </h5>
             <small class="text-muted" style="font-size: 12px;">
                 <?= $row_anggaran_used['jumlah_sub_kegiatan_0_persen'] ?? '-' ?>
-            di bidang <?= $row_anggaran_used['bidang'] ?? '-' ?>
+            data di <?= $row_anggaran_used['bidang'] ?? '-' ?>
             </small>
           </div>
         </div>
@@ -530,20 +531,30 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                     </h6>
                     <h6><strong>Lokasi :</strong> <?= htmlspecialchars($row['tempat']); ?></h6>
                     <h6><strong>Mengundang :</strong> <?= htmlspecialchars($row['pihak_mengundang']); ?></h6>
-                    <h6>
-                        <strong>Bidang Terkait :</strong>
-                        <?= htmlspecialchars($row['bidang_terkait']); ?>
-                    </h6>
+                    <div class="d-flex">
+                      <h6><strong>Pihak terkait :</strong></h6>
+
+                      <?php
+                      $bidangList = array_filter(array_map('trim', explode(',', $row['bidang_terkait'])));
+                      ?>
+
+                      <ul class="bidang-list">
+                        <?php foreach ($bidangList as $bidang): ?>
+                          <li><?= htmlspecialchars($bidang); ?></li>
+                        <?php endforeach; ?>
+                      </ul>
+                    </div>
+
                     <h6>
                       <strong>Menghadiri :</strong>
                       <?= !empty($row['menghadiri']) ? htmlspecialchars($row['menghadiri']) : '-' ?>
                     </h6>
                     <?php if ($row['status_kegiatan'] == 'Terlaksana'): ?>
-<h6>
-  <strong>Delegasi :</strong>
-  <?= !empty($row['delegasi']) ? htmlspecialchars($row['delegasi']) : '-' ?>
-</h6>
-<?php endif; ?>
+                    <h6>
+                      <strong>Delegasi :</strong>
+                      <?= !empty($row['delegasi']) ? htmlspecialchars($row['delegasi']) : '-' ?>
+                    </h6>
+                    <?php endif; ?>
 
 
                   </div>
@@ -694,7 +705,7 @@ $row_total_undangan = mysqli_fetch_assoc($result_total_undangan);
                           <th>Waktu</th>
                           <th>Tempat</th>
                           <th>Pihak Yang Mengundang</th>
-                          <th>Bidang Yang Terkait</th>
+                          <th>Pihak Yang Terkait</th>
                           <th>menghadiri</th>
                           <th>Status</th>
                       </tr>

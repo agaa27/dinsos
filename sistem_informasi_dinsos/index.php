@@ -52,7 +52,7 @@ if (isset($_POST['submit'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/image/dinsos_logo.png">
-  <title>Login - Sistem Informasi Dinsos Kota Tarakan</title>
+  <title>Login - SIPEKA</title>
     
   <link rel="stylesheet" href="assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/bootstrap-icons/bootstrap-icons.css">
@@ -291,8 +291,8 @@ if (isset($_POST['submit'])) {
     <div class="login-container">
         <!-- Bagian Kiri: Informasi Sistem -->
         <div class="login-left">
-            <h1>Sistem Informasi Dinsos Tarakan</h1>
-            <p>Sistem terintegrasi untuk pengelolaan laporan dan kegiatan Dinas Sosial & Pemberdayaan Masyarakat Kota Tarakan</p>
+            <h1 class="border-bottom">SIPEKA</h1>
+            <p>Sistem Informasi Pelaporan Kegiatan & Anggaran Dinas Sosial & Pemberdayaan Masyarakat Kota Tarakan</p>
             
             <ul class="features">
                 <li><i class="bi bi-check fs-2"></i> Manajemen Laporan</li>
